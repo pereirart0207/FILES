@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUNCTO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            font-weight: bold;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            font-size: 1.2rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+
+        .card h3 i {
+            margin-right: 10px;
+            font-size: 1.4rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .btn-danger {
+            background-color: #f44336;
+        }
+
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 6px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-header {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-footer {
+            text-align: right;
+        }
+
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .modal-body input {
+            font-size: 1rem;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+
+        .modal-body label {
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .button-container .btn {
+            width: 48%;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 40px;
+        }
+        #logo{
+            width: 200px;
+            height: auto;
+
+        }
+        #image-container{
+            text-align: center;
+            align-content: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* Estilo base para las etiquetas */
+label {
+    font-size: 16px;
+    color: #333;
+    display: inline-block;
+    margin-right: 20px;
+    cursor: pointer;
+}
+
+
+/* Estilo base para el contenedor */
+.radio-group {
+    display: flex;
+    gap: 20px;
+}
+
+/* Estilo del contenedor de cada radio button */
+.radio-container {
+    position: relative;
+    display: inline-block;
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    padding-left: 35px;
+    user-select: none; /* Evita la selección de texto */
+}
+
+/* Ocultar el radio button original */
+.radio-container input[type="radio"] {
+    display: none;
+}
+
+/* Estilo del botón de radio personalizado */
+.radio-btn {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid #007bff;
+    background-color: #fff;
+    transition: all 0.3s ease;
+}
+
+/* Estilo cuando el radio button está seleccionado */
+.radio-container input[type="radio"]:checked + .radio-btn {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.radio-container input[type="radio"]:checked + .radio-btn::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: white;
+}
+
+/* Efecto al pasar el ratón por encima del radio button */
+.radio-container:hover .radio-btn {
+    border-color: #0056b3;
+}
+
+/* Efecto cuando el radio button está en foco */
+.radio-container input[type="radio"]:focus + .radio-btn {
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+
+
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!--<h1><i class="fas fa-file-invoice"></i> Factura</h1>
+-->
+    <div id="image-container">
+        <img id="logo" src="https://raw.githubusercontent.com/pereirart0207/FILES/main/PUNCTO_LOGO.png" alt="LOGO">
+    </div>
+    
+
+
+    <div class="radio-group">
+        <label class="radio-container">
+            <input type="radio" name="documentType" value="presupuesto" id="presupuesto">
+            <span class="radio-btn"></span>
+            Presupuesto
+        </label>
+        <label class="radio-container">
+            <input type="radio" checked name="documentType" value="factura" id="factura">
+            <span class="radio-btn"></span>
+            Factura
+        </label>
+    </div>
+
+
+    <br>
+    
+    <!-- Datos del Vendedor -->
+    <div class="card" id="seller-card">
+        <h3><i class="fas fa-store"></i> Datos del Vendedor</h3>
+        <p><strong>Nombre:</strong> <span id="seller-name">ANTONIO PEREIRA ROSALES</span></p>
+        <p><strong>Dirección:</strong> <span id="seller-address">Vereda del Alquitón, 9, Arganda Del Rey, Madrid</span></p>
+        <p><strong>Teléfono:</strong> <span id="seller-phone">640968219</span></p>
+        <p><strong>Email:</strong> <span id="seller-email">punctoapp@gmail.com</span></p>
+        <p><strong>CIF:</strong> <span id="seller-cif">04737671Q</span></p>
+        <button class="btn btn-primary" onclick="openModal('seller')"><i class="fas fa-edit"></i> Modificar Vendedor</button>
+    </div>
+
+    <!-- Datos del Comprador -->
+    <div class="card" id="buyer-card" style="display:none;">
+        <h3><i class="fas fa-user"></i> Datos del Comprador</h3>
+        <p><strong>Nombre:</strong> <span id="buyer-name"></span></p>
+        <p><strong>Dirección:</strong> <span id="buyer-address"></span></p>
+        <p><strong>Email:</strong> <span id="buyer-email"></span></p>
+        <p><strong>Teléfono:</strong> <span id="buyer-phone"></span></p>
+        <p><strong>CIF:</strong> <span id="buyer-cif"></span></p>
+    </div>
+
+    <!-- Botón para Agregar Comprador -->
+    <div class="button-container">
+        <button class="btn btn-primary" onclick="openModal('buyer')"><i class="fas fa-user-plus"></i> Agregar Comprador</button>
+        <button class="btn btn-primary" onclick="openArticleModal()"><i class="fas fa-plus-circle"></i> Agregar Artículo</button>
+    </div>
+
+    <!-- Tabla de Artículos -->
+    <h3><i class="fas fa-box-open"></i> Artículos</h3>
+    <table id="items-table">
+        <thead>
+            <tr>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Total</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="items-body">
+            <!-- Los artículos se agregarán aquí -->
+        </tbody>
+    </table>
+
+    <!-- Totales de la Factura -->
+    <div class="section">
+        <p><strong>Subtotal:</strong> <span id="subtotal">0.00</span></p>
+        <p><strong>Impuestos (21%):</strong> <span id="taxes">0.00</span></p>
+        <p><strong>Total:</strong> <span id="total">0.00</span></p>
+    </div>
+
+    <!-- Botón para generar PDF -->
+    <div class="button-container">
+        <button onclick="downloadPDF()" class="btn"><i class="fas fa-download"></i> Descargar PDF</button>
+    </div>
+</div>
+
+<!-- Modal para editar los datos -->
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <div class="modal-header">
+            <h2 id="modal-header"><i class="fas fa-edit"></i> Editar Datos</h2>
+        </div>
+        <div id="modal-body">
+            <!-- Formulario que se actualizará dinámicamente -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn" onclick="saveData()"><i class="fas fa-save"></i> Guardar Datos</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para agregar artículos -->
+<div id="article-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeArticleModal()">&times;</span>
+        <div class="modal-header">
+            <h2><i class="fas fa-box"></i> Agregar Artículo</h2>
+        </div>
+        <div id="article-modal-body" class="modal-body">
+            <label for="item-description">Descripción:</label>
+            <input type="text" id="item-description" class="input-field" placeholder="Descripción del artículo">
+
+            <label for="item-quantity">Cantidad:</label>
+            <input type="number" id="item-quantity" class="input-field" value="1" placeholder="Cantidad">
+
+            <label for="item-price">Precio Unitario (€):</label>
+            <input type="number" id="item-price" class="input-field" placeholder="Precio Unitario">
+
+            <button class="btn btn-primary" onclick="addItem()"><i class="fas fa-plus-circle"></i> Agregar Artículo</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.16/jspdf.plugin.autotable.min.js"></script>
+<script>
+    // Inicialización de variables
+    let items = [];
+
+    // Abrir el modal de edición (vendedor o comprador)
+    function openModal(type) {
+        const modal = document.getElementById("edit-modal");
+        const modalBody = document.getElementById("modal-body");
+        const header = document.getElementById("modal-header");
+
+        modal.style.display = "block";
+        modalBody.innerHTML = `
+            <label for="name">${type === 'seller' ? 'Nombre del Vendedor' : 'Nombre del Comprador'}:</label>
+            <input type="text" id="name" class="input-field" placeholder="Nombre">
+            
+            <label for="address">Dirección:</label>
+            <input type="text" id="address" class="input-field" placeholder="Dirección">
+            
+            <label for="phone">Teléfono:</label>
+            <input type="text" id="phone" class="input-field" placeholder="Teléfono">
+            
+            <label for="email">Email:</label>
+            <input type="email" id="email" class="input-field" placeholder="Email">
+            
+            <label for="cif">CIF/NIF:</label>
+            <input type="text" id="cif" class="input-field" placeholder="CIF/NIF">
+        `;
+        if (type === 'seller') {
+            document.getElementById("name").value = document.getElementById("seller-name").innerText;
+            document.getElementById("address").value = document.getElementById("seller-address").innerText;
+            document.getElementById("phone").value = document.getElementById("seller-phone").innerText;
+            document.getElementById("email").value = document.getElementById("seller-email").innerText;
+            document.getElementById("cif").value = document.getElementById("seller-cif").innerText;
+        } else {
+            document.getElementById("name").value = '';
+            document.getElementById("address").value = '';
+            document.getElementById("phone").value = '';
+            document.getElementById("email").value = '';
+            document.getElementById("cif").value = '';
+        }
+    }
+
+    // Cerrar el modal
+    function closeModal() {
+        const modal = document.getElementById("edit-modal");
+        modal.style.display = "none";
+    }
+
+    // Guardar los datos
+    function saveData() {
+        const name = document.getElementById("name").value;
+        const address = document.getElementById("address").value;
+        const phone = document.getElementById("phone").value;
+        const email = document.getElementById("email").value;
+        const cif = document.getElementById("cif").value;
+
+        if (document.getElementById("modal-header").innerText.includes("Vendedor")) {
+            document.getElementById("seller-name").innerText = name;
+            document.getElementById("seller-address").innerText = address;
+            document.getElementById("seller-phone").innerText = phone;
+            document.getElementById("seller-email").innerText = email;
+            document.getElementById("seller-cif").innerText = cif;
+        } else {
+            document.getElementById("buyer-name").innerText = name;
+            document.getElementById("buyer-address").innerText = address;
+            document.getElementById("buyer-phone").innerText = phone;
+            document.getElementById("buyer-email").innerText = email;
+            document.getElementById("buyer-cif").innerText = cif;
+            document.getElementById("buyer-card").style.display = "block";
+        }
+
+        closeModal();
+    }
+
+    // Abrir modal para agregar artículo
+    function openArticleModal() {
+        const modal = document.getElementById("article-modal");
+        modal.style.display = "block";
+    }
+
+    // Cerrar el modal de artículo
+    function closeArticleModal() {
+        const modal = document.getElementById("article-modal");
+        modal.style.display = "none";
+    }
+
+    // Agregar artículo a la tabla
+    function addItem() {
+        const description = document.getElementById("item-description").value;
+        const quantity = parseFloat(document.getElementById("item-quantity").value);
+        const price = parseFloat(document.getElementById("item-price").value);
+        const total = quantity * price;
+
+        items.push({ description, quantity, price, total });
+
+        // Actualizar tabla
+        const tbody = document.getElementById("items-body");
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${description}</td>
+            <td>${quantity}</td>
+            <td>${price.toFixed(2)}</td>
+            <td>${total.toFixed(2)}</td>
+            <td><button class="btn btn-danger" onclick="removeItem(${items.length - 1})"><i class="fas fa-trash-alt"></i> Eliminar</button></td>
+        `;
+        tbody.appendChild(row);
+
+        // Actualizar totales
+        updateTotals();
+
+        closeArticleModal();
+    }
+
+    // Eliminar artículo
+    function removeItem(index) {
+        items.splice(index, 1);
+        updateItemsTable();
+        updateTotals();
+    }
+
+    // Actualizar la tabla de artículos
+    function updateItemsTable() {
+        const tbody = document.getElementById("items-body");
+        tbody.innerHTML = "";
+
+        items.forEach((item, index) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${item.description}</td>
+                <td>${item.quantity}</td>
+                <td>${item.price.toFixed(2)}</td>
+                <td>${item.total.toFixed(2)}</td>
+                <td><button class="btn btn-danger" onclick="removeItem(${index})"><i class="fas fa-trash-alt"></i> Eliminar</button></td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function generateRandomNumber() {
+    let randomNumber = '';
+    for (let i = 0; i < 15; i++) {
+        randomNumber += Math.floor(Math.random() * 10); // Generate a random digit between 0 and 9
+    }
+    return randomNumber;
+    }
+    // Actualizar los totales de la factura
+    function updateTotals() {
+        let subtotal = 0;
+        items.forEach(item => {
+            subtotal += item.total;
+        });
+
+        const taxes = subtotal * 0.21;
+        const total = subtotal + taxes;
+
+        document.getElementById("subtotal").innerText = subtotal.toFixed(2);
+        document.getElementById("taxes").innerText = taxes.toFixed(2);
+        document.getElementById("total").innerText = total.toFixed(2);
+    }
+
+    function downloadPDF() {
+        const { jsPDF } = window.jspdf; // Accedemos al objeto jsPDF desde la librería
+        const doc = new jsPDF('p', 'mm', 'a4'); // Crea un nuevo documento PDF en formato A4
+        
+        // Establecer la fuente predeterminada
+        doc.setFont('courier'); // Usamos la fuente Courier para darle estilo pixelado
+        doc.setFontSize(22);
+        
+        doc.text('PUNCTO.', 105, 20, null, null, 'center');
+        doc.setFont('courier');
+        doc.setFontSize(10);
+        doc.text('Factura ' + generateRandomNumber(), 105, 25, null, null, 'center');
+
+
+
+
+        // Datos del Vendedor
+        doc.setFontSize(12);
+        doc.setFont('courier', 'bold');
+        doc.text(document.getElementById("seller-name").innerText.toUpperCase(), 10, 45);
+        doc.setFont('courier', 'normal');
+        doc.text(`Dirección : ${document.getElementById("seller-address").innerText}`, 10, 50);
+        doc.text(`TEL       : ${document.getElementById("seller-phone").innerText}`, 10, 55);
+        doc.text(`Email     : ${document.getElementById("seller-email").innerText}`, 10, 60);
+        doc.text(`CIF       : ${document.getElementById("seller-cif").innerText}`, 10, 65);
+        
+
+        // Datos del Comprador (si existe)
+        if (document.getElementById("buyer-name").innerText) {
+            doc.setFontSize(14);
+            doc.text('FACTURADO A:', 10, 80);
+            doc.setFontSize(12);
+            doc.setFont('courier', 'bold');
+            doc.text(document.getElementById("buyer-name").innerText.toLocaleUpperCase(), 10, 85);
+            doc.setFont('courier', 'normal');
+            doc.text(`Dirección : ${document.getElementById("buyer-address").innerText}`, 10, 90);
+            doc.text(`TEL       : ${document.getElementById("buyer-phone").innerText}`, 10, 95);
+            doc.text(`Email     : ${document.getElementById("buyer-email").innerText}`, 10, 100);
+            doc.text(`CIF       : ${document.getElementById("buyer-cif").innerText}`, 10, 105);
+        }
+
+        // Recuperamos los datos de los artículos desde la tabla
+        const items = [];
+        const rows = document.querySelectorAll('#items-body tr');
+        
+        rows.forEach(row => {
+            const description = row.cells[0].innerText;
+            const quantity = row.cells[1].innerText;
+            const price = row.cells[2].innerText;
+            const total = row.cells[3].innerText;
+            items.push({ description, quantity, price, total });
+        });
+
+        const tableColumn = ['Descripción', 'Cantidad', 'Precio Unitario (€)', 'Total (€)'];
+        doc.autoTable({
+            head: [tableColumn],
+            body: items.map(item => [
+                item.description, 
+                item.quantity, 
+                item.price, 
+                item.total
+            ]),
+            startY: 130,
+            theme: 'grid', // Añade bordes a las celdas
+            headStyles: { fillColor: [200, 200, 200] }, // Estilo de los encabezados
+            bodyStyles: { fontSize: 10 }
+        });
+
+        // Totales de la Factura
+        const totalStartY = doc.lastAutoTable.finalY + 10; // Ubica la tabla después de la tabla de artículos
+        const totals = [
+            { label: 'Subtotal', value: document.getElementById("subtotal").innerText },
+            { label: 'Impuestos (21%)', value: document.getElementById("taxes").innerText },
+            { label: 'Total', value: document.getElementById("total").innerText }
+        ];
+
+        // Dibuja la tabla de Totales a la derecha
+        const marginRight = 10;  // Margen desde el borde derecho
+        const pageWidth = doc.internal.pageSize.width;
+        const tableWidth = 80; // Ancho de la tabla de totales
+        const marginLeft = pageWidth - tableWidth - marginRight;
+
+        doc.autoTable({
+            head: [['Descripción', 'Cantidad']],
+            body: totals.map(total => [total.label, `${total.value} €`]),
+            startY: totalStartY,
+            theme: 'grid',
+            headStyles: { fillColor: [200, 200, 200] }, // Color de los encabezados
+            bodyStyles: { fontSize: 12 },
+            margin: { left: marginLeft }, // Alinea la tabla a la derecha
+            columnStyles: {
+                0: { cellWidth: 'auto' },
+                1: { cellWidth: 'auto' }
+            }
+        });
+
+        // Guardar el documento PDF
+        doc.save('factura_jialichuang.pdf');
+    }
+
+</script>
+
+</body>
+</html>
