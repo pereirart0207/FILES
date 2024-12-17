@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PunctoNet - Generador de UUID y QR WiFi</title>
+    
+    <!-- Incluir Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Incluir Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        /* Reset General */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f7f7f7;
+            color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        /* Contenedor Principal */
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        button {
+            padding: 14px 30px;
+            background-color: #32be9d;
+            color: white;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        button:hover {
+            background-color: #28a079;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button i {
+            margin-right: 8px;
+        }
+
+        /* Contenido del resultado */
+        #output {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        #output p {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #34495e;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #qrCanvas {
+            margin-top: 30px;
+            border-radius: 8px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            opacity: 0.8;
+        }
+
+        /* Estilos Responsivos */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            #output {
+                padding: 15px;
+            }
+
+            button {
+                padding: 12px 20px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            #output {
+                padding: 10px;
+            }
+
+            button {
+                width: 100%;
+                padding: 12px;
+                font-size: 1rem;
+            }
+        }
+
+        .copy-icon {
+            cursor: pointer;
+            color: #32be9d;
+            transition: color 0.3s ease;
+        }
+
+        /* Animación para cambiar color temporalmente */
+        .copied {
+            color: #f39c12; /* Color dorado */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>PunctoNet</h1>
+
+        <div class="buttons-container">
+            <!-- Botón Generar -->
+            <button onclick="generate()">
+                <i class="fas fa-sync-alt"></i> Generar
+            </button>
+
+            <!-- Botón Descargar PDF -->
+            <button onclick="downloadPDF()">
+                <i class="fas fa-download"></i> Descargar PDF
+            </button>
+        </div>
+
+        <div id="output">
+            <p><i class="fas fa-wifi"></i> <span id="wifiName">---</span> <i class="fas fa-copy copy-icon" onclick="copyToClipboard('wifiName')"></i></p>
+            <p><i class="fas fa-key"></i> <span id="wifiPassword">---</span> <i class="fas fa-copy copy-icon" onclick="copyToClipboard('wifiPassword')"></i></p>
+        </div>
+
+        <canvas id="qrCanvas"></canvas>
+
+        <footer>&copy; 2024 PunctoDevices</footer>
+    </div>
+
+    <script>
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                const r = (Math.random() * 16) | 0;
+                const v = c === 'x' ? r : (r & 0x3) | 0x8;
+                return v.toString(16);
+            });
+        }
+
+        function generateRandomNumber() {
+            return Math.floor(1000000 + Math.random() * 9000000);
+        }
+        var wifiName;
+        function generate() {
+            var uuid = generateUUID();
+            const randomNumber = generateRandomNumber();
+            wifiName = `Puncto-${randomNumber}`;
+            const wifiPassword = uuid;
+
+            // Mostrar en pantalla
+            document.getElementById("wifiName").innerText = wifiName;
+            document.getElementById("wifiPassword").innerText = wifiPassword;
+
+            // Generar QR
+            const qr = new QRious({
+                element: document.getElementById("qrCanvas"),
+                size: 250,
+                value: `WIFI:S:${wifiName};T:WPA;P:${wifiPassword};;`
+            });
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Establecer tamaño de página basado en las dimensiones del QR
+            const qrSizeMM = 23;  // Tamaño de la etiqueta QR en milímetros
+            const qrSizePX = qrSizeMM * 3.77953;  // Convertir milímetros a píxeles (1 mm = 3.77953 px)
+
+            // Crear la página con el tamaño exacto para el QR sin agregar páginas adicionales
+            doc.setPage(1);
+            doc.internal.pageSize.width = qrSizePX;
+            doc.internal.pageSize.height = qrSizePX;
+
+            // Generar el QR
+            const qr = document.getElementById("qrCanvas");
+            const qrDataUrl = qr.toDataURL();
+
+            // Añadir el QR al PDF
+            const offset = (qrSizePX - qrSizePX) / 2;  // Centrado
+            doc.addImage(qrDataUrl, 'PNG', offset, offset, qrSizePX, qrSizePX);
+
+            // Descargar el PDF
+            doc.save(wifiName.toString() + "-wifi.pdf");
+        }
+
+        // Función para copiar al portapapeles
+        function copyToClipboard(id) {
+            var text = document.getElementById(id).innerText;
+            var textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            // Cambiar color del icono por 5 segundos
+            var icon = event.target;
+            icon.classList.add('copied');
+            setTimeout(function() {
+                icon.classList.remove('copied');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
