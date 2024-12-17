@@ -596,12 +596,13 @@ label {
         const month = date.getMonth() + 1;
         const year = date.getFullYear();
         const fecha = day + "/" + month + "/" + year;
-
+        var checkbox = document.getElementById("factura");
+        var rnumber = generateRandomNumber();
 
         doc.text('PUNCTO.', 105, 20, null, null, 'center');
         doc.setFont('courier');
         doc.setFontSize(10);
-        doc.text('Factura ' + generateRandomNumber(), 105, 25, null, null, 'center');
+        doc.text((checkbox.checked ? 'Factura ': 'Presupuesto ') + rnumber.toString(), 105, 25, null, null, 'center');
         doc.text('Fecha de emisión: ' +fecha, 105, 30, null, null, 'center');
 
 
@@ -687,7 +688,7 @@ label {
         });
 
         // Guardar el documento PDF
-        doc.save('factura_jialichuang.pdf');
+        doc.save( (checkbox.checked?'Factura_':'Presupuesto_') + rnumber.toString() + '.pdf');
     }
 
 </script>
