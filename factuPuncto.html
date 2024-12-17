@@ -371,6 +371,7 @@ label {
     <!-- Botón para generar PDF -->
     <div class="button-container">
         <button onclick="downloadPDF()" class="btn"><i class="fas fa-download"></i> Descargar PDF</button>
+       <button class="btn btn-danger" onclick="redirectTo('qr.html')"><i class="fas fa-qrcode"></i> Preparar QR</button>
     </div>
 </div>
 
@@ -408,8 +409,11 @@ label {
             <input type="number" id="item-price" class="input-field" placeholder="Precio Unitario">
 
             <button class="btn btn-primary" onclick="addItem()"><i class="fas fa-plus-circle"></i> Agregar Artículo</button>
+            
         </div>
+        
     </div>
+    
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -418,6 +422,9 @@ label {
     // Inicialización de variables
     let items = [];
 
+    function redirectTo(url) {
+    window.location.href = url;
+}
     // Abrir el modal de edición (vendedor o comprador)
     function openModal(type) {
         const modal = document.getElementById("edit-modal");
@@ -582,11 +589,20 @@ label {
         doc.setFont('courier'); // Usamos la fuente Courier para darle estilo pixelado
         doc.setFontSize(22);
         
+
+
+        const date= new Date();
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        const fecha = day + "/" + month + "/" + year;
+
+
         doc.text('PUNCTO.', 105, 20, null, null, 'center');
         doc.setFont('courier');
         doc.setFontSize(10);
         doc.text('Factura ' + generateRandomNumber(), 105, 25, null, null, 'center');
-
+        doc.text('Fecha de emisión: ' +fecha, 105, 30, null, null, 'center');
 
 
 
@@ -604,15 +620,15 @@ label {
         // Datos del Comprador (si existe)
         if (document.getElementById("buyer-name").innerText) {
             doc.setFontSize(14);
-            doc.text('FACTURADO A:', 10, 80);
+           // doc.text(, 10, 80);
             doc.setFontSize(12);
             doc.setFont('courier', 'bold');
-            doc.text(document.getElementById("buyer-name").innerText.toLocaleUpperCase(), 10, 85);
+            doc.text('FACTURADO A: ' + document.getElementById("buyer-name").innerText.toLocaleUpperCase(), 10, 80);
             doc.setFont('courier', 'normal');
-            doc.text(`Dirección : ${document.getElementById("buyer-address").innerText}`, 10, 90);
-            doc.text(`TEL       : ${document.getElementById("buyer-phone").innerText}`, 10, 95);
-            doc.text(`Email     : ${document.getElementById("buyer-email").innerText}`, 10, 100);
-            doc.text(`CIF       : ${document.getElementById("buyer-cif").innerText}`, 10, 105);
+            doc.text(`Dirección : ${document.getElementById("buyer-address").innerText}`, 10, 85);
+            doc.text(`TEL       : ${document.getElementById("buyer-phone").innerText}`, 10, 90);
+            doc.text(`Email     : ${document.getElementById("buyer-email").innerText}`, 10, 95);
+            doc.text(`CIF       : ${document.getElementById("buyer-cif").innerText}`, 10, 100);
         }
 
         // Recuperamos los datos de los artículos desde la tabla
