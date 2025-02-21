@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function checkDevice(ip) {
     const url = `http://${ip}/ispuncto`;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1500); // Tiempo de espera de 5 segundos
+    const timeoutId = setTimeout(() => controller.abort(), 2000); // Tiempo de espera de 5 segundos
 
     try {
       const response = await fetch(url, {
