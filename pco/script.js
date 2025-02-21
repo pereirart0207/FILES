@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const devices = [];
     const baseIP = subnet.split(".").slice(0, 3).join(".") + ".";
     const promises = [];
-    const maxConcurrentRequests = 50; // Límite de solicitudes concurrentes
+    const maxConcurrentRequests = 15; // Límite de solicitudes concurrentes
 
     for (let i = 1; i < 255; i++) {
       const ip = `${baseIP}${i}`;
