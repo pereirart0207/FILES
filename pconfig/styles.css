@@ -1,0 +1,232 @@
+* {
+    box-sizing: border-box; /* Asegura que el padding y border se incluyan en el ancho y alto de los elementos */
+}
+
+body {
+    font-family: Arial, sans-serif; /* Fuente más estándar y seria */
+    background-color: #181818; /* Color de fondo oscuro */
+    color: #f0f0f0; /* Color de texto claro */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.header {
+    background-color: #ffffff; /* Fondo del encabezado */
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Sombra ligera */
+}
+
+.title {
+    font-size: 2rem; /* Tamaño de fuente más grande */
+    color: #000000; /* Texto en negro */
+    margin: 0; /* Eliminar margen */
+    font-family: 'Press Start 2P', cursive;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+    width: 100%;
+    max-width: 600px; /* Máximo ancho para el contenedor */
+}
+
+.input-container {
+    margin-left: 10px;
+    margin-right: 10px;
+    display: flex; /* Usar flexbox para alinear el input y el botón */
+    justify-content: center; /* Centrar horizontalmente */
+    align-items: center; /* Alinear verticalmente */
+    gap: 10px; /* Espaciado entre el input y el botón */
+    width: 90vw; /* Ancho completo */
+}
+
+input[type="text"] {
+    padding: 12px;
+    border: 2px solid #dcdcdc; /* Bordes destacados en gris claro */
+    border-radius: 5px;
+    width: 250px; /* Ancho fijo para el input */
+    max-width: 100%;
+    font-size: 1rem;
+    background-color: #2a2a2a; /* Color de fondo del input oscuro */
+    color: #f0f0f0; /* Color del texto claro */
+    transition: border-color 0.3s; /* Transición en el borde */
+}
+
+input[type="text"]::placeholder {
+    color: #aaa; /* Color del placeholder */
+}
+
+input[type="text"]:focus {
+    border-color: #cccccc; /* Color del borde al hacer foco */
+    outline: none; /* Quitar el contorno predeterminado */
+}
+
+button {
+    background-color: #dcdcdc; /* Color de fondo del botón */
+    border: none;
+    border-radius: 5px;
+    color: #000000; /* Texto en negro */
+    font-size: 1rem;
+    padding: 12px 12px; /* Ajustar el padding para que sea más compacto */
+    cursor: pointer;
+    transition: background-color 0.3s; /* Añadir transición al background */
+}
+
+.tips-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 400px;
+    background-color: rgba(50, 50, 50, 0.85); /* Fondo oscuro semi-transparente */
+    color: #ffffff;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+/* Clase para mostrar el consejo */
+.tips-container.show {
+    opacity: 1;
+}
+
+ .notification.good{
+    background-color: aquamarine;
+    color: #000000;
+ }
+ .notification.bad{
+    background-color: rgba(255, 0, 0, 0.3); /* Color rojo con más transparencia */
+    color: #ffffff; /* Texto en blanco */
+ }
+
+.notification {
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100vw - 40px); /* Asegura que no toque los bordes */
+    max-width: 400px; /* Límite para pantallas grandes */
+    border: 1px solid rgba(255, 200, 200, 0.7); /* Borde rojo suave */
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Sombra ligera */
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+/* Clase para mostrar la notificación */
+.notification.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.key.clear{
+    background-color: #d9534f;
+}
+
+button:hover {
+    background-color: #c0c0c0; /* Color del botón al pasar el mouse */
+}
+
+.keyboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px; /* Espaciado entre teclas */
+    margin: 20px 0;
+}
+
+.key {
+    background-color: #b0b0b0; /* Color de fondo de las teclas en gris */
+    border: none;
+    border-radius: 5px;
+    color: #000000; /* Texto en negro */
+    font-size: 2rem;
+    padding: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s; /* Añadir transición al background */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Sombra para las teclas */
+}
+
+.key:hover {
+    background-color: #a0a0a0; /* Color de las teclas al pasar el mouse */
+}
+
+.number-display {
+    position: absolute;
+    top: 20%; /* Ajustar posición superior */
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Press Start 2P', cursive; /* Mantener fuente arcade para el display */
+    font-size: 4rem; /* Tamaño más grande para los números */
+    color: rgba(240, 240, 240, 0.5); /* Semi-transparente */
+    pointer-events: none; /* Ignorar eventos para que no interfiera con el teclado */
+    white-space: nowrap; /* Evitar que se rompa el texto */
+}
+
+.feedback {
+    margin-top: 20px;
+    font-size: 1.2rem;
+    color: #d9534f; /* Color rojo para feedback */
+}
+
+.device-list {
+    margin: 20px;
+    width: 80vw; /* Ancho completo para la lista de dispositivos */
+    align-content: center;
+}
+
+.device {
+    background-color: #b0b0b0; /* Color de fondo de los dispositivos */
+    color: #000000; /* Texto en negro */
+    padding: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 5px 0;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s; /* Transición para el fondo */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Sombra para la lista de dispositivos */
+    
+}
+
+.device i {
+    margin-right: 10px; /* Espaciado entre el icono y el texto */
+}
+
+.function{
+    background-color: #f0f0f0;
+}
+
+.device:hover {
+    background-color: #a0a0a0; /* Color de fondo al pasar el mouse */
+}
+
+.spinner {
+    border: 8px solid rgba(255, 255, 255, 0.1);
+    border-top: 8px solid #b0b0b0; /* Color gris para el spinner */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite; /* Animación del spinner */
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

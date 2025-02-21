@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Teclado Numérico - Puncto</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="header">
+      <h1 class="title">PUNCTO.</h1>
+    </header>
+    <div class="container">
+      <div class="input-container">
+        <input
+          type="text"
+          id="subnetInput"
+          value="192.168.1.0/24"
+          placeholder="Ingrese la subred"
+        />
+        <button id="scanButton"><i class="fas fa-search"></i></button>
+      </div>
+      <div id="spinner" class="spinner" style="display: none"></div>
+      <div id="deviceList" class="device-list"></div>
+      <div class="tips-container"></div>
+      <div id="keyboardContainer" style="display: none">
+        <div class="number-display" id="numberDisplay"></div>
+        <form id="numberForm" action="" method="POST">
+          <div class="keyboard">
+            <input type="button" class="key" data-value="1" value="1" />
+            <input type="button" class="key" data-value="2" value="2" />
+            <input type="button" class="key" data-value="3" value="3" />
+            <input type="button" class="key" data-value="4" value="4" />
+            <input type="button" class="key" data-value="5" value="5" />
+            <input type="button" class="key" data-value="6" value="6" />
+            <input type="button" class="key" data-value="7" value="7" />
+            <input type="button" class="key" data-value="8" value="8" />
+            <input type="button" class="key" data-value="9" value="9" />
+            <input
+              id="clearbtn"
+              type="button"
+              class="key clear"
+              value="C"
+            />
+            <input type="button" class="key" data-value="0" value="0" />
+            <button type="submit" class="key function">
+              <i class="fa-solid fa-paper-plane"></i>
+            </button>
+          </div>
+          <input type="hidden" name="number" id="numberInput" />
+        </form>
+        <div id="feedback" class="feedback"></div>
+      </div>
+    </div>
+    <div class="notification" id="notification"></div>
+    <script>
+
+
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const keys = document.querySelectorAll(".key");
+        const numberInput = document.getElementById("numberInput");
+        const feedback = document.getElementById("feedback");
+        const scanButton = document.getElementById("scanButton");
+        const subnetInput = document.getElementById("subnetInput");
+        const deviceList = document.getElementById("deviceList");
+        const spinner = document.getElementById("spinner");
+        const keyboardContainer = document.getElementById("keyboardContainer");
+        const tips = [
+          "Fichar a tiempo demuestra responsabilidad y compromiso.",
+          "Si fichar fuera un videojuego, llegar tarde sería como perder una vida.",
+          "Evita problemas con la nómina registrando tu horario correctamente.",
+          "Si el sistema no te encuentra, no es el sistema... eres tú.",
+          "Llegar tarde puede afectar la planificación de tu equipo.",
+          "Recuerda fichar, o podrías terminar explicándole al jefe por qué llegaste 'mentalmente' a tiempo.",
+          "Registrar tu entrada y salida es clave para el control de horas extras.",
+          "No fichar no te hace un rebelde, solo te acerca a una charla incómoda con tu jefe.",
+          "Un buen historial de asistencia mejora tu reputación en el trabajo.",
+          "Si la red no responde, puede que sea un lunes... o que el router necesite café.",
+          "Si olvidas fichar, podrías enfrentar descuentos en tu salario.",
+          "Tu nómina y tu billetera te agradecerán que no te olvides de fichar.",
+          "Revisar que el sistema funcione antes de fichar te ahorra problemas.",
+          "No fichar es como ignorar el despertador... una mala idea.",
+          "Si no encuentras el dispositivo, verifica que esté en la misma red.",
+          "Fichar tarde es como ver el final de una serie sin ver los capítulos anteriores... simplemente no tiene sentido.",
+          "Un router sobrecargado puede afectar la conexión, intenta reiniciarlo.",
+          "La diferencia entre un buen día y una charla con RRHH: fichar a tiempo.",
+          "Revisar la configuración de red del dispositivo puede evitar errores.",
+          "Si fichar diera puntos, serías el MVP o el que juega en modo difícil.",
+        ];
+
+
+
+        document.getElementById("clearbtn").addEventListener("click", ()=>{
+            numberInput.value = ""; // Limpia el input
+            showNotification("Número borrado");
+        }); 
+
+        let stopTips = false;
+
+        function showNextTip() {
+          if (stopTips) return;
+          let tipIndex = Math.floor(Math.random() * tips.length);
+          const tipElement = document.querySelector(".tips-container");
+          tipElement.textContent = tips[tipIndex];
+          tipElement.classList.add("show");
+
+          setTimeout(() => {
+            tipElement.classList.remove("show");
+            setTimeout(showNextTip, 500);
+          }, 5000);
+        }
+
+        function stopTipsRotation() {
+          stopTips = true;
+        }
+
+        scanButton.addEventListener("click", () => {
+          stopTips = false;
+          showNextTip();
+          simulateNetworkScan(); // Llama a la función de simulación
+        });
+
+        keys.forEach((key) => {
+          key.addEventListener("click", () => {
+            if (key.dataset.value) {
+              numberInput.value += key.dataset.value;
+            }
+          });
+        });
+
+        function simulateNetworkScan() {
+          const subnet = subnetInput.value;
+          deviceList.innerHTML = "";
+          spinner.style.display = "block";
+
+          setTimeout(() => {
+            spinner.style.display = "none";
+            const simulatedDevices = generateSimulatedDevices(subnet);
+            stopTipsRotation();
+            if (simulatedDevices.length > 0) {
+              simulatedDevices.forEach((device) => {
+                const deviceDiv = document.createElement("div");
+                deviceDiv.className = "device";
+                deviceDiv.innerHTML = `<i class="fas fa-microchip"></i>${device.devname} (${device.ip})`;
+                deviceDiv.addEventListener("click", () => {
+                  setupKeyboard(device.ip);
+                });
+                deviceList.appendChild(deviceDiv);
+              });
+            } else {
+              showNotification("No se encontraron dispositivos.");
+            }
+          }, 2000); // Simula un retraso de 2 segundos en la respuesta
+        }
+
+        function generateSimulatedDevices(subnet) {
+          // Simula la generación de dispositivos
+          const devices = [];
+          for (let i = 1; i <= 5; i++) {
+            // Simula 5 dispositivos
+            devices.push({
+              ip: `${subnet
+                .split("/")[0]
+                .split(".")
+                .slice(0, 3)
+                .join(".")}.${i}`,
+              devname: `Dispositivo ${i}`,
+            });
+          }
+          return devices;
+        }
+
+        function setupKeyboard(device) {
+          // Simular la configuración del teclado
+          document.getElementById(
+            "numberForm"
+          ).action = `http://${device}/number`;
+          keyboardContainer.style.display = "block";
+          deviceList.style.display = "none";
+        }
+
+        document
+          .getElementById("numberForm")
+          .addEventListener("submit", async (event) => {
+            event.preventDefault();
+            // Simular la respuesta del servidor al enviar el número
+            const number = numberInput.value;
+
+            showNotification(`Número ${number} enviado con éxito.`);
+            numberInput.value = ""; // Limpiar el input después del envío
+          });
+
+        function showNotification(message, type = "good") {
+          const notification = document.querySelector(".notification");
+          notification.className = "notification"; // Resetear clases
+          notification.classList.add(type);
+          notification.textContent = message;
+          notification.classList.add("show");
+
+          setTimeout(() => {
+            notification.classList.remove("show");
+          }, 3000); // Desaparece después de 3 segundos
+        }
+      });
+    </script>
+  </body>
+</html>
