@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const deviceList = document.getElementById("deviceList");
   const spinner = document.getElementById("spinner");
 
-  // Array de consejos
   const tips = [
     "Fichar a tiempo demuestra responsabilidad y compromiso.",
     "Si fichar fuera un videojuego, llegar tarde sería como perder una vida.",
@@ -44,11 +43,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 5000);
   }
 
-  // Detener la rotación de consejos
-  function stopTipsRotation() {
-    stopTips = true;
-  }
-
   scanButton.addEventListener("click", async () => {
     const subnet = subnetInput.value.trim();
     if (!subnet) {
@@ -56,71 +50,78 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
+    stopTips = false;
+    showNextTip();
+
     deviceList.innerHTML = ""; // Limpiar lista
+    stopTips = true;
     spinner.style.display = "block"; // Mostrar cargando
 
-    try {
-      const devices = await scanNetwork(subnet);
-      spinner.style.display = "none"; // Ocultar cargando
-
-      if (devices.length > 0) {
-        devices.forEach((device) => {
-          const deviceDiv = document.createElement("div");
-          deviceDiv.className = "device";
-          deviceDiv.innerHTML = `<i class="fas fa-microchip"></i>${device.devname} (${device.ip})`;
-          deviceDiv.addEventListener("click", () => setupKeyboard(device.ip));
-          deviceList.appendChild(deviceDiv);
-        });
-      } else {
-        showNotification("No se encontraron dispositivos.", "bad");
-      }
-    } catch (error) {
-      console.error("Error en escaneo:", error);
-      showNotification("Error al escanear la red.", "bad");
-    } finally {
-      spinner.style.display = "none";
-    }
-  });
-
-  async function scanNetwork(subnet) {
-    const baseIP =
-      subnet.split(".")[0] +
-      "." +
-      subnet.split(".")[1] +
-      "." +
-      subnet.split(".")[2] +
-      ".";
-    let devices = [];
+    const devices = [];
+    const baseIP = subnet.split(".").slice(0, 3).join(".") + ".";
+    const promises = [];
+    const maxConcurrentRequests = 50; // Límite de solicitudes concurrentes
 
     for (let i = 1; i < 255; i++) {
       const ip = `${baseIP}${i}`;
-      const device = await checkDevice(ip);
-      if (device) {
-        devices.push(device);
+      promises.push(checkDevice(ip));
+
+      // Si hemos alcanzado el límite de solicitudes concurrentes, espera a que se resuelvan
+      if (promises.length === maxConcurrentRequests) {
+        await Promise.allSettled(promises).then((results) => {
+          results.forEach((result) => {
+            if (result.status === "fulfilled" && result.value) {
+              devices.push(result.value);
+              displayDevice(result.value); // Mostrar el dispositivo tan pronto como se encuentra
+            }
+          });
+        });
+        promises.length = 0; // Vacía el array de promesas
       }
     }
-    return devices;
+
+    // Maneja las promesas restantes
+    if (promises.length > 0) {
+      await Promise.allSettled(promises).then((results) => {
+        results.forEach((result) => {
+          if (result.status === "fulfilled" && result.value) {
+            devices.push(result.value);
+            displayDevice(result.value); // Mostrar el dispositivo tan pronto como se encuentra
+          }
+        });
+      });
+    }
+
+    spinner.style.display = "none"; // Ocultar cargando
+    if (devices.length === 0) {
+      showNotification("No se encontraron dispositivos.", "bad");
+    }
+  });
+
+  function displayDevice(device) {
+    const deviceDiv = document.createElement("div");
+    deviceDiv.className = "device";
+    deviceDiv.innerHTML = `<i class="fas fa-microchip"></i>${device.devname} (${device.ip})`;
+    deviceDiv.addEventListener("click", () => setupKeyboard(device.ip));
+    deviceList.appendChild(deviceDiv); // Agregar dispositivo a la lista
   }
 
   async function checkDevice(ip) {
     const url = `http://${ip}/ispuncto`;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 200); // Aumentamos timeout a 30s
+    const timeoutId = setTimeout(() => controller.abort(), 1500); // Tiempo de espera de 5 segundos
 
     try {
-      const headResponse = await fetch(url, {
-        method: "HEAD",
-        signal: controller.signal,
-      });
-      if (!headResponse.ok) return null;
-
       const response = await fetch(url, {
         method: "GET",
         signal: controller.signal,
       });
+
       if (response.ok) {
         const data = await response.json();
         return { ip, devname: data.devname };
+      } else {
+        console.warn(`Error al acceder a ${ip}: ${response.statusText}`);
       }
     } catch (error) {
       console.warn(`Error con ${ip}: ${error.message}`);
@@ -147,6 +148,4 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Iniciar la rotación de consejos
-  stopTips = false; // Reiniciar la rotación de consejos
-  showNextTip();
 });
