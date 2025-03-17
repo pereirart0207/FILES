@@ -17,22 +17,23 @@
         /* Estilos globales */
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #f7f7f7;
-            color: #333;
+            background-color: #121212; /* Fondo oscuro */
+            color: #EAEAEA; /* Texto claro */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
             flex-direction: column;
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .container {
             text-align: center;
             padding: 30px;
-            background-color: #ffffff;
+            background-color: #1f1f1f; /* Fondo oscuro para el contenedor */
             border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             width: 100%;
             max-width: 450px;
             margin: 10px;
@@ -41,21 +42,22 @@
         h1 {
             font-size: 24px;
             margin-bottom: 20px;
-            color: #333;
+            color: #ffffff; /* Título blanco */
         }
 
         p {
             font-size: 16px;
             margin-bottom: 20px;
-            color: #777;
+            color: #ddd; /* Texto gris claro */
         }
 
         select {
             padding: 10px;
             font-size: 16px;
-            border: 1px solid #ccc;
+            border: 1px solid #444;
             border-radius: 5px;
-            background-color: #fafafa;
+            background-color: #333;
+            color: #EAEAEA;
             width: 100%;
             max-width: 200px;
             margin: 10px 0;
@@ -71,7 +73,7 @@
         .result {
             font-size: 18px;
             font-weight: bold;
-            color: #333;
+            color: #EAEAEA;
             margin-top: 20px;
         }
 
@@ -79,7 +81,7 @@
         .additional-info {
             margin-top: 20px;
             font-size: 16px;
-            color: #555;
+            color: #ddd;
             text-align: left;
         }
 
@@ -93,10 +95,10 @@
         .ip-info {
             margin-top: 20px;
             font-size: 16px;
-            color: #333;
+            color: #EAEAEA;
             font-weight: bold;
             padding: 10px;
-            background-color: #f2f2f2;
+            background-color: #333;
             border-radius: 5px;
         }
 
@@ -120,6 +122,15 @@
             text-align: center;
         }
 
+        .copyright a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .copyright a:hover {
+            text-decoration: underline;
+        }
+
     </style>
 </head>
 <body>
@@ -140,54 +151,60 @@
 
     <!-- Copyright -->
     <div class="copyright">
-        <p>&copy; 2025 PunctoApp.com. Todos los derechos reservados.</p>
+        <p>&copy; 2025 <a href="https://punctoapp.com" target="_blank">PunctoApp.com</a>. Todos los derechos reservados.</p>
     </div>
 
     <script>
         // Función para obtener la zona horaria
         const getTimeZone = async () => {
             try {
-                const response = await fetch('http://ip-api.com/json?fields=timezone');
+                const response = await fetch('https://ipwhois.app/json/');
                 const data = await response.json();
-                if (data.status === "fail") {
+                if (!data.success) {
                     throw new Error("Failed to get zone information");
                 }
-                return data.timezone;
+                return data.timezone;  // La zona horaria ahora se obtiene directamente de data.timezone
             } catch (error) {
                 throw new Error(error.message || "An error occurred");
             }
         };
-
+    
         // Función para obtener más información (país, ciudad, etc.)
         const getAdditionalInfo = async () => {
             try {
-                const response = await fetch('http://ip-api.com/json');
+                const response = await fetch('https://ipwhois.app/json/');
                 const data = await response.json();
-
-                if (data.status === "fail") {
+    
+                if (!data.success) {
                     throw new Error("Failed to get additional information");
                 }
-
+    
                 return {
                     country: data.country,
                     city: data.city,
-                    region: data.regionName,
-                    zip: data.zip,
-                    countryCode: data.countryCode, // Para obtener el código de país
-                    ip: data.query, // IP pública
-                    flag: `https://flagcdn.com/w320/${data.countryCode.toLowerCase()}.png`, // URL de la bandera
+                    region: data.region,
+                    continent: data.continent,
+                    continentCode: data.continent_code, // Código del continente
+                    countryCode: data.country_code, // Código de país
+                    ip: data.ip, // IP pública
+                    flag: data.country_flag, // URL de la bandera
+                    capital: data.country_capital, // Capital del país
+                    timezone: data.timezone, // Zona horaria
+                    currency: data.currency, // Moneda
+                    currencySymbol: data.currency_symbol, // Símbolo de la moneda
+                    isp: data.isp, // Proveedor de servicios de internet
                 };
             } catch (error) {
                 console.error('Error al obtener la información adicional:', error);
                 return null;
             }
         };
-
+    
         // Función para poblar las zonas horarias
         const populateTimeZones = () => {
             const timeZones = Intl.supportedValuesOf("timeZone");
             const timezoneSelect = document.getElementById('timezoneSelect');
-
+    
             // Agregar las opciones al select
             timeZones.forEach(zone => {
                 const option = document.createElement('option');
@@ -196,13 +213,13 @@
                 timezoneSelect.appendChild(option);
             });
         };
-
+    
         // Función para establecer la zona horaria por defecto
         const setDefaultTimeZone = async () => {
             try {
                 const userTimeZone = await getTimeZone();
                 const timezoneSelect = document.getElementById('timezoneSelect');
-
+    
                 // Establecer la zona horaria por defecto (si está en la lista de zonas horarias soportadas)
                 const options = timezoneSelect.getElementsByTagName('option');
                 for (let option of options) {
@@ -211,7 +228,7 @@
                         break;
                     }
                 }
-
+    
                 // Mostrar la zona horaria obtenida
                 document.getElementById('result').textContent = `Tu zona horaria es: ${userTimeZone}`;
             } catch (error) {
@@ -219,46 +236,51 @@
                 document.getElementById('result').textContent = 'No se pudo obtener la zona horaria.';
             }
         };
-
+    
         // Función para mostrar la información adicional (país, ciudad, etc.)
         const displayAdditionalInfo = async () => {
             const additionalInfo = await getAdditionalInfo();
-
+    
             if (additionalInfo) {
                 const infoContainer = document.getElementById('additionalInfo');
                 const ipContainer = document.getElementById('ipInfo');
-
+    
                 // Mostrar la información del país, ciudad, etc.
                 infoContainer.innerHTML = `
                     <p><strong>País:</strong> ${additionalInfo.country}</p>
                     <p><strong>Ciudad:</strong> ${additionalInfo.city}</p>
                     <p><strong>Región:</strong> ${additionalInfo.region}</p>
-                    <p><strong>Código Postal:</strong> ${additionalInfo.zip}</p>
+                    <p><strong>Continente:</strong> ${additionalInfo.continent}</p>
+                    <p><strong>Código de País:</strong> ${additionalInfo.countryCode}</p>
+                    <p><strong>Capital:</strong> ${additionalInfo.capital}</p>
+                    <p><strong>Moneda:</strong> ${additionalInfo.currency} (${additionalInfo.currencySymbol})</p>
+                    <p><strong>Proveedor ISP:</strong> ${additionalInfo.isp}</p>
                 `;
-
+    
                 // Mostrar la bandera del país
                 const flagImage = document.createElement('img');
                 flagImage.src = additionalInfo.flag;
                 flagImage.alt = `${additionalInfo.country} flag`;
                 flagImage.classList.add('flag');
                 infoContainer.appendChild(flagImage);
-
+    
                 // Mostrar la IP del usuario
                 ipContainer.innerHTML = `Tu IP es: <strong>${additionalInfo.ip}</strong>`;
             } else {
                 document.getElementById('additionalInfo').textContent = 'No se pudo obtener información adicional.';
             }
         };
-
+    
         // Inicializar la página
         const initialize = () => {
             populateTimeZones();
             setDefaultTimeZone();
             displayAdditionalInfo();
         };
-
+    
         // Ejecutar la inicialización cuando la página esté lista
         window.onload = initialize;
     </script>
+
 </body>
 </html>
