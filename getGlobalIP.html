@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geolocalización Automática por IP</title>
+
+    <!-- Estilos CSS -->
+    <style>
+        /* Resetear algunos márgenes y paddings */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Estilos globales */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            margin: 10px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #777;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fafafa;
+            width: 100%;
+            max-width: 200px;
+            margin: 10px 0;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus {
+            border-color: #007BFF;
+            outline: none;
+        }
+
+        /* Animación para el texto de resultado */
+        .result {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 20px;
+        }
+
+        /* Sección adicional de información */
+        .additional-info {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #555;
+            text-align: left;
+        }
+
+        .flag {
+            margin-top: 10px;
+            width: 50px;
+            height: auto;
+        }
+
+        /* IP section */
+        .ip-info {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+            font-weight: bold;
+            padding: 10px;
+            background-color: #f2f2f2;
+            border-radius: 5px;
+        }
+
+        /* Agregar un estilo de transición suave a la página */
+        .container {
+            opacity: 0;
+            animation: fadeIn 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Ubicación de la IP de tu conexión</h1>
+        <p id="result" class="result">Obteniendo información...</p>
+
+        <select id="timezoneSelect">
+            <!-- Las opciones de zonas horarias se agregarán dinámicamente aquí -->
+        </select>
+
+        <div id="additionalInfo" class="additional-info"></div>
+
+        <!-- Mostrar la IP -->
+        <div id="ipInfo" class="ip-info"></div>
+    </div>
+
+    <script>
+        // Función para obtener la zona horaria
+        const getTimeZone = async () => {
+            try {
+                const response = await fetch('http://ip-api.com/json?fields=timezone');
+                const data = await response.json();
+                if (data.status === "fail") {
+                    throw new Error("Failed to get zone information");
+                }
+                return data.timezone;
+            } catch (error) {
+                throw new Error(error.message || "An error occurred");
+            }
+        };
+
+        // Función para obtener más información (país, ciudad, etc.)
+        const getAdditionalInfo = async () => {
+            try {
+                const response = await fetch('http://ip-api.com/json');
+                const data = await response.json();
+
+                if (data.status === "fail") {
+                    throw new Error("Failed to get additional information");
+                }
+
+                return {
+                    country: data.country,
+                    city: data.city,
+                    region: data.regionName,
+                    zip: data.zip,
+                    countryCode: data.countryCode, // Para obtener el código de país
+                    ip: data.query, // IP pública
+                    flag: `https://flagcdn.com/w320/${data.countryCode.toLowerCase()}.png`, // URL de la bandera
+                };
+            } catch (error) {
+                console.error('Error al obtener la información adicional:', error);
+                return null;
+            }
+        };
+
+        // Función para poblar las zonas horarias
+        const populateTimeZones = () => {
+            const timeZones = Intl.supportedValuesOf("timeZone");
+            const timezoneSelect = document.getElementById('timezoneSelect');
+
+            // Agregar las opciones al select
+            timeZones.forEach(zone => {
+                const option = document.createElement('option');
+                option.value = zone;
+                option.textContent = zone;
+                timezoneSelect.appendChild(option);
+            });
+        };
+
+        // Función para establecer la zona horaria por defecto
+        const setDefaultTimeZone = async () => {
+            try {
+                const userTimeZone = await getTimeZone();
+                const timezoneSelect = document.getElementById('timezoneSelect');
+
+                // Establecer la zona horaria por defecto (si está en la lista de zonas horarias soportadas)
+                const options = timezoneSelect.getElementsByTagName('option');
+                for (let option of options) {
+                    if (option.value === userTimeZone) {
+                        option.selected = true;
+                        break;
+                    }
+                }
+
+                // Mostrar la zona horaria obtenida
+                document.getElementById('result').textContent = `Tu zona horaria es: ${userTimeZone}`;
+            } catch (error) {
+                console.error('Error al establecer la zona horaria:', error);
+                document.getElementById('result').textContent = 'No se pudo obtener la zona horaria.';
+            }
+        };
+
+        // Función para mostrar la información adicional (país, ciudad, etc.)
+        const displayAdditionalInfo = async () => {
+            const additionalInfo = await getAdditionalInfo();
+
+            if (additionalInfo) {
+                const infoContainer = document.getElementById('additionalInfo');
+                const ipContainer = document.getElementById('ipInfo');
+
+                // Mostrar la información del país, ciudad, etc.
+                infoContainer.innerHTML = `
+                    <p><strong>País:</strong> ${additionalInfo.country}</p>
+                    <p><strong>Ciudad:</strong> ${additionalInfo.city}</p>
+                    <p><strong>Región:</strong> ${additionalInfo.region}</p>
+                    <p><strong>Código Postal:</strong> ${additionalInfo.zip}</p>
+                `;
+
+                // Mostrar la bandera del país
+                const flagImage = document.createElement('img');
+                flagImage.src = additionalInfo.flag;
+                flagImage.alt = `${additionalInfo.country} flag`;
+                flagImage.classList.add('flag');
+                infoContainer.appendChild(flagImage);
+
+                // Mostrar la IP del usuario
+                ipContainer.innerHTML = `Tu IP es: <strong>${additionalInfo.ip}</strong>`;
+            } else {
+                document.getElementById('additionalInfo').textContent = 'No se pudo obtener información adicional.';
+            }
+        };
+
+        // Inicializar la página
+        const initialize = () => {
+            populateTimeZones();
+            setDefaultTimeZone();
+            displayAdditionalInfo();
+        };
+
+        // Ejecutar la inicialización cuando la página esté lista
+        window.onload = initialize;
+    </script>
+</body>
+</html>
