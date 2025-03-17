@@ -24,6 +24,7 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            flex-direction: column;
         }
 
         .container {
@@ -110,6 +111,15 @@
                 opacity: 1;
             }
         }
+
+        /* Estilos para el copyright */
+        .copyright {
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 30px;
+            text-align: center;
+        }
+
     </style>
 </head>
 <body>
@@ -126,6 +136,11 @@
 
         <!-- Mostrar la IP -->
         <div id="ipInfo" class="ip-info"></div>
+    </div>
+
+    <!-- Copyright -->
+    <div class="copyright">
+        <p>&copy; 2025 PunctoApp.com. Todos los derechos reservados.</p>
     </div>
 
     <script>
