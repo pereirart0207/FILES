@@ -195,6 +195,7 @@
 
     <script>
         generate();
+    
         function generateUUID() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 const r = (Math.random() * 16) | 0;
@@ -202,21 +203,31 @@
                 return v.toString(16);
             });
         }
-
+    
         function generateRandomNumber() {
             return Math.floor(1000000 + Math.random() * 9000000);
         }
+    
+        function generateRandomPassword() {
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            let password = "";
+            for (let i = 0; i < 8; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        }
+    
         var wifiName;
         function generate() {
             var uuid = generateUUID();
             const randomNumber = generateRandomNumber();
             wifiName = `Puncto-${randomNumber}`;
-            const wifiPassword = uuid;
-
+            const wifiPassword = generateRandomPassword();
+    
             // Mostrar en pantalla
             document.getElementById("wifiName").innerText = wifiName;
             document.getElementById("wifiPassword").innerText = wifiPassword;
-
+    
             // Generar QR
             const qr = new QRious({
                 element: document.getElementById("qrCanvas"),
@@ -224,33 +235,31 @@
                 value: `WIFI:S:${wifiName};T:WPA;P:${wifiPassword};;`
             });
         }
-
+    
         function downloadPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-
+    
             // Establecer tamaño de página basado en las dimensiones del QR
-            const qrSizeMM = 23;  // Tamaño de la etiqueta QR en milímetros
-            const qrSizePX = qrSizeMM * 3.77953;  // Convertir milímetros a píxeles (1 mm = 3.77953 px)
-
-            // Crear la página con el tamaño exacto para el QR sin agregar páginas adicionales
+            const qrSizeMM = 23;
+            const qrSizePX = qrSizeMM * 3.77953;
+    
             doc.setPage(1);
             doc.internal.pageSize.width = qrSizePX;
             doc.internal.pageSize.height = qrSizePX;
-
+    
             // Generar el QR
             const qr = document.getElementById("qrCanvas");
             const qrDataUrl = qr.toDataURL();
-
+    
             // Añadir el QR al PDF
-            const offset = (qrSizePX - qrSizePX) / 2;  // Centrado
+            const offset = (qrSizePX - qrSizePX) / 2;
             doc.addImage(qrDataUrl, 'PNG', offset, offset, qrSizePX, qrSizePX);
-
+    
             // Descargar el PDF
             doc.save(wifiName.toString() + "-wifi.pdf");
         }
-
-        // Función para copiar al portapapeles
+    
         function copyToClipboard(id) {
             var text = document.getElementById(id).innerText;
             var textarea = document.createElement('textarea');
@@ -259,8 +268,7 @@
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
-
-            // Cambiar color del icono por 5 segundos
+    
             var icon = event.target;
             icon.classList.add('copied');
             setTimeout(function() {
@@ -268,5 +276,5 @@
             }, 5000);
         }
     </script>
-</body>
+    </body>
 </html>

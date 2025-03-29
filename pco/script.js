@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const devices = [];
     const baseIP = subnet.split(".").slice(0, 3).join(".") + ".";
     const promises = [];
-    const maxConcurrentRequests = 15; // Límite de solicitudes concurrentes
+    const maxConcurrentRequests = 60; // Límite de solicitudes concurrentes
 
     for (let i = 1; i < 255; i++) {
       const ip = `${baseIP}${i}`;
@@ -101,15 +101,71 @@ document.addEventListener("DOMContentLoaded", () => {
   function displayDevice(device) {
     const deviceDiv = document.createElement("div");
     deviceDiv.className = "device";
-    deviceDiv.innerHTML = `<i class="fas fa-microchip"></i>${device.devname} (${device.ip})`;
-    deviceDiv.addEventListener("click", () => setupKeyboard(device.ip));
+
+    // Agregar iconos
+    deviceDiv.innerHTML = `
+        <i class="fas fa-microchip"></i> ${device.devname} (${device.ip})
+        <i class="fas fa-sync-alt reboot-icon" title="Reboot"></i>
+        <i class="fas fa-cog config-icon" title="Configuración"></i>
+        <i class="fas fa-key access-icon" title="Acceso"></i>
+    `;
+
+    // Evento para abrir la configuración al hacer clic en el div
+    deviceDiv.addEventListener("click", () => openConfiguration(device.ip));
+
+    // Eventos para los iconos
+    deviceDiv
+      .querySelector(".reboot-icon")
+      .addEventListener("click", (event) => {
+        event.stopPropagation(); // Evita que se dispare el evento del div
+        rebootDevice(device.ip);
+      });
+
+    deviceDiv
+      .querySelector(".config-icon")
+      .addEventListener("click", (event) => {
+        event.stopPropagation();
+        openConfiguration(device.ip);
+      });
+
+    deviceDiv
+      .querySelector(".access-icon")
+      .addEventListener("click", (event) => {
+        event.stopPropagation();
+        grantAccess(device.ip);
+      });
+
     deviceList.appendChild(deviceDiv); // Agregar dispositivo a la lista
+  }
+
+  // Funciones simuladas para las acciones
+  async function rebootDevice(ip) {
+    // Mostrar el cuadro de confirmación
+    const r = confirm(
+      "Está a punto de reiniciar el dispositivo,\n esta acción no se puede deshacer y elimina todos los datos de configuración."
+    );
+
+    // Comprobar si el usuario ha confirmado (hizo clic en "Aceptar")
+    if (r) {
+      // `r` es el valor retornado por `confirm()`, que es `true` si se hace clic en "Aceptar"
+      await fetch(`http://${ip}/reboot`);
+    } else {
+      console.log("Operación cancelada.");
+    }
+  }
+
+  async function openConfiguration(ip) {
+    window.location.href = `http://${ip}/`;
+  }
+
+  function grantAccess(ip) {
+    setupKeyboard(ip);
   }
 
   async function checkDevice(ip) {
     const url = `http://${ip}/ispuncto`;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 2000); // Tiempo de espera de 5 segundos
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // Tiempo de espera de 2.5 segundos
 
     try {
       const response = await fetch(url, {
