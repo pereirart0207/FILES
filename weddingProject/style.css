@@ -1,0 +1,177 @@
+/* Resetear estilos por defecto */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Arial', sans-serif;
+    background: #f8f8f8;
+    color: #333;
+    line-height: 1.5;
+  }
+  
+  .container {
+    max-width: 480px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  h1 {
+    font-size: 2.4rem;
+    color: #6a1b9a; /* Color morado moderno */
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+  }
+  
+  h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1.2rem;
+    color: #333;
+  }
+  
+  h3 {
+    font-size: 1.2rem;
+    color: #666;
+    margin-top: 1.5rem;
+  }
+  
+  input,
+  textarea,
+  button {
+    font-size: 1rem;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+  }
+  
+  input[type="text"],
+  input[type="email"],
+  input[type="number"],
+  textarea {
+    width: 100%;
+  }
+  
+  input[type="email"]:focus,
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  textarea:focus {
+    outline: none;
+    border: 1px solid #6a1b9a;
+  }
+  
+  textarea {
+    resize: none;
+  }
+  
+  button {
+    background-color: #6a1b9a;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    padding: 0.9rem;
+    border-radius: 12px;
+    font-size: 1.1rem;
+  }
+  
+  button:hover {
+    background-color: #4a148c;
+  }
+  
+  /* Estilos para iconos en los campos */
+  .input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.2rem;
+  }
+  
+  .input-group i {
+    color: #6a1b9a;
+    margin-right: 0.8rem;
+    font-size: 1.5rem;
+  }
+  
+  /* Estilo para la lista de confirmados */
+  ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 2rem;
+  }
+  
+  ul li {
+    background: #f4f4f4;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  ul li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  ul li strong {
+    font-size: 1.1rem;
+    color: #6a1b9a;
+  }
+  
+  ul li small {
+    display: block;
+    color: #777;
+  }
+  
+  ul li span {
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  /* Mobile-first */
+  @media (max-width: 600px) {
+    .container {
+      padding: 1.5rem;
+    }
+  
+    h1 {
+      font-size: 2rem;
+    }
+  
+    button {
+      padding: 1rem;
+      font-size: 1.2rem;
+    }
+  
+    .input-group i {
+      font-size: 1.2rem;
+    }
+  
+    ul li {
+      padding: 0.8rem;
+    }
+  }
+  
+  /* Dispositivos más grandes (tabletas y escritorios) */
+  @media (min-width: 601px) {
+    .container {
+      max-width: 700px;
+    }
+  
+    h1 {
+      font-size: 2.6rem;
+    }
+  
+    button {
+      padding: 1.2rem 2rem;
+      font-size: 1.2rem;
+    }
+  }
+  

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title id="pageTitle">Confirmación de Boda</title>
+  
+  <!-- Agregar Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  
+  <!-- Enlazar el CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1 id="formTitle">💍 Confirmación de Asistencia</h1>
+    <form id="form">
+      <div class="input-group">
+        <i class="fas fa-user"></i>
+        <input type="text" id="name" placeholder="Tu nombre completo" required />
+      </div>
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="email" placeholder="Tu correo electrónico" required />
+      </div>
+      <div class="input-group">
+        <i class="fas fa-users"></i>
+        <input type="number" id="companions" placeholder="¿Cuántos acompañantes?" min="0"/>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-comment"></i>
+        <textarea id="note" placeholder="Deja una nota (opcional)" rows="4"></textarea>
+      </div>
+      <button type="submit"><i class="fas fa-paper-plane"></i> Confirmar</button>
+    </form>
+
+    <div id="confirmationMessage" style="display: none;">
+      <h2>¡Confirmación exitosa!</h2>
+      <p>Gracias por confirmar tu asistencia a la boda. ¡Nos vemos pronto!</p>
+      </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  
+  <!-- App -->
+  <script src="script.js"></script>
+</body>
+</html>
