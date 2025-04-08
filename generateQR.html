@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Códigos QR</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f7f7f7;
+            text-align: center;
+            margin: 50px;
+            color: #333;
+        }
+        h1 {
+            font-size: 2em;
+            color: #4CAF50;
+        }
+        input, button {
+            padding: 12px;
+            font-size: 16px;
+            margin-top: 15px;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            outline: none;
+        }
+        input {
+            width: 250px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #qrcode {
+            margin-top: 30px;
+        }
+        canvas {
+            border: 2px solid #4CAF50;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        #copyButton, #downloadButton {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+        }
+        #copyButton {
+            background-color: #008CBA;
+        }
+        #copyButton:hover {
+            background-color: #007B9E;
+        }
+        #downloadButton {
+            background-color: #FF5722;
+        }
+        #downloadButton:hover {
+            background-color: #FF4511;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Generador de Códigos QR</h1>
+    <p>Introduce el texto que deseas convertir en un código QR:</p>
+    
+    <input type="text" id="inputText" placeholder="Escribe el texto aquí" />
+    <button onclick="generateQRCode()">Generar QR</button>
+
+    <div id="qrcode">
+        <canvas id="qrCanvas"></canvas>
+    </div>
+    
+    <button id="copyButton" style="display:none;" onclick="copyToClipboard()">Copiar al portapapeles</button>
+    <button id="downloadButton" style="display:none;" onclick="downloadQRCode()">Descargar como PNG</button>
+
+    <script>
+        function generateQRCode() {
+            const inputText = document.getElementById("inputText").value.trim();
+
+            if (inputText) {
+                // Limpiar el canvas y ocultar los botones de copiar y descargar inicialmente
+                document.getElementById("qrCanvas").getContext("2d").clearRect(0, 0, 250, 250);
+                document.getElementById("copyButton").style.display = 'none';
+                document.getElementById("downloadButton").style.display = 'none';
+
+                // Generar QR con QRious
+                const qr = new QRious({
+                    element: document.getElementById("qrCanvas"),
+                    size: 250,
+                    value: inputText
+                });
+
+                // Mostrar los botones de copiar y descargar
+                document.getElementById("copyButton").style.display = 'inline-block';
+                document.getElementById("downloadButton").style.display = 'inline-block';
+            } else {
+                alert("Por favor, introduce un texto.");
+            }
+        }
+
+        function copyToClipboard() {
+            var canvas = document.getElementById('qrCanvas');
+            var imageURL = canvas.toDataURL('image/png'); // Convertir el canvas a una imagen base64
+
+            // Crear un elemento de imagen y copiarlo al portapapeles
+            var img = new Image();
+            img.src = imageURL;
+
+            img.onload = function() {
+                const data = img.src;
+                navigator.clipboard.write([
+                    new ClipboardItem({
+                        'image/png': fetch(data).then(r => r.blob()) // Usamos un Blob para copiar como imagen
+                    })
+                ]).then(() => {
+                    alert("Imagen copiada al portapapeles.");
+                }).catch(err => {
+                    alert("No se pudo copiar la imagen: " + err);
+                });
+            };
+        }
+
+        function downloadQRCode() {
+            var canvas = document.getElementById('qrCanvas');
+            var imageURL = canvas.toDataURL('image/png'); // Convertir el canvas a una imagen base64
+
+            // Crear un enlace de descarga y simular un clic
+            var link = document.createElement('a');
+            link.href = imageURL;
+            link.download = 'codigo-qr.png';
+            link.click();
+        }
+    </script>
+
+</body>
+</html>

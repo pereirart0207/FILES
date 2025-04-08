@@ -195,10 +195,7 @@
 
     <script>
         generate();
-<<<<<<< HEAD
-=======
     
->>>>>>> 71a4b72fa83181c22a57c8d4b0c471a14875af65
         function generateUUID() {
             return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 const r = (Math.random() * 16) | 0;
@@ -206,12 +203,6 @@
                 return v.toString(16);
             });
         }
-<<<<<<< HEAD
-
-        function generateRandomNumber() {
-            return Math.floor(1000000 + Math.random() * 9000000);
-        }
-=======
     
         function generateRandomNumber() {
             return Math.floor(1000000 + Math.random() * 9000000);
@@ -226,27 +217,17 @@
             return password;
         }
     
->>>>>>> 71a4b72fa83181c22a57c8d4b0c471a14875af65
         var wifiName;
         function generate() {
             var uuid = generateUUID();
             const randomNumber = generateRandomNumber();
             wifiName = `Puncto-${randomNumber}`;
-<<<<<<< HEAD
-            const wifiPassword = uuid;
-
-            // Mostrar en pantalla
-            document.getElementById("wifiName").innerText = wifiName;
-            document.getElementById("wifiPassword").innerText = wifiPassword;
-
-=======
             const wifiPassword = generateRandomPassword();
     
             // Mostrar en pantalla
             document.getElementById("wifiName").innerText = wifiName;
             document.getElementById("wifiPassword").innerText = wifiPassword;
     
->>>>>>> 71a4b72fa83181c22a57c8d4b0c471a14875af65
             // Generar QR
             const qr = new QRious({
                 element: document.getElementById("qrCanvas"),
@@ -254,35 +235,6 @@
                 value: `WIFI:S:${wifiName};T:WPA;P:${wifiPassword};;`
             });
         }
-<<<<<<< HEAD
-
-        function downloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            // Establecer tamaño de página basado en las dimensiones del QR
-            const qrSizeMM = 23;  // Tamaño de la etiqueta QR en milímetros
-            const qrSizePX = qrSizeMM * 3.77953;  // Convertir milímetros a píxeles (1 mm = 3.77953 px)
-
-            // Crear la página con el tamaño exacto para el QR sin agregar páginas adicionales
-            doc.setPage(1);
-            doc.internal.pageSize.width = qrSizePX;
-            doc.internal.pageSize.height = qrSizePX;
-
-            // Generar el QR
-            const qr = document.getElementById("qrCanvas");
-            const qrDataUrl = qr.toDataURL();
-
-            // Añadir el QR al PDF
-            const offset = (qrSizePX - qrSizePX) / 2;  // Centrado
-            doc.addImage(qrDataUrl, 'PNG', offset, offset, qrSizePX, qrSizePX);
-
-            // Descargar el PDF
-            doc.save(wifiName.toString() + "-wifi.pdf");
-        }
-
-        // Función para copiar al portapapeles
-=======
     
         function downloadPDF() {
             const { jsPDF } = window.jspdf;
@@ -308,7 +260,6 @@
             doc.save(wifiName.toString() + "-wifi.pdf");
         }
     
->>>>>>> 71a4b72fa83181c22a57c8d4b0c471a14875af65
         function copyToClipboard(id) {
             var text = document.getElementById(id).innerText;
             var textarea = document.createElement('textarea');
@@ -317,12 +268,7 @@
             textarea.select();
             document.execCommand('copy');
             document.body.removeChild(textarea);
-<<<<<<< HEAD
-
-            // Cambiar color del icono por 5 segundos
-=======
     
->>>>>>> 71a4b72fa83181c22a57c8d4b0c471a14875af65
             var icon = event.target;
             icon.classList.add('copied');
             setTimeout(function() {
@@ -330,9 +276,5 @@
             }, 5000);
         }
     </script>
-<<<<<<< HEAD
-</body>
-=======
     </body>
->>>>>>> 71a4b72fa83181c22a57c8d4b0c471a14875af65
 </html>
