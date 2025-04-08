@@ -199,15 +199,52 @@ button:hover {
     margin: 5px 0;
     display: flex;
     align-items: center;
+<<<<<<< HEAD
     transition: background-color 0.3s; /* Transición para el fondo */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Sombra para la lista de dispositivos */
     
+=======
+    justify-content: space-between; /* Espaciado uniforme */
+    transition: background-color 0.3s; /* Transición para el fondo */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Sombra para la lista de dispositivos */
+}
+
+.device:hover {
+    background-color: #a0a0a0; /* Color de fondo al pasar el mouse */
+>>>>>>> 71a4b72fa83181c22a57c8d4b0c471a14875af65
 }
 
 .device i {
     margin-right: 10px; /* Espaciado entre el icono y el texto */
 }
 
+<<<<<<< HEAD
+=======
+.device .fas {
+    cursor: pointer;
+    padding: 5px;
+    font-size: 1.2rem;
+    transition: color 0.3s ease-in-out;
+}
+
+.device .reboot-icon:hover {
+    color: rgb(255, 0, 0); /* Color rojo al pasar el mouse */
+}
+
+.device .config-icon:hover {
+    color: blue; /* Color azul para configuración */
+}
+
+.device .access-icon:hover {
+    color: green; /* Color verde para acceso */
+}
+
+.device-icons {
+    display: flex;
+    gap: 10px; /* Espaciado entre íconos */
+    margin-left: auto; /* Empuja los íconos al final del div */
+}
+>>>>>>> 71a4b72fa83181c22a57c8d4b0c471a14875af65
 .function{
     background-color: #f0f0f0;
 }
