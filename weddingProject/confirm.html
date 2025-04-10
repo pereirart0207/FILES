@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmar Invitado</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="confirm-container">
+    <h1>Confirmar Invitado</h1>
+    <div id="guestInfo">
+      <p>Loading guest data...</p>
+    </div>
+    <button id="confirmBtn" class="hidden">Confirmar Invitado</button>
+    <p id="statusMessage"></p>
+  </div>
+
+  <!-- Tu script de lógica -->
+  <script src="confirm.js"></script>
+</body>
+</html>
