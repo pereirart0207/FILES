@@ -179,7 +179,7 @@ async function sendInvitationEmail(email, name, guestId) {
       to_name: name,
       to_email: email,
       from_name: "Novios",
-      event_date: "15 de Diciembre, 2023",
+      event_date: "Sep, 13, 2025",
       event_location: "7707 NW 103rd St Hialeah Gardens, FL 33016 Estados Unidos",
       reply_to: "glezalej2@gmail.com",
       confirm_link: confirmLink
