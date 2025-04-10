@@ -39,8 +39,10 @@ async function loadGuests(searchTerm = '') {
     let query = db.collection("confirmations").orderBy("timestamp");
     
     if (searchTerm) {
-      query = query.where("name", ">=", searchTerm)
-                  .where("name", "<=", searchTerm + '\uf8ff');
+      query = query
+        .orderBy("name")  // Asegúrate de ordenar por 'name'
+        .where("name", ">=", searchTerm)
+        .where("name", "<=", searchTerm + '\uf8ff');
     }
     
     const snapshot = await query.get();
@@ -102,6 +104,7 @@ async function loadGuests(searchTerm = '') {
     attendeesList.innerHTML = '<li>Error al cargar los invitados</li>';
   }
 }
+
 
 // Función para agregar event listeners a los botones dinámicos
 function addButtonEventListeners() {
