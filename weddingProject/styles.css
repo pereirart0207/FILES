@@ -219,26 +219,101 @@ button[type="submit"] i {
   text-align: center;
 }
 
-
-#confirmBtn {
-  background-color: #28a745;
-  color: white;
-  padding: 10px 20px;
-  font-size: 16px;
+/* Estilos base para todos los botones de acción */
+.action-btn {
+  padding: 6px 12px;
+  font-size: 13px;
   border: none;
   cursor: pointer;
   border-radius: 4px;
+  margin: 0 4px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-#confirmBtn:hover {
-  background-color: #218838;
+.action-btn i {
+  margin-right: 5px;
+  font-size: 11px;
 }
 
+/* Botón de confirmación */
+#confirmBtn, .toggle-confirm-btn {
+  background-color: #4CAF50; /* Verde más suave */
+  color: white;
+}
+
+#confirmBtn:hover, .toggle-confirm-btn:hover {
+  background-color: #3e8e41;
+}
+
+/* Botón de enviar invitación */
+.send-invite-btn {
+  background-color: #2196F3; /* Azul más suave */
+  color: white;
+}
+
+.send-invite-btn:hover {
+  background-color: #0b7dda;
+}
+
+/* Botón de eliminar */
+.delete-btn {
+  background-color: #f44336; /* Rojo más suave */
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* Efectos comunes para hover */
+.action-btn:hover {
+  opacity: 0.9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* Mensaje de estado */
 #statusMessage {
-  margin-top: 20px;
-  font-weight: bold;
+  margin-top: 15px;
+  font-weight: 500;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  border-left: 3px solid #2196F3;
+  font-size: 14px;
 }
 
+/* Clase para elementos ocultos */
 .hidden {
   display: none;
+}
+
+/* Contenedor de acciones en cada item */
+.guest-actions {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.guest-actions .action-btn {
+  flex-grow: 1;
+  min-width: 100px;
+}
+
+/* Estilo minimalista para los items de la lista */
+#attendeesList li {
+  transition: background-color 0.2s ease;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+}
+
+#attendeesList li:hover {
+  background-color: #f5f5f5;
 }

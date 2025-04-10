@@ -37,68 +37,74 @@ document.addEventListener("DOMContentLoaded", () => {
 async function loadGuests(searchTerm = '') {
   try {
     let query = db.collection("confirmations").orderBy("timestamp");
-    
+
     if (searchTerm) {
       query = query
         .orderBy("name")  // Asegúrate de ordenar por 'name'
         .where("name", ">=", searchTerm)
         .where("name", "<=", searchTerm + '\uf8ff');
     }
-    
+
     const snapshot = await query.get();
     attendeesList.innerHTML = '';
     let total = 0;
     let confirmed = 0;
-    
+
     if (snapshot.empty) {
       attendeesList.innerHTML = '<li>No se encontraron invitados</li>';
       totalGuests.textContent = '0';
       confirmedGuests.textContent = '0';
       return;
     }
-    
+
     snapshot.forEach(doc => {
       const data = doc.data();
       total += 1 + (data.companions || 0);
       if (data.confirmed) confirmed++;
-      
+
       const li = document.createElement("li");
+      // Dentro de la función loadGuests, en el innerHTML del li:
       li.innerHTML = `
-        <div class="guest-header">
-          <strong>${data.name}</strong> 
-          <span class="guest-status ${data.confirmed ? 'confirmed' : 'pending'}">
-            ${data.confirmed ? '✓ Confirmado' : '✗ Pendiente'}
-          </span>
-        </div>
-        <div class="guest-email">${data.email}</div>
-        <div class="guest-details">
-          <span>Acompañantes: ${data.companions || 0}</span>
-          ${data.note ? `<span class="guest-note">Nota: ${data.note}</span>` : ''}
-        </div>
-        <div class="guest-actions">
-          <button class="action-btn send-invite-btn" 
-                  data-id="${doc.id}" 
-                  data-email="${data.email}" 
-                  data-name="${data.name}">
-            <i class="fas fa-envelope"></i> Enviar invitación
-          </button>
-          <button class="action-btn toggle-confirm-btn" 
-                  data-id="${doc.id}" 
-                  data-confirmed="${data.confirmed}">
-            <i class="fas fa-${data.confirmed ? 'times' : 'check'}"></i> 
-            ${data.confirmed ? 'Cancelar' : 'Confirmar'}
-          </button>
-        </div>
-      `;
+  <div class="guest-header">
+    <strong>${data.name}</strong> 
+    <span class="guest-status ${data.confirmed ? 'confirmed' : 'pending'}">
+      ${data.confirmed ? '✓ Confirmado' : '✗ Pendiente'}
+    </span>
+  </div>
+  <div class="guest-email">${data.email}</div>
+  <div class="guest-details">
+    <span>Acompañantes: ${data.companions || 0}</span>
+    ${data.note ? `<span class="guest-note">Nota: ${data.note}</span>` : ''}
+  </div>
+  <div class="guest-actions">
+    <button class="action-btn send-invite-btn" 
+            data-id="${doc.id}" 
+            data-email="${data.email}" 
+            data-name="${data.name}">
+      <i class="fas fa-envelope"></i> Enviar invitación
+    </button>
+    <button class="action-btn toggle-confirm-btn" 
+            data-id="${doc.id}" 
+            data-confirmed="${data.confirmed}">
+      <i class="fas fa-${data.confirmed ? 'times' : 'check'}"></i> 
+      ${data.confirmed ? 'Cancelar' : 'Confirmar'}
+    </button>
+    <button class="action-btn delete-btn" 
+            data-id="${doc.id}" 
+            data-name="${data.name}">
+      <i class="fas fa-trash"></i> Eliminar
+    </button>
+  </div>
+`;
       attendeesList.appendChild(li);
     });
-    
+
     totalGuests.textContent = total;
     confirmedGuests.textContent = confirmed;
-    
+
     // Agregar event listeners a los botones
     addButtonEventListeners();
-    
+
   } catch (error) {
     console.error("Error cargando invitados: ", error);
     attendeesList.innerHTML = '<li>Error al cargar los invitados</li>';
@@ -118,14 +124,36 @@ function addButtonEventListeners() {
       await sendInvitationEmail(email, name, guestId);
     });
   });
-  
+
+
+  document.querySelectorAll('.delete-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const button = e.target.closest('button');
+      const guestId = button.getAttribute('data-id');
+      const guestName = button.getAttribute('data-name');
+      
+      // Confirmar antes de eliminar
+      if (confirm(`¿Estás seguro que deseas eliminar a ${guestName}?`)) {
+        try {
+          await db.collection("confirmations").doc(guestId).delete();
+          loadGuests(searchInput.value);
+          alert(`Invitado ${guestName} eliminado correctamente`);
+        } catch (error) {
+          console.error("Error eliminando invitado: ", error);
+          alert("Error al eliminar el invitado");
+        }
+      }
+    });
+  });
+
+
   // Botones de confirmar/cancelar
   document.querySelectorAll('.toggle-confirm-btn').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       const button = e.target.closest('button');
       const guestId = button.getAttribute('data-id');
       const isConfirmed = button.getAttribute('data-confirmed') === 'true';
-      
+
       try {
         await db.collection("confirmations").doc(guestId).update({
           confirmed: !isConfirmed
@@ -152,8 +180,8 @@ async function sendInvitationEmail(email, name, guestId) {
       to_email: email,
       from_name: "Novios",
       event_date: "15 de Diciembre, 2023",
-      event_location: "Hacienda Las Flores, Ciudad de México",
-      reply_to: "bodabodaalejandro@gmail.com",
+      event_location: "7707 NW 103rd St Hialeah Gardens, FL 33016 Estados Unidos",
+      reply_to: "glezalej2@gmail.com",
       confirm_link: confirmLink
     }
   };
@@ -211,17 +239,17 @@ guestModal.addEventListener('click', (e) => {
 // Manejar envío del formulario
 guestForm.addEventListener('submit', async (e) => {
   e.preventDefault();
-  
+
   const name = document.getElementById('name').value.trim();
   const email = document.getElementById('email').value.trim();
   const companions = parseInt(document.getElementById('companions').value) || 0;
   const note = document.getElementById('note').value.trim();
-  
+
   if (!name || !email) {
     alert('Por favor completa los campos obligatorios');
     return;
   }
-  
+
   try {
     await db.collection('confirmations').add({
       name,
@@ -231,7 +259,7 @@ guestForm.addEventListener('submit', async (e) => {
       confirmed: false,
       timestamp: Date.now()
     });
-    
+
     guestForm.reset();
     guestModal.classList.add('hidden');
     loadGuests(searchInput.value.trim());
