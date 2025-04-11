@@ -76,12 +76,13 @@ h1, h2, h3 {
 }
 
 .search-container button {
-  padding: 0 15px;
+  padding: 12px 15px;
   background: #5d3b7a;
   color: white;
   border: none;
   border-radius: 0 5px 5px 0;
   cursor: pointer;
+  font-size: 16px;
 }
 
 .attendees-list {
@@ -122,6 +123,7 @@ h1, h2, h3 {
   align-items: center;
   justify-content: center;
   gap: 10px;
+  margin-bottom: 20px; /* Añadido para espacio entre el botón y la lista */
 }
 
 .add-guest-btn:hover {
@@ -316,4 +318,86 @@ button[type="submit"] i {
 
 #attendeesList li:hover {
   background-color: #f5f5f5;
+}
+
+/* --- ESTILOS RESPONSIVE --- */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  .stats {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .stat-card {
+    width: 100%;
+  }
+
+  .search-container {
+    flex-direction: row;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .search-container input,
+  .search-container button {
+    width: auto;
+  }
+
+  .add-guest-btn {
+    font-size: 15px;
+    padding: 10px;
+    margin-bottom: 20px; /* Espacio antes de la lista */
+  }
+
+  .modal-content {
+    padding: 20px;
+  }
+
+  .input-group input,
+  .input-group textarea {
+    padding-left: 40px;
+  }
+
+  .guest-actions {
+    flex-direction: column;
+  }
+
+  .guest-actions .action-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  h1, h2, h3 {
+    font-size: 1.2rem;
+  }
+
+  .stat-card h3 {
+    font-size: 0.9rem;
+  }
+
+  .stat-card p {
+    font-size: 1.2rem;
+  }
+
+  .modal-content {
+    padding: 15px;
+  }
+
+  .add-guest-btn {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+
+  .action-btn {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .input-group i {
+    top: 12px;
+  }
 }
