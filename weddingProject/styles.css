@@ -191,7 +191,62 @@
     background-color: #ffffff;
     color: #3e2f1c;
   }
+  .companions-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
   
+  .companions-header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .add-companion-btn {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+  }
+  
+  .add-companion-btn:hover {
+    background: #45a049;
+  }
+  
+  .companions-container {
+    width: 100%;
+  }
+  
+  .companion-field {
+    display: flex;
+    margin-bottom: 8px;
+    width: 100%;
+  }
+  
+  .companion-field input {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .remove-companion-btn {
+    background: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0 12px;
+    margin-left: 8px;
+    cursor: pointer;
+  }
+  
+  .remove-companion-btn:hover {
+    background: #cc0000;
+  }
   .input-group textarea {
     min-height: 80px;
     resize: vertical;

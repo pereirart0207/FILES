@@ -54,10 +54,21 @@
             <i class="fas fa-envelope"></i>
             <input type="email" id="email" placeholder="Correo electrónico" required />
           </div>
-          <div class="input-group">
+          
+          <!-- Sección de acompañantes (reemplaza el input numérico) -->
+          <div class="input-group companions-section">
             <i class="fas fa-users"></i>
-            <input type="number" id="companions" placeholder="Acompañantes" min="0" value="0"/>
+            <div class="companions-header">
+              <label>Acompañantes</label>
+              <button type="button" id="addCompanionBtn" class="add-companion-btn">
+                <i class="fas fa-plus"></i> Agregar
+              </button>
+            </div>
+            <div id="companionsContainer" class="companions-container">
+              <!-- Los campos de acompañantes se agregarán aquí dinámicamente -->
+            </div>
           </div>
+          
           <div class="input-group">
             <i class="fas fa-comment"></i>
             <textarea id="note" placeholder="Notas adicionales (opcional)" rows="3"></textarea>
