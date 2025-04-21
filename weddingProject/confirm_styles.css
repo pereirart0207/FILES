@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #f3ede5, #fff8f0);
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.confirm-container {
+  background-color: #ffffff;
+  padding: 2.5rem 3rem;
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(62, 47, 28, 0.1);
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  color: #3e2f1c;
+}
+
+h1 {
+  color: #6b4e2e;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+}
+
+#guestInfo p {
+  font-size: 1.1rem;
+  color: #5e4a35;
+  margin-bottom: 1rem;
+}
+
+#confirmBtn {
+  background-color: #a68c6d;
+  color: #ffffff;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s;
+  box-shadow: 0 4px 10px rgba(77, 57, 39, 0.2);
+}
+
+#confirmBtn:hover {
+  background-color: #6b4e2e;
+  transform: scale(1.03);
+}
+
+#statusMessage {
+  margin-top: 1.5rem;
+  font-weight: 600;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+#statusMessage.success {
+  background-color: #d2b48c;
+  color: #3e2f1c;
+  border: 1px solid #a68c6d;
+}
+
+#statusMessage.error {
+  background-color: #fff0f0;
+  color: #4d3927;
+  border: 1px solid #c8b6a6;
+}
+
+.hidden {
+  display: none;
+}
