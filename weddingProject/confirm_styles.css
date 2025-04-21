@@ -1,77 +1,108 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;500&display=swap');
 
 body {
   font-family: 'Poppins', sans-serif;
-  background: linear-gradient(135deg, #f3ede5, #fff8f0);
+  background: linear-gradient(135deg, #fefbf8, #f8efe4);
   margin: 0;
-  padding: 0;
+  padding: 1rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
+  background-image: url('https://www.transparenttextures.com/patterns/white-marble.png');
+  background-size: cover;
 }
 
 .confirm-container {
-  background-color: #ffffff;
-  padding: 2.5rem 3rem;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 2rem;
   border-radius: 24px;
-  box-shadow: 0 10px 30px rgba(62, 47, 28, 0.1);
+  box-shadow: 0 12px 35px rgba(80, 60, 40, 0.15);
+  width: 100%;
   max-width: 420px;
-  width: 90%;
   text-align: center;
-  color: #3e2f1c;
+  color: #4a3725;
+  backdrop-filter: blur(6px);
+  border: 1px solid #e9dfd0;
 }
 
 h1 {
-  color: #6b4e2e;
+  font-family: 'Playfair Display', serif;
+  color: #7b5e42;
   margin-bottom: 1.5rem;
-  font-size: 2rem;
+  font-size: 1.9rem;
+  letter-spacing: 0.5px;
 }
 
 #guestInfo p {
-  font-size: 1.1rem;
-  color: #5e4a35;
+  font-size: 1.05rem;
+  color: #5c4632;
   margin-bottom: 1rem;
+  line-height: 1.4;
 }
 
 #confirmBtn {
-  background-color: #a68c6d;
-  color: #ffffff;
+  background: linear-gradient(to right, #bfa181, #9e7f5b);
+  color: #fff;
   border: none;
-  padding: 0.8rem 2rem;
-  border-radius: 30px;
+  padding: 0.85rem 2rem;
+  border-radius: 40px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
+  width: 100%;
+  max-width: 300px;
+  margin-top: 1rem;
   transition: background 0.3s ease, transform 0.2s;
-  box-shadow: 0 4px 10px rgba(77, 57, 39, 0.2);
+  box-shadow: 0 5px 15px rgba(115, 95, 75, 0.25);
 }
 
 #confirmBtn:hover {
-  background-color: #6b4e2e;
+  background: linear-gradient(to right, #8d6e52, #7b5e42);
   transform: scale(1.03);
 }
 
 #statusMessage {
   margin-top: 1.5rem;
   font-weight: 600;
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.1rem;
   border-radius: 12px;
   transition: all 0.3s ease;
+  font-size: 0.95rem;
 }
 
 #statusMessage.success {
-  background-color: #d2b48c;
-  color: #3e2f1c;
-  border: 1px solid #a68c6d;
+  background-color: #e7d5bd;
+  color: #4e3929;
+  border: 1px solid #bfa181;
 }
 
 #statusMessage.error {
-  background-color: #fff0f0;
-  color: #4d3927;
-  border: 1px solid #c8b6a6;
+  background-color: #fceeee;
+  color: #5a3f2c;
+  border: 1px solid #d7bca8;
 }
 
 .hidden {
   display: none;
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  .confirm-container {
+    padding: 1.8rem 1.5rem;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  #guestInfo p {
+    font-size: 1rem;
+  }
+
+  #confirmBtn {
+    font-size: 0.95rem;
+    padding: 0.8rem 1.6rem;
+  }
 }
