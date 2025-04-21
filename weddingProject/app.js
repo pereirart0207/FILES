@@ -107,7 +107,16 @@ async function loadGuests(searchTerm = "") {
       const data = doc.data();
       const companionsCount = data.companions ? data.companions.length : 0;
       total += 1 + companionsCount;
-      if (data.confirmed == "confirmed") confirmed++;
+
+      // Contar al invitado principal si está confirmado
+      if (data.confirmed === "confirmed") confirmed++;
+
+      // Contar acompañantes confirmados
+      if (data.companions && data.companions.length > 0) {
+        data.companions.forEach((companion) => {
+          if (companion.confirmed === "confirmed") confirmed++;
+        });
+      }
 
       const li = document.createElement("li");
       li.className = "guest-item";
@@ -146,9 +155,9 @@ async function loadGuests(searchTerm = "") {
           </button>
           <button class="action-btn toggle-confirm-btn" 
                   data-id="${doc.id}" 
-                 data-confirmed="${
-                   data.confirmed == "confirmed" ? "true" : "false"
-                 }">
+                  data-confirmed="${
+                    data.confirmed == "confirmed" ? "true" : "false"
+                  }">
             <i class="fas fa-${
               data.confirmed == "confirmed" ? "times" : "check"
             }"></i> 
@@ -189,8 +198,8 @@ function handleAttendeeActions(e) {
     deleteGuest(guestId, guestName);
   } else if (button.classList.contains("toggle-confirm-btn")) {
     const guestId = button.getAttribute("data-id");
-    const isConfirmed = button.getAttribute("data-confirmed") === "True";
-    toggleGuestConfirmation(guestId, isConfirmed ? "confirmed" : "pending");
+    const isConfirmed = button.getAttribute("data-confirmed") === "true";
+    toggleGuestConfirmation(guestId, !isConfirmed ? "confirmed" : "pending");
   }
 }
 
@@ -342,16 +351,39 @@ async function deleteGuest(guestId, guestName) {
   }
 }
 
-// Cambiar estado de confirmación
 async function toggleGuestConfirmation(guestId, newStatus) {
   try {
-    await db.collection("confirmations").doc(guestId).update({
-      confirmed: newStatus,
-      lastUpdate: firebase.firestore.FieldValue.serverTimestamp(),
-    });
+    const guestRef = db.collection("confirmations").doc(guestId);
+
+    // Actualizar estado del invitado principal
+    await guestRef.update({ confirmed: newStatus });
+
+    // Obtener datos del invitado
+    const guestDoc = await guestRef.get();
+
+    if (!guestDoc.exists) {
+      throw new Error("El invitado no existe.");
+    }
+
+    const guestData = guestDoc.data();
+
+    // Si tiene acompañantes, actualizar el estado de cada uno
+    if (
+      Array.isArray(guestData.companions) &&
+      guestData.companions.length > 0
+    ) {
+      const updatedCompanions = guestData.companions.map((companion) => ({
+        ...companion,
+        confirmed: newStatus, // ← string: "confirmed" o "pending"
+      }));
+
+      await guestRef.update({ companions: updatedCompanions });
+    }
+
+    // Recargar lista de invitados
     loadGuests(domElements.searchInput.value.trim());
   } catch (error) {
     console.error("Error actualizando estado: ", error);
-    alert("Error al actualizar el estado del invitado");
+    alert("Error al actualizar el estado del invitado y/o acompañantes");
   }
 }
