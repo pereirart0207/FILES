@@ -81,7 +81,7 @@ async function loadGuests(searchTerm = '') {
             data-id="${doc.id}" 
             data-email="${data.email}" 
             data-name="${data.name}">
-      <i class="fas fa-envelope"></i> Enviar invitación
+      <i class="fas fa-envelope"></i> Reenviar invitación
     </button>
     <button class="action-btn toggle-confirm-btn" 
             data-id="${doc.id}" 

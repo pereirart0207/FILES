@@ -225,26 +225,8 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     text-align: center;
   }
-  .confirm-container button {
-    background-color: #6b4e2e;
-    color: #ffffff;
-    border: 2px solid #a68c6d;
-    padding: 14px 32px;
-    font-size: 16px;
-    font-weight: bold;
-    text-transform: uppercase;
-    border-radius: 8px;
-    cursor: pointer;
-    box-shadow: 4px 4px 0 #d2b48c;
-    transition: all 0.3s ease;
-  }
+
   
-  .confirm-container button:hover {
-    background-color: #4d3927;
-    box-shadow: 2px 2px 0 #a68c6d;
-  }
-  
-  /* Estilos para botones de acción */
   .action-btn {
     padding: 6px 12px;
     font-size: 13px;
@@ -256,13 +238,41 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-  }
-  
-  .action-btn i {
+}
+
+.action-btn i {
     margin-right: 5px;
     font-size: 11px;
-  }
-  
+}
+
+/* --- ESTILOS RESPONSIVE --- */
+@media (max-width: 768px) {
+    /* Ocultar texto en botones y mostrar solo iconos en móvil */
+    .action-btn {
+        padding: 5px 8px; /* Hacer más pequeños los botones */
+        min-width: auto; /* Eliminar ancho mínimo */
+    }
+    
+    .action-btn span {
+        display: none; /* Ocultar el texto */
+    }
+    
+    .action-btn i {
+        margin-right: 0; /* Eliminar margen del icono */
+        font-size: 12px; /* Ajustar tamaño del icono */
+    }
+}
+
+/* Ajustes adicionales para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    .action-btn {
+        padding: 4px 6px; /* Hacer aún más pequeños */
+    }
+    
+    .action-btn i {
+        font-size: 11px;
+    }
+}
   /* Botón de confirmación */
   #confirmBtn, .toggle-confirm-btn {
     background-color: #a68c6d;
