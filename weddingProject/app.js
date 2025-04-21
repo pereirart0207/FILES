@@ -106,10 +106,10 @@ async function loadGuests(searchTerm = "") {
     snapshot.forEach((doc) => {
       const data = doc.data();
       const companionsCount = data.companions ? data.companions.length : 0;
-      total += 1 + companionsCount;
+      total += companionsCount;
 
       // Contar al invitado principal si está confirmado
-      if (data.confirmed === "confirmed") confirmed++;
+      //if (data.confirmed === "confirmed") confirmed++;
 
       // Contar acompañantes confirmados
       if (data.companions && data.companions.length > 0) {
@@ -131,7 +131,7 @@ async function loadGuests(searchTerm = "") {
         </div>
         ${data.email ? `<div class="guest-email">${data.email}</div>` : ""}
         <div class="guest-details">
-          <span>Acompañantes: ${companionsCount}</span>
+          <span>Acompañantes: ${companionsCount - 1}</span>
           ${
             data.companions && data.companions.length > 0
               ? `<div class="companions-list">${data.companions
@@ -245,11 +245,13 @@ async function handleGuestSubmission(e) {
   try {
     // Obtener acompañantes con validación
     const companions = [];
+    companions.push({ name, confirmed: "pending" });
+
     document.querySelectorAll(".companion-field").forEach((field) => {
-      const name = field.querySelector(".companion-name").value.trim();
-      if (name) {
+      const companionName = field.querySelector(".companion-name").value.trim();
+      if (companionName) {
         companions.push({
-          name,
+          name: companionName,
           confirmed: "pending",
         });
       }
