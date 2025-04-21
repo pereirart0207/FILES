@@ -101,20 +101,12 @@ function renderCompanionsSection(companions, guestId) {
           type="checkbox" 
           id="companion-${index}" 
           class="companion-checkbox" 
+          checked = "${companion.confirmed === "confirmed" ? "true" : "false"}"
           ${companion.confirmed === "confirmed" ? "checked disabled" : ""}
           data-index="${index}"
         >
         <label for="companion-${index}" class="companion-info">
           <span>${companion.name}</span>
-          <span class="status ${
-            companion.confirmed === "confirmed" ? "confirmed" : "pending"
-          }">
-            ${
-              companion.confirmed === "confirmed"
-                ? "✅ Confirmado"
-                : "❌ Pendiente"
-            }
-          </span>
         </label>
       </div>
     `;
