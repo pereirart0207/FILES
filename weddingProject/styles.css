@@ -218,15 +218,7 @@
     margin-right: 8px;
   }
   
-  .confirm-container {
-    background-color: #fff8f0;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-
-  
+ 
   .action-btn {
     padding: 6px 12px;
     font-size: 13px;
@@ -274,12 +266,12 @@
     }
 }
   /* Botón de confirmación */
-  #confirmBtn, .toggle-confirm-btn {
+  .toggle-confirm-btn {
     background-color: #a68c6d;
     color: #ffffff;
   }
   
-  #confirmBtn:hover, .toggle-confirm-btn:hover {
+  .toggle-confirm-btn:hover {
     background-color: #8a755c;
   }
   
