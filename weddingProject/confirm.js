@@ -106,8 +106,8 @@ async function fetchGuestData(guestId) {
     const guestData = docSnap.data();
     renderGuestInfo(guestData, guestId);
 
-    if (guestData.companions && guestData.companions.length > 0) {
-      renderCompanionsSection(guestData.companions, guestId);
+    if (guestData.companions && guestData.companionNames.length > 0) {
+      renderCompanionsSection(guestData.companionNames, guestId);
     }
 
     if (!guestData.confirmed) {
