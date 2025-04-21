@@ -238,8 +238,6 @@ async function handleGuestSubmission(e) {
         companions.push({
           name,
           confirmed: "pending",
-          confirmedAt: null,
-          email: field.querySelector(".companion-email")?.value.trim() || null,
         });
       }
     });
