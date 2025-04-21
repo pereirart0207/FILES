@@ -107,7 +107,7 @@ async function loadGuests(searchTerm = "") {
       const data = doc.data();
       const companionsCount = data.companions ? data.companions.length : 0;
       total += 1 + companionsCount;
-      if (data.confirmed) confirmed++;
+      if (data.confirmed == "confirmed") confirmed++;
 
       const li = document.createElement("li");
       li.className = "guest-item";
@@ -115,9 +115,9 @@ async function loadGuests(searchTerm = "") {
         <div class="guest-header">
           <strong>${data.name}</strong> 
           <span class="guest-status ${
-            data.confirmed ? "confirmed" : "pending"
+            data.confirmed == "confirmed" ? "confirmed" : "pending"
           }">
-            ${data.confirmed ? "✓ Confirmado" : "✗ Pendiente"}
+            ${data.confirmed == "confirmed" ? "✓ Confirmado" : "✗ Pendiente"}
           </span>
         </div>
         ${data.email ? `<div class="guest-email">${data.email}</div>` : ""}
@@ -146,9 +146,11 @@ async function loadGuests(searchTerm = "") {
           </button>
           <button class="action-btn toggle-confirm-btn" 
                   data-id="${doc.id}" 
-                  data-confirmed="${data.confirmed}">
-            <i class="fas fa-${data.confirmed ? "times" : "check"}"></i> 
-            ${data.confirmed ? "Cancelar" : "Confirmar"}
+                  data-confirmed="${data.confirmed == "confirmed"}">
+            <i class="fas fa-${
+              data.confirmed == "confirmed" ? "times" : "check"
+            }"></i> 
+            ${data.confirmed == "confirmed" ? "Cancelar" : "Confirmar"}
           </button>
           <button class="action-btn delete-btn" 
                   data-id="${doc.id}" 
@@ -185,8 +187,11 @@ function handleAttendeeActions(e) {
     deleteGuest(guestId, guestName);
   } else if (button.classList.contains("toggle-confirm-btn")) {
     const guestId = button.getAttribute("data-id");
-    const isConfirmed = button.getAttribute("data-confirmed") === "true";
-    toggleGuestConfirmation(guestId, !isConfirmed);
+    const isConfirmed = button.getAttribute("data-confirmed") === "confirmed";
+    toggleGuestConfirmation(
+      guestId,
+      isConfirmed == "confirmed" ? "confirmed" : "pending"
+    );
   }
 }
 
@@ -251,7 +256,7 @@ async function handleGuestSubmission(e) {
       email: email?.trim() || null,
       companions: companions.length > 0 ? companions : null,
       note: note?.trim() || null,
-      confirmed: false,
+      confirmed: "pending",
       timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     });
     // Limpiar y cerrar

@@ -42,7 +42,7 @@ async function fetchGuestData(guestId) {
       renderCompanionsSection(guestData.companions, guestId);
     }
 
-    if (guestData.confirmed == "pending") {
+    if (guestData.confirmed != "confirmed") {
       setupConfirmationControls(guestId);
     } else {
       showStatusMessage(
@@ -94,36 +94,29 @@ function renderCompanionsSection(companions, guestId) {
     const companionItem = document.createElement("div");
     companionItem.className = "companion-item";
     companionItem.innerHTML = `
-        <div class="companion-info">
-          <span>${companion.name}</span>
-          <span class="status ${
-            companion.confirmed == "confirmed" ? "confirmed" : "pending"
-          }">
-            ${
-              companion.confirmed == "confirmed"
-                ? "✅ Confirmado"
-                : "❌ Pendiente"
-            }
-          </span>
+        <div class="companion-checkbox-container">
+          <input 
+            type="checkbox" 
+            id="companion-${index}" 
+            class="companion-checkbox" 
+            ${companion.confirmed === "confirmed" ? "checked disabled" : ""}
+            data-index="${index}"
+          >
+          <label for="companion-${index}" class="companion-info">
+            <span>${companion.name}</span>
+            <span class="status ${
+              companion.confirmed === "confirmed" ? "confirmed" : "pending"
+            }">
+              ${
+                companion.confirmed === "confirmed"
+                  ? "✅ Confirmado"
+                  : "❌ Pendiente"
+              }
+            </span>
+          </label>
         </div>
-        ${
-          !companion.confirmed == "confirmed"
-            ? `
-          <button class="confirm-companion-btn" data-index="${index}">
-            <i class="fas fa-check"></i> Confirmar
-          </button>
-        `
-            : ""
-        }
       `;
     companionsList.appendChild(companionItem);
-  });
-
-  // Agregar eventos a los botones de confirmación
-  document.querySelectorAll(".confirm-companion-btn").forEach((btn) => {
-    btn.addEventListener("click", () =>
-      confirmCompanion(guestId, parseInt(btn.dataset.index))
-    );
   });
 }
 
@@ -131,34 +124,64 @@ function setupConfirmationControls(guestId) {
   const controls = document.getElementById("confirmationControls");
   controls.classList.remove("hidden");
 
-  document
-    .getElementById("confirmAllBtn")
-    .addEventListener("click", () => confirmAll(guestId));
+  // Confirmar todos
+  document.getElementById("confirmAllBtn").addEventListener("click", () => {
+    const checkboxes = document.querySelectorAll(
+      ".companion-checkbox:not(:disabled)"
+    );
+    checkboxes.forEach((checkbox) => {
+      checkbox.checked = true;
+    });
+    confirmAll(guestId);
+  });
+
+  // Confirmar seleccionados
   document
     .getElementById("confirmSelectedBtn")
-    .addEventListener("click", () => confirmSelected(guestId));
+    .addEventListener("click", () => {
+      const selectedCompanions = Array.from(
+        document.querySelectorAll(".companion-checkbox:checked:not(:disabled)")
+      ).map((checkbox) => parseInt(checkbox.dataset.index));
+
+      if (selectedCompanions.length > 0) {
+        confirmSelectedCompanions(guestId, selectedCompanions);
+      } else {
+        showStatusMessage(
+          "Por favor selecciona al menos un acompañante",
+          "error"
+        );
+      }
+    });
 }
 
-async function confirmCompanion(guestId, companionIndex) {
+// Nueva función para confirmar acompañantes seleccionados
+async function confirmSelectedCompanions(guestId, companionIndexes) {
   try {
     const docRef = db.collection("confirmations").doc(guestId);
     const doc = await docRef.get();
     const companions = [...doc.data().companions];
 
-    companions[companionIndex] = {
-      ...companions[companionIndex],
-      confirmed: "confirmed",
-    };
+    companionIndexes.forEach((index) => {
+      if (index >= 0 && index < companions.length) {
+        companions[index] = {
+          ...companions[index],
+          confirmed: "confirmed",
+          confirmedAt: new Date().toISOString(),
+        };
+      }
+    });
 
     await docRef.update({ companions });
     renderCompanionsSection(companions, guestId);
-    showStatusMessage("Acompañante confirmado exitosamente!", "success");
+    showStatusMessage("Acompañantes seleccionados confirmados!", "success");
+    confettiEffect();
   } catch (error) {
-    console.error("Error al confirmar acompañante:", error);
-    showStatusMessage("Error al confirmar el acompañante", "error");
+    console.error("Error al confirmar acompañantes:", error);
+    showStatusMessage("Error al confirmar los acompañantes", "error");
   }
 }
 
+// Modificar confirmAll para mantener consistencia
 async function confirmAll(guestId) {
   try {
     const docRef = db.collection("confirmations").doc(guestId);
@@ -169,6 +192,7 @@ async function confirmAll(guestId) {
       ? data.companions.map((companion) => ({
           ...companion,
           confirmed: "confirmed",
+          confirmedAt: new Date().toISOString(),
         }))
       : [];
 
@@ -178,8 +202,8 @@ async function confirmAll(guestId) {
       companions: updatedCompanions,
     });
 
-    fetchGuestData(guestId); // Recargar datos
-    showStatusMessage("¡Todos confirmados exitosamente! �", "success");
+    fetchGuestData(guestId);
+    showStatusMessage("¡Todos confirmados exitosamente! 🎉", "success");
     confettiEffect();
   } catch (error) {
     console.error("Error al confirmar todos:", error);
