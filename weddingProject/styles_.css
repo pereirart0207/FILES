@@ -220,6 +220,24 @@ button[type="submit"] i {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   text-align: center;
 }
+.confirm-container button {
+  background-color: #6b4e2e;
+  color: #ffffff;
+  border: 2px solid #a68c6d;
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 #d2b48c;
+  transition: all 0.3s ease;
+}
+
+.confirm-container button:hover {
+  background-color: #4d3927;
+  box-shadow: 2px 2px 0 #a68c6d;
+}
 
 /* Estilos base para todos los botones de acción */
 .action-btn {
