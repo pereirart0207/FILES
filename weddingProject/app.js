@@ -105,9 +105,7 @@ async function loadGuests(searchTerm = "") {
 
     snapshot.forEach((doc) => {
       const data = doc.data();
-      const companionsCount = data.companionsNames
-        ? data.companionsNames.length
-        : 0;
+      const companionsCount = data.companions ? data.companions.length : 0;
       total += 1 + companionsCount;
       if (data.confirmed) confirmed++;
 
@@ -126,9 +124,14 @@ async function loadGuests(searchTerm = "") {
         <div class="guest-details">
           <span>Acompañantes: ${companionsCount}</span>
           ${
-            data.companionsNames && data.companionsNames.length > 0
-              ? `<div class="companions-list">${data.companionsNames
-                  .map((name) => `<span class="companion-name">${name}</span>`)
+            data.companions && data.companions.length > 0
+              ? `<div class="companions-list">${data.companions
+                  .map(
+                    (companion) =>
+                      `<span class="companion-name">${
+                        companion.confirmed != "pending" ? "✅" : "❌"
+                      } ${companion.name}</span>`
+                  )
                   .join(", ")}</div>`
               : ""
           }
@@ -227,23 +230,32 @@ async function handleGuestSubmission(e) {
   }
 
   try {
-    // Obtener nombres de acompañantes de manera segura
-    const companionsNames = Array.from(
-      document.querySelectorAll(".companion-name")
-    )
-      .map((input) => (input.value ? input.value.trim() : ""))
-      .filter((name) => name !== "");
+    // Obtener acompañantes con validación
+    const companions = [];
+    document.querySelectorAll(".companion-field").forEach((field) => {
+      const name = field.querySelector(".companion-name").value.trim();
+      if (name) {
+        companions.push({
+          name,
+          confirmed: "pending",
+          confirmedAt: null,
+          email: field.querySelector(".companion-email")?.value.trim() || null,
+        });
+      }
+    });
+
+    // Validación principal
+    if (!name.trim()) throw new Error("El nombre del invitado es requerido");
 
     // Agregar a Firestore
     const docRef = await db.collection("confirmations").add({
-      name,
-      email,
-      companionsNames: companionsNames.length > 0 ? companionsNames : null,
-      note: note || null,
+      name: name.trim(),
+      email: email?.trim() || null,
+      companions: companions.length > 0 ? companions : null,
+      note: note?.trim() || null,
       confirmed: false,
       timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     });
-
     // Limpiar y cerrar
     closeGuestModal();
 
@@ -258,8 +270,8 @@ async function handleGuestSubmission(e) {
     // Recargar lista
     loadGuests(domElements.searchInput.value.trim());
   } catch (error) {
-    console.error("Error agregando invitado:", error);
-    alert("Error al agregar el invitado: " + error.message);
+    console.error("Error:", error);
+    alert(`Error: ${error.message}`);
   }
 }
 
