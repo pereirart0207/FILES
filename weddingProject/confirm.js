@@ -42,7 +42,7 @@ async function fetchGuestData(guestId) {
       renderCompanionsSection(guestData.companions, guestId);
     }
 
-    if (!guestData.confirmed == "confirmed") {
+    if (guestData.confirmed == "pending") {
       setupConfirmationControls(guestId);
     } else {
       showStatusMessage(
@@ -62,11 +62,17 @@ function renderGuestInfo(guestData, guestId) {
       <div class="guest-card">
         <h2>${guestData.name}</h2>
         <p><i class="fas fa-envelope"></i> ${guestData.email}</p>
-        <p class="status ${guestData.confirmed ? "confirmed" : "pending"}">
+        <p class="status ${
+          guestData.confirmed == "confirmed" ? "confirmed" : "pending"
+        }">
           <i class="fas ${
-            guestData.confirmed ? "fa-check-circle" : "fa-clock"
+            guestData.confirmed == "confirmed" ? "fa-check-circle" : "fa-clock"
           }"></i>
-          ${guestData.confirmed ? "Confirmado" : "Pendiente de confirmación"}
+          ${
+            guestData.confirmed == "confirmed"
+              ? "Confirmado"
+              : "Pendiente de confirmación"
+          }
         </p>
         ${
           guestData.note
@@ -90,12 +96,18 @@ function renderCompanionsSection(companions, guestId) {
     companionItem.innerHTML = `
         <div class="companion-info">
           <span>${companion.name}</span>
-          <span class="status ${companion.confirmed ? "confirmed" : "pending"}">
-            ${companion.confirmed ? "✅ Confirmado" : "❌ Pendiente"}
+          <span class="status ${
+            companion.confirmed == "confirmed" ? "confirmed" : "pending"
+          }">
+            ${
+              companion.confirmed == "confirmed"
+                ? "✅ Confirmado"
+                : "❌ Pendiente"
+            }
           </span>
         </div>
         ${
-          !companion.confirmed
+          !companion.confirmed == "confirmed"
             ? `
           <button class="confirm-companion-btn" data-index="${index}">
             <i class="fas fa-check"></i> Confirmar
@@ -135,8 +147,7 @@ async function confirmCompanion(guestId, companionIndex) {
 
     companions[companionIndex] = {
       ...companions[companionIndex],
-      confirmed: true,
-      confirmedAt: new Date().toISOString(),
+      confirmed: "confirmed",
     };
 
     await docRef.update({ companions });
@@ -157,13 +168,12 @@ async function confirmAll(guestId) {
     const updatedCompanions = data.companions
       ? data.companions.map((companion) => ({
           ...companion,
-          confirmed: true,
-          confirmedAt: new Date().toISOString(),
+          confirmed: "confirmed",
         }))
       : [];
 
     await docRef.update({
-      confirmed: true,
+      confirmed: "confirmed",
       confirmedAt: new Date().toISOString(),
       companions: updatedCompanions,
     });
@@ -184,7 +194,7 @@ async function confirmSelected(guestId) {
     const data = doc.data();
 
     await docRef.update({
-      confirmed: true,
+      confirmed: "confirmed",
       confirmedAt: new Date().toISOString(),
     });
 
