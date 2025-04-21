@@ -1,0 +1,403 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
+}
+
+body {
+  background-color: #f5f5f5;
+  color: #333;
+  line-height: 1.6;
+  padding: 20px;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2, h3 {
+  color: #5d3b7a;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 15px 20px;
+  border-radius: 8px;
+  width: 45%;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.stat-card i {
+  font-size: 2rem;
+  color: #5d3b7a;
+  margin-right: 15px;
+}
+
+.stat-card h3 {
+  font-size: 1rem;
+  margin: 0;
+  text-align: left;
+  color: #6c757d;
+}
+
+.stat-card p {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 5px 0 0;
+}
+
+.search-container {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.search-container input {
+  flex: 1;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px 0 0 5px;
+  font-size: 16px;
+}
+
+.search-container button {
+  padding: 12px 15px;
+  background: #5d3b7a;
+  color: white;
+  border: none;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.attendees-list {
+  list-style: none;
+  margin-bottom: 30px;
+}
+
+.attendees-list li {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.3s;
+}
+
+.attendees-list li:hover {
+  background-color: #f9f9f9;
+}
+
+.attendees-list li strong {
+  color: #5d3b7a;
+}
+
+.attendees-list li small {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.add-guest-btn {
+  background-color: #5d3b7a;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px; /* Añadido para espacio entre el botón y la lista */
+}
+
+.add-guest-btn:hover {
+  background-color: #7a4b9e;
+}
+
+/* Modal styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #6c757d;
+}
+
+.hidden {
+  display: none;
+}
+
+.input-group {
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.input-group i {
+  position: absolute;
+  left: 15px;
+  top: 15px;
+  color: #5d3b7a;
+}
+
+.input-group input,
+.input-group textarea {
+  width: 100%;
+  padding: 12px 15px 12px 45px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.input-group textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+button[type="submit"] {
+  background-color: #5d3b7a;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  width: 100%;
+  transition: background-color 0.3s;
+  margin-top: 10px;
+}
+
+button[type="submit"]:hover {
+  background-color: #7a4b9e;
+}
+
+button[type="submit"] i {
+  margin-right: 8px;
+}
+
+.confirm-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+/* Estilos base para todos los botones de acción */
+.action-btn {
+  padding: 6px 12px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 0 4px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.action-btn i {
+  margin-right: 5px;
+  font-size: 11px;
+}
+
+/* Botón de confirmación */
+#confirmBtn, .toggle-confirm-btn {
+  background-color: #4CAF50; /* Verde más suave */
+  color: white;
+}
+
+#confirmBtn:hover, .toggle-confirm-btn:hover {
+  background-color: #3e8e41;
+}
+
+/* Botón de enviar invitación */
+.send-invite-btn {
+  background-color: #2196F3; /* Azul más suave */
+  color: white;
+}
+
+.send-invite-btn:hover {
+  background-color: #0b7dda;
+}
+
+/* Botón de eliminar */
+.delete-btn {
+  background-color: #f44336; /* Rojo más suave */
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #d32f2f;
+}
+
+/* Efectos comunes para hover */
+.action-btn:hover {
+  opacity: 0.9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* Mensaje de estado */
+#statusMessage {
+  margin-top: 15px;
+  font-weight: 500;
+  padding: 10px;
+  border-radius: 4px;
+  background-color: #f8f9fa;
+  border-left: 3px solid #2196F3;
+  font-size: 14px;
+}
+
+/* Clase para elementos ocultos */
+.hidden {
+  display: none;
+}
+
+/* Contenedor de acciones en cada item */
+.guest-actions {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.guest-actions .action-btn {
+  flex-grow: 1;
+  min-width: 100px;
+}
+
+/* Estilo minimalista para los items de la lista */
+#attendeesList li {
+  transition: background-color 0.2s ease;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+}
+
+#attendeesList li:hover {
+  background-color: #f5f5f5;
+}
+
+/* --- ESTILOS RESPONSIVE --- */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  .stats {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .stat-card {
+    width: 100%;
+  }
+
+  .search-container {
+    flex-direction: row;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .search-container input,
+  .search-container button {
+    width: auto;
+  }
+
+  .add-guest-btn {
+    font-size: 15px;
+    padding: 10px;
+    margin-bottom: 20px; /* Espacio antes de la lista */
+  }
+
+  .modal-content {
+    padding: 20px;
+  }
+
+  .input-group input,
+  .input-group textarea {
+    padding-left: 40px;
+  }
+
+  .guest-actions {
+    flex-direction: column;
+  }
+
+  .guest-actions .action-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  h1, h2, h3 {
+    font-size: 1.2rem;
+  }
+
+  .stat-card h3 {
+    font-size: 0.9rem;
+  }
+
+  .stat-card p {
+    font-size: 1.2rem;
+  }
+
+  .modal-content {
+    padding: 15px;
+  }
+
+  .add-guest-btn {
+    padding: 10px 15px;
+    font-size: 14px;
+  }
+
+  .action-btn {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .input-group i {
+    top: 12px;
+  }
+}

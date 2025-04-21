@@ -250,22 +250,26 @@ guestForm.addEventListener('submit', async (e) => {
     return;
   }
 
-  try {
-    await db.collection('confirmations').add({
-      name,
-      email,
-      companions,
-      note,
-      confirmed: false,
-      timestamp: Date.now()
-    });
+ try {
+  const docRef = await db.collection('confirmations').add({
+    name,
+    email,
+    companions,
+    note,
+    confirmed: false,
+    timestamp: Date.now()
+  });
 
-    guestForm.reset();
-    guestModal.classList.add('hidden');
-    loadGuests(searchInput.value.trim());
-    alert('Invitado agregado exitosamente');
-  } catch (error) {
-    console.error('Error agregando invitado:', error);
-    alert('Error al agregar el invitado');
-  }
+  guestForm.reset();
+  guestModal.classList.add('hidden');
+  loadGuests(searchInput.value.trim());
+
+  // Esperar a que se envíe el correo antes de mostrar la alerta
+  await sendInvitationEmail(email, name, docRef.id);
+
+  alert(`Invitado agregado exitosamente, se le ha enviado la invitación al correo especificado ${email}`);
+} catch (error) {
+  console.error('Error agregando invitado:', error);
+  alert('Error al agregar el invitado');
+}
 });
