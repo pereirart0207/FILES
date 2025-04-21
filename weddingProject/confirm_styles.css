@@ -145,15 +145,26 @@ h2 {
   justify-content: center;
 }
 
-#confirmAllBtn, #confirmSelectedBtn {
+#confirmAllBtn,
+#confirmSelectedBtn {
   background: linear-gradient(to right, #7b5e42, #5c4632);
   padding: 0.8rem 1.5rem;
   font-size: 0.95rem;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-#confirmAllBtn:hover, #confirmSelectedBtn:hover {
-  background: linear-gradient(to right, #5c4632, #4a3725);
+#confirmAllBtn:hover,
+#confirmSelectedBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  opacity: 0.95;
 }
+
 
 #statusMessage {
   margin-top: 1.5rem;
