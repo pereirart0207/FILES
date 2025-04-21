@@ -146,7 +146,9 @@ async function loadGuests(searchTerm = "") {
           </button>
           <button class="action-btn toggle-confirm-btn" 
                   data-id="${doc.id}" 
-                  data-confirmed="${data.confirmed == "confirmed"}">
+                 data-confirmed="${
+                   data.confirmed == "confirmed" ? "true" : "false"
+                 }">
             <i class="fas fa-${
               data.confirmed == "confirmed" ? "times" : "check"
             }"></i> 
@@ -187,11 +189,8 @@ function handleAttendeeActions(e) {
     deleteGuest(guestId, guestName);
   } else if (button.classList.contains("toggle-confirm-btn")) {
     const guestId = button.getAttribute("data-id");
-    const isConfirmed = button.getAttribute("data-confirmed") === "confirmed";
-    toggleGuestConfirmation(
-      guestId,
-      isConfirmed == "confirmed" ? "confirmed" : "pending"
-    );
+    const isConfirmed = button.getAttribute("data-confirmed") === "True";
+    toggleGuestConfirmation(guestId, isConfirmed ? "confirmed" : "pending");
   }
 }
 
