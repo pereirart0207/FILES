@@ -6,7 +6,7 @@ const firebaseConfig = {
   storageBucket: "bodda-451a0.appspot.com",
   messagingSenderId: "357631041042",
   appId: "1:357631041042:web:1bfc8be63fb1d9a7f1c2cb",
-  measurementId: "G-JB87P9RLTF"
+  measurementId: "G-JB87P9RLTF",
 };
 
 // Configuración de EmailJS
@@ -18,79 +18,134 @@ const TEMPLATE_ID = "template_ykovwyb";
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
-// Elementos del DOM
-const attendeesList = document.getElementById("attendeesList");
-const totalGuests = document.getElementById("totalGuests");
-const confirmedGuests = document.getElementById("confirmedGuests");
-const searchInput = document.getElementById("searchInput");
-const searchBtn = document.getElementById("searchBtn");
-const addGuestBtn = document.getElementById("addGuestBtn");
-const guestModal = document.getElementById("guestModal");
-const closeBtn = document.querySelector(".close-btn");
-const guestForm = document.getElementById("guestForm");
-const companionsContainer = document.getElementById("companionsContainer");
-const addCompanionBtn = document.getElementById("addCompanionBtn");
+// Cache de elementos del DOM
+const domElements = {
+  attendeesList: document.getElementById("attendeesList"),
+  totalGuests: document.getElementById("totalGuests"),
+  confirmedGuests: document.getElementById("confirmedGuests"),
+  searchInput: document.getElementById("searchInput"),
+  searchBtn: document.getElementById("searchBtn"),
+  addGuestBtn: document.getElementById("addGuestBtn"),
+  guestModal: document.getElementById("guestModal"),
+  closeBtn: document.querySelector(".close-btn"),
+  guestForm: document.getElementById("guestForm"),
+  companionsContainer: document.getElementById("companionsContainer"),
+  addCompanionBtn: document.getElementById("addCompanionBtn"),
+  nameInput: document.getElementById("name"),
+  emailInput: document.getElementById("email"),
+  noteInput: document.getElementById("note"),
+};
 
+// Inicialización
 document.addEventListener("DOMContentLoaded", () => {
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+
   loadGuests();
+  setupEventListeners();
 });
 
+// Configurar event listeners
+function setupEventListeners() {
+  // Event delegation para botones dinámicos
+  domElements.attendeesList.addEventListener("click", handleAttendeeActions);
+
+  // Búsqueda
+  domElements.searchBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    loadGuests(domElements.searchInput.value.trim());
+  });
+
+  domElements.searchInput.addEventListener("keyup", (e) => {
+    if (e.key === "Enter") {
+      loadGuests(domElements.searchInput.value.trim());
+    }
+  });
+
+  // Modal de invitado
+  domElements.addGuestBtn.addEventListener("click", openGuestModal);
+  domElements.closeBtn.addEventListener("click", closeGuestModal);
+  domElements.guestModal.addEventListener("click", (e) => {
+    if (e.target === domElements.guestModal) {
+      closeGuestModal();
+    }
+  });
+
+  // Añadir acompañante
+  domElements.addCompanionBtn.addEventListener("click", addCompanionField);
+
+  // Formulario de invitado
+  domElements.guestForm.addEventListener("submit", handleGuestSubmission);
+}
+
 // Función para cargar invitados
-async function loadGuests(searchTerm = '') {
+async function loadGuests(searchTerm = "") {
   try {
-    let query = db.collection("confirmations").orderBy("timestamp");
+    let query = db.collection("confirmations").orderBy("timestamp", "desc");
 
     if (searchTerm) {
       query = query
-        .orderBy("name")
         .where("name", ">=", searchTerm)
-        .where("name", "<=", searchTerm + '\uf8ff');
+        .where("name", "<=", searchTerm + "\uf8ff");
     }
 
     const snapshot = await query.get();
-    attendeesList.innerHTML = '';
+    domElements.attendeesList.innerHTML = "";
     let total = 0;
     let confirmed = 0;
 
     if (snapshot.empty) {
-      attendeesList.innerHTML = '<li>No se encontraron invitados</li>';
-      totalGuests.textContent = '0';
-      confirmedGuests.textContent = '0';
+      domElements.attendeesList.innerHTML =
+        '<li class="no-guests">No se encontraron invitados</li>';
+      domElements.totalGuests.textContent = "0";
+      domElements.confirmedGuests.textContent = "0";
       return;
     }
 
-    snapshot.forEach(doc => {
+    snapshot.forEach((doc) => {
       const data = doc.data();
-      const companionsCount = data.companionsNames ? data.companionsNames.length : 0;
+      const companionsCount = data.companionsNames
+        ? data.companionsNames.length
+        : 0;
       total += 1 + companionsCount;
       if (data.confirmed) confirmed++;
 
       const li = document.createElement("li");
+      li.className = "guest-item";
       li.innerHTML = `
         <div class="guest-header">
           <strong>${data.name}</strong> 
-          <span class="guest-status ${data.confirmed ? 'confirmed' : 'pending'}">
-            ${data.confirmed ? '✓ Confirmado' : '✗ Pendiente'}
+          <span class="guest-status ${
+            data.confirmed ? "confirmed" : "pending"
+          }">
+            ${data.confirmed ? "✓ Confirmado" : "✗ Pendiente"}
           </span>
         </div>
-        <div class="guest-email">${data.email}</div>
+        ${data.email ? `<div class="guest-email">${data.email}</div>` : ""}
         <div class="guest-details">
           <span>Acompañantes: ${companionsCount}</span>
-          ${data.companionsNames ? `<div class="companions-list">${data.companionsNames.map(name => `<span class="companion-name">${name}</span>`).join('')}</div>` : ''}
-          ${data.note ? `<span class="guest-note">Nota: ${data.note}</span>` : ''}
+          ${
+            data.companionsNames && data.companionsNames.length > 0
+              ? `<div class="companions-list">${data.companionsNames
+                  .map((name) => `<span class="companion-name">${name}</span>`)
+                  .join(", ")}</div>`
+              : ""
+          }
+          ${data.note ? `<div class="guest-note">Nota: ${data.note}</div>` : ""}
         </div>
         <div class="guest-actions">
           <button class="action-btn send-invite-btn" 
                   data-id="${doc.id}" 
-                  data-email="${data.email}" 
+                  data-email="${data.email || ""}" 
                   data-name="${data.name}">
             <i class="fas fa-envelope"></i> Reenviar invitación
           </button>
           <button class="action-btn toggle-confirm-btn" 
                   data-id="${doc.id}" 
                   data-confirmed="${data.confirmed}">
-            <i class="fas fa-${data.confirmed ? 'times' : 'check'}"></i> 
-            ${data.confirmed ? 'Cancelar' : 'Confirmar'}
+            <i class="fas fa-${data.confirmed ? "times" : "check"}"></i> 
+            ${data.confirmed ? "Cancelar" : "Confirmar"}
           </button>
           <button class="action-btn delete-btn" 
                   data-id="${doc.id}" 
@@ -99,96 +154,122 @@ async function loadGuests(searchTerm = '') {
           </button>
         </div>
       `;
-      attendeesList.appendChild(li);
+      domElements.attendeesList.appendChild(li);
     });
 
-    totalGuests.textContent = total;
-    confirmedGuests.textContent = confirmed;
-
-    // Agregar event listeners a los botones
-    addButtonEventListeners();
-
+    domElements.totalGuests.textContent = total;
+    domElements.confirmedGuests.textContent = confirmed;
   } catch (error) {
     console.error("Error cargando invitados: ", error);
-    attendeesList.innerHTML = '<li>Error al cargar los invitados</li>';
+    domElements.attendeesList.innerHTML =
+      '<li class="error">Error al cargar los invitados</li>';
+  }
+}
+
+// Manejar acciones de los invitados
+function handleAttendeeActions(e) {
+  const button = e.target.closest("button");
+  if (!button) return;
+
+  if (button.classList.contains("send-invite-btn")) {
+    const email = button.getAttribute("data-email") || "";
+    const name = button.getAttribute("data-name");
+    const guestId = button.getAttribute("data-id");
+    sendInvitationEmail(email, name, guestId);
+  } else if (button.classList.contains("delete-btn")) {
+    const guestId = button.getAttribute("data-id");
+    const guestName = button.getAttribute("data-name");
+    deleteGuest(guestId, guestName);
+  } else if (button.classList.contains("toggle-confirm-btn")) {
+    const guestId = button.getAttribute("data-id");
+    const isConfirmed = button.getAttribute("data-confirmed") === "true";
+    toggleGuestConfirmation(guestId, !isConfirmed);
   }
 }
 
 // Función para agregar campos de acompañantes
-function addCompanionField(value = '') {
-  const div = document.createElement('div');
-  div.className = 'companion-field';
+function addCompanionField() {
+  const div = document.createElement("div");
+  div.className = "companion-field";
   div.innerHTML = `
-    <input type="text" class="companion-name" placeholder="Nombre del acompañante" value="${value}">
-    <button type="button" class="remove-companion-btn">×</button>
+    <input type="text" class="companion-name" placeholder="Nombre del acompañante">
+    <button type="button" class="remove-companion-btn">&times;</button>
   `;
-  companionsContainer.appendChild(div);
-  
-  // Agregar evento para eliminar el campo
-  div.querySelector('.remove-companion-btn').addEventListener('click', () => {
+  domElements.companionsContainer.appendChild(div);
+
+  div.querySelector(".remove-companion-btn").addEventListener("click", () => {
     div.remove();
   });
 }
+// Abrir modal de invitado
+function openGuestModal() {
+  domElements.guestForm.reset();
+  domElements.companionsContainer.innerHTML = "";
+  domElements.guestModal.classList.remove("hidden");
+}
 
-// Evento para agregar más acompañantes
-addCompanionBtn.addEventListener('click', () => {
-  addCompanionField();
-});
+// Cerrar modal de invitado
+function closeGuestModal() {
+  domElements.guestModal.classList.add("hidden");
+}
 
-// Función para agregar event listeners a los botones dinámicos
-function addButtonEventListeners() {
-  // Botones de enviar invitación
-  document.querySelectorAll('.send-invite-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const button = e.target.closest('button');
-      const email = button.getAttribute('data-email');
-      const name = button.getAttribute('data-name');
-      const guestId = button.getAttribute('data-id');
-      await sendInvitationEmail(email, name, guestId);
+// Manejar envío del formulario
+async function handleGuestSubmission(e) {
+  e.preventDefault();
+
+  const name = domElements.nameInput.value.trim();
+  const email = domElements.emailInput.value.trim();
+  const note = domElements.noteInput.value.trim();
+
+  if (!name || !email) {
+    alert("Por favor completa los campos obligatorios (Nombre y Email)");
+    return;
+  }
+
+  try {
+    // Obtener nombres de acompañantes de manera segura
+    const companionsNames = Array.from(
+      document.querySelectorAll(".companion-name")
+    )
+      .map((input) => (input.value ? input.value.trim() : ""))
+      .filter((name) => name !== "");
+
+    // Agregar a Firestore
+    const docRef = await db.collection("confirmations").add({
+      name,
+      email,
+      companionsNames: companionsNames.length > 0 ? companionsNames : null,
+      note: note || null,
+      confirmed: false,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     });
-  });
 
-  document.querySelectorAll('.delete-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const button = e.target.closest('button');
-      const guestId = button.getAttribute('data-id');
-      const guestName = button.getAttribute('data-name');
-      
-      if (confirm(`¿Estás seguro que deseas eliminar a ${guestName}?`)) {
-        try {
-          await db.collection("confirmations").doc(guestId).delete();
-          loadGuests(searchInput.value);
-          alert(`Invitado ${guestName} eliminado correctamente`);
-        } catch (error) {
-          console.error("Error eliminando invitado: ", error);
-          alert("Error al eliminar el invitado");
-        }
-      }
-    });
-  });
+    // Limpiar y cerrar
+    closeGuestModal();
 
-  // Botones de confirmar/cancelar
-  document.querySelectorAll('.toggle-confirm-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const button = e.target.closest('button');
-      const guestId = button.getAttribute('data-id');
-      const isConfirmed = button.getAttribute('data-confirmed') === 'true';
+    // Enviar invitación (si hay email)
+    if (email) {
+      await sendInvitationEmail(email, name, docRef.id);
+      alert(`Invitado agregado exitosamente. Invitación enviada a ${email}`);
+    } else {
+      alert(`Invitado agregado exitosamente.`);
+    }
 
-      try {
-        await db.collection("confirmations").doc(guestId).update({
-          confirmed: !isConfirmed
-        });
-        loadGuests(searchInput.value);
-      } catch (error) {
-        console.error("Error actualizando estado: ", error);
-        alert("Error al actualizar el estado del invitado");
-      }
-    });
-  });
+    // Recargar lista
+    loadGuests(domElements.searchInput.value.trim());
+  } catch (error) {
+    console.error("Error agregando invitado:", error);
+    alert("Error al agregar el invitado: " + error.message);
+  }
 }
 
 // Función para enviar invitación por email
 async function sendInvitationEmail(email, name, guestId) {
+  if (!email) {
+    console.warn("No se puede enviar invitación sin email");
+    return;
+  }
+
   const confirmLink = `https://pereirart0207.github.io/FILES/weddingProject/confirm.html?guestId=${guestId}`;
 
   const emailData = {
@@ -201,104 +282,62 @@ async function sendInvitationEmail(email, name, guestId) {
       from_name: "Novios",
       event_date: "Sep, 13, 2025, 11AM",
       event_location: "12201 SW 26th St Miami, FL 33175, United States",
-      party_address: "7707 NW 103rd St Hialeah Gardens, FL 33016, United States",
+      party_address:
+        "7707 NW 103rd St Hialeah Gardens, FL 33016, United States",
       reply_to: "+1(772)204-6309",
-      confirm_link: confirmLink
-    }
+      confirm_link: confirmLink,
+    },
   };
 
   try {
-    const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(emailData)
-    });
+    const response = await fetch(
+      "https://api.emailjs.com/api/v1.0/email/send",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(emailData),
+      }
+    );
 
-    if (response.ok) {
-      alert(`Invitación enviada exitosamente a ${email}`);
-    } else {
+    if (!response.ok) {
       const errorText = await response.text();
       throw new Error(errorText || "Error al enviar el correo");
     }
   } catch (error) {
     console.error("Error enviando invitación: ", error);
-    alert("Error al enviar la invitación: " + error.message);
+    throw error;
   }
 }
 
-// Manejar búsqueda
-searchBtn.addEventListener('click', (e) => {
-  e.preventDefault();
-  loadGuests(searchInput.value.trim());
-});
-
-searchInput.addEventListener('keyup', (e) => {
-  if (e.key === 'Enter') {
-    loadGuests(searchInput.value.trim());
-  }
-});
-
-// Mostrar modal para agregar invitado
-addGuestBtn.addEventListener('click', () => {
-  // Limpiar campos de acompañantes al abrir el modal
-  companionsContainer.innerHTML = '';
-  guestModal.classList.remove('hidden');
-});
-
-// Cerrar modal
-closeBtn.addEventListener('click', () => {
-  guestModal.classList.add('hidden');
-});
-
-// Cerrar modal al hacer clic fuera del contenido
-guestModal.addEventListener('click', (e) => {
-  if (e.target === guestModal) {
-    guestModal.classList.add('hidden');
-  }
-});
-
-// Manejar envío del formulario
-guestForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const name = document.getElementById('name').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const note = document.getElementById('note').value.trim();
-  
-  // Obtener nombres de acompañantes
-  const companionsNames = [];
-  document.querySelectorAll('.companion-name').forEach(input => {
-    if (input.value.trim()) {
-      companionsNames.push(input.value.trim());
+// Eliminar invitado
+async function deleteGuest(guestId, guestName) {
+  if (
+    confirm(
+      `¿Estás seguro que deseas eliminar a ${guestName}? Esta acción no se puede deshacer.`
+    )
+  ) {
+    try {
+      await db.collection("confirmations").doc(guestId).delete();
+      loadGuests(domElements.searchInput.value.trim());
+    } catch (error) {
+      console.error("Error eliminando invitado: ", error);
+      alert("Error al eliminar el invitado");
     }
-  });
-
-  if (!name || !email) {
-    alert('Por favor completa los campos obligatorios');
-    return;
   }
+}
 
+// Cambiar estado de confirmación
+async function toggleGuestConfirmation(guestId, newStatus) {
   try {
-    const docRef = await db.collection('confirmations').add({
-      name,
-      email,
-      companionsNames,
-      note,
-      confirmed: false,
-      timestamp: Date.now()
+    await db.collection("confirmations").doc(guestId).update({
+      confirmed: newStatus,
+      lastUpdate: firebase.firestore.FieldValue.serverTimestamp(),
     });
-
-    guestForm.reset();
-    companionsContainer.innerHTML = '';
-    guestModal.classList.add('hidden');
-    loadGuests(searchInput.value.trim());
-
-    await sendInvitationEmail(email, name, docRef.id);
-    alert(`Invitado agregado exitosamente, se le ha enviado la invitación al correo especificado ${email}`);
+    loadGuests(domElements.searchInput.value.trim());
   } catch (error) {
-    console.error('Error agregando invitado:', error);
-    alert('Error al agregar el invitado');
+    console.error("Error actualizando estado: ", error);
+    alert("Error al actualizar el estado del invitado");
   }
-});
+}

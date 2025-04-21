@@ -6,6 +6,7 @@
   <title>Confirmar Invitado</title>
   <link rel="stylesheet" href="confirm_styles.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
@@ -14,13 +15,22 @@
   <div class="confirm-container">
     <h1>Confirmar Invitado</h1>
     <div id="guestInfo">
-      <p>Cargando informacion de invitados...</p>
+      <p>Cargando información de invitados...</p>
     </div>
-    <button id="confirmBtn" class="hidden">Confirmar Asistencia</button>
+    
+    <div id="companionsSection" class="hidden">
+      <h3>Acompañantes</h3>
+      <div id="companionsList"></div>
+    </div>
+    
+    <div id="confirmationControls" class="hidden">
+      <button id="confirmAllBtn">Confirmar Todos</button>
+      <button id="confirmSelectedBtn">Confirmar Seleccionados</button>
+    </div>
+    
     <p id="statusMessage"></p>
   </div>
 
-  <!-- Tu script de lógica -->
   <script src="confirm.js"></script>
 </body>
 </html>
