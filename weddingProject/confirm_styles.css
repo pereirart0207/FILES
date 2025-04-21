@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Poppins:wght@300;500&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
 body {
   font-family: 'Poppins', sans-serif;
@@ -15,18 +16,18 @@ body {
 
 .confirm-container {
   background: rgba(255, 255, 255, 0.96);
-  padding: 2rem;
+  padding: 2.5rem;
   border-radius: 24px;
   box-shadow: 0 12px 35px rgba(80, 60, 40, 0.15);
   width: 100%;
-  max-width: 420px;
+  max-width: 500px;
   text-align: center;
   color: #4a3725;
   backdrop-filter: blur(6px);
   border: 1px solid #e9dfd0;
 }
 
-h1 {
+h1, h2, h3 {
   font-family: 'Playfair Display', serif;
   color: #7b5e42;
   margin-bottom: 1.5rem;
@@ -34,51 +35,144 @@ h1 {
   letter-spacing: 0.5px;
 }
 
-#guestInfo p {
-  font-size: 1.05rem;
-  color: #5c4632;
+h2 {
+  font-size: 1.5rem;
+  margin-top: 2rem;
   margin-bottom: 1rem;
-  line-height: 1.4;
 }
 
-#confirmBtn {
+.guest-card {
+  background: rgba(249, 243, 234, 0.7);
+  padding: 1.5rem;
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+  border-left: 3px solid #bfa181;
+  text-align: left;
+}
+
+.guest-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0.8rem;
+}
+
+.guest-info i {
+  color: #9e7f5b;
+  width: 20px;
+  text-align: center;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.status.confirmed {
+  background: rgba(191, 161, 129, 0.15);
+  color: #5c4632;
+  border: 1px solid rgba(191, 161, 129, 0.3);
+}
+
+.status.pending {
+  background: rgba(255, 213, 153, 0.3);
+  color: #7b5e42;
+  border: 1px solid rgba(255, 183, 77, 0.3);
+}
+
+.companion-item {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid #e9dfd0;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.companion-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(115, 95, 75, 0.1);
+}
+
+.companion-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.companion-info i {
+  color: #9e7f5b;
+}
+
+.confirm-btn {
   background: linear-gradient(to right, #bfa181, #9e7f5b);
   color: #fff;
   border: none;
-  padding: 0.85rem 2rem;
-  border-radius: 40px;
-  font-size: 1rem;
-  font-weight: 600;
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
-  width: 100%;
-  max-width: 300px;
-  margin-top: 1rem;
-  transition: background 0.3s ease, transform 0.2s;
-  box-shadow: 0 5px 15px rgba(115, 95, 75, 0.25);
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 3px 10px rgba(115, 95, 75, 0.2);
 }
 
-#confirmBtn:hover {
+.confirm-btn:hover {
   background: linear-gradient(to right, #8d6e52, #7b5e42);
-  transform: scale(1.03);
+  transform: scale(1.05);
+}
+
+.confirm-btn:active {
+  transform: scale(0.98);
+}
+
+#confirmationControls {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: center;
+}
+
+#confirmAllBtn, #confirmSelectedBtn {
+  background: linear-gradient(to right, #7b5e42, #5c4632);
+  padding: 0.8rem 1.5rem;
+  font-size: 0.95rem;
+}
+
+#confirmAllBtn:hover, #confirmSelectedBtn:hover {
+  background: linear-gradient(to right, #5c4632, #4a3725);
 }
 
 #statusMessage {
   margin-top: 1.5rem;
-  font-weight: 600;
-  padding: 0.85rem 1.1rem;
+  font-weight: 500;
+  padding: 1rem;
   border-radius: 12px;
   transition: all 0.3s ease;
   font-size: 0.95rem;
+  text-align: center;
 }
 
 #statusMessage.success {
-  background-color: #e7d5bd;
+  background-color: rgba(231, 213, 189, 0.7);
   color: #4e3929;
   border: 1px solid #bfa181;
 }
 
 #statusMessage.error {
-  background-color: #fceeee;
+  background-color: rgba(252, 238, 238, 0.7);
   color: #5a3f2c;
   border: 1px solid #d7bca8;
 }
@@ -91,18 +185,28 @@ h1 {
 @media (max-width: 480px) {
   .confirm-container {
     padding: 1.8rem 1.5rem;
+    border-radius: 18px;
   }
 
   h1 {
     font-size: 1.6rem;
   }
 
-  #guestInfo p {
-    font-size: 1rem;
+  h2 {
+    font-size: 1.3rem;
   }
 
-  #confirmBtn {
-    font-size: 0.95rem;
-    padding: 0.8rem 1.6rem;
+  .guest-card {
+    padding: 1.2rem;
+  }
+
+  #confirmationControls {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  #confirmAllBtn, #confirmSelectedBtn {
+    width: 100%;
+    justify-content: center;
   }
 }
