@@ -10,9 +10,9 @@ const firebaseConfig = {
 };
 
 // Configuración de EmailJS
-const EMAILJS_USER_ID = "ePP1jTB0KozLmd1kF";
+const EMAILJS_USER_ID = "-Q-hV4bAlYnHn7l7V";
 const SERVICE_ID = "service_czex81h";
-const TEMPLATE_ID = "template_wwhdcrf";
+const TEMPLATE_ID = "template_94r2yir";
 
 // Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
@@ -337,6 +337,7 @@ async function sendInvitationEmail(email, name, guestId) {
       const errorText = await response.text();
       throw new Error(errorText || "Error al enviar el correo");
     }
+    alert(`Invitación reenviada a ${email}` );
   } catch (error) {
     console.error("Error enviando invitación: ", error);
     throw error;
