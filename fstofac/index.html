@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PunctoBill - Gestión de Documentos</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1><i class="fas fa-file-invoice-dollar"></i> PunctoBill - Gestión de Documentos</h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="openTab('documents')"><i class="fas fa-folder-open"></i> Documentos</button>
+            <button class="tab" onclick="openTab('newDocument')"><i class="fas fa-plus-square"></i> Nuevo Documento</button>
+            <button class="tab" onclick="openTab('manageData')"><i class="fas fa-database"></i> Gestionar Datos</button>
+        </div>
+
+        <!-- Documentos -->
+        <div id="documents" class="tab-content active">
+            <div class="card">
+                <h2><i class="fas fa-filter"></i> Filtrar Documentos</h2>
+                <!-- filtros -->
+                <div class="form-group">
+                    <label for="docTypeFilter">Tipo de Documento</label>
+                    <select id="docTypeFilter">
+                        <option value="invoices">Facturas</option>
+                        <option value="estimates">Presupuestos</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="clientNameFilter">Nombre del Cliente</label>
+                    <input type="text" id="clientNameFilter" placeholder="Filtrar por cliente...">
+                </div>
+                <div class="form-group">
+                    <label for="sellerNameFilter">Nombre del Vendedor</label>
+                    <input type="text" id="sellerNameFilter" placeholder="Filtrar por vendedor...">
+                </div>
+                <button id="filterBtn"><i class="fas fa-search"></i> Filtrar</button>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-list"></i> Lista de Documentos</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Tipo</th>
+                            <th>Cliente</th>
+                            <th>Vendedor</th>
+                            <th>Total</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody id="documentsList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Nuevo Documento -->
+        <div id="newDocument" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-file-medical"></i> Crear Nuevo Documento</h2>
+                <div class="form-group">
+                    <label for="newDocType">Tipo de Documento</label>
+                    <select id="newDocType">
+                        <option value="invoices">Factura</option>
+                        <option value="estimates">Presupuesto</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="docDate">Fecha</label>
+                    <input type="date" id="docDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Cliente</label>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="clientSelect" style="flex: 1;">
+                            <option value="">Seleccionar cliente existente</option>
+                        </select>
+                        <button onclick="openModal('newClientModal')" style="width: auto;">
+                            <i class="fas fa-user-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Vendedor</label>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="sellerSelect" style="flex: 1;">
+                            <option value="">Seleccionar vendedor existente</option>
+                        </select>
+                        <button onclick="openModal('newSellerModal')" style="width: auto;">
+                            <i class="fas fa-user-tie"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="shipmentPrice">Gastos de envío</label>
+                    <input value="0" type="number" id="shipmentPrice"/>
+                </div>
+                <h3><i class="fas fa-boxes"></i> Artículos</h3>
+                <div id="itemsContainer"></div>
+                <button onclick="addItemRow()" style="margin-top: 10px;"><i class="fas fa-plus"></i> Añadir Artículo</button>
+
+                <div class="total-display">
+                    <i class="fas fa-euro-sign"></i> Total: <span id="totalAmount">0.00</span> €
+                </div>
+
+                <button id="saveDocumentBtn" class="btn-success"><i class="fas fa-save"></i> Guardar Documento</button>
+            </div>
+        </div>
+
+        <!-- Gestionar Datos -->
+        <div id="manageData" class="tab-content">
+            <div class="card">
+                <h2><i class="fas fa-box"></i> Artículos</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Precio</th>
+                            <th>IVA</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsList"></tbody>
+                </table>
+                <button onclick="openModal('newItemModal')" style="margin-top: 10px;"><i class="fas fa-plus"></i> Nuevo Artículo</button>
+            </div>
+            <div class="card">
+                <h2><i class="fas fa-users"></i> Clientes</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Dirección</th>
+                            <th>Teléfono</th>
+                            <th>Email</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="clientsList"></tbody>
+                </table>
+                <button onclick="openModal('newClientModal')" style="margin-top: 10px;"><i class="fas fa-user-plus"></i> Nuevo Cliente</button>
+            </div>
+            <div class="card">
+                <h2><i class="fas fa-user-tie"></i> Vendedores</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sellersList"></tbody>
+                </table>
+                <button onclick="openModal('newSellerModal')" style="margin-top: 10px;"><i class="fas fa-user-plus"></i> Nuevo Vendedor</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modales -->
+    <div id="newItemModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('newItemModal')">&times;</span>
+            <h2>Nuevo Artículo</h2>
+            <div class="form-group">
+                <label for="itemName">Nombre</label>
+                <input type="text" id="itemName" required>
+            </div>
+            <div class="form-group">
+                <label for="itemPrice">Precio</label>
+                <input type="number" id="itemPrice" step="0.01" required>
+            </div>
+            <div class="form-group">
+                <label for="itemVat">IVA (%)</label>
+                <input type="number" id="itemVat" value="21" required>
+            </div>
+            <button id="saveItemBtn" class="btn-success">Guardar Artículo</button>
+        </div>
+    </div>
+    
+    <div id="newClientModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('newClientModal')">&times;</span>
+            <h2>Nuevo Cliente</h2>
+            <div class="form-group">
+                <label for="clientName">Nombre</label>
+                <input type="text" id="clientName" required>
+            </div>
+            <div class="form-group">
+                <label for="clientAddress">Dirección</label>
+                <input type="text" id="clientAddress">
+            </div>
+            <div class="form-group">
+                <label for="clientPhone">Teléfono</label>
+                <input type="text" id="clientPhone">
+            </div>
+            <div class="form-group">
+                <label for="clientEmail">Email</label>
+                <input type="email" id="clientEmail">
+            </div>
+            <div class="form-group">
+                <label for="clientCif">CIF/NIF</label>
+                <input type="text" id="clientCif">
+            </div>
+            <button id="saveClientBtn" class="btn-success">Guardar Cliente</button>
+        </div>
+    </div>
+    
+    <div id="newSellerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('newSellerModal')">&times;</span>
+            <h2>Nuevo Vendedor</h2>
+            <div class="form-group">
+                <label for="sellerName">Nombre</label>
+                <input type="text" id="sellerName" required>
+            </div>
+            <div class="form-group">
+                <label for="sellerEmail">Email</label>
+                <input type="email" id="sellerEmail">
+            </div>
+            <div class="form-group">
+                <label for="sellerPhone">Teléfono</label>
+                <input type="text" id="sellerPhone">
+            </div>
+            <div class="form-group">
+                <label for="sellerCif">CIF/NIF</label>
+                <input type="text" id="sellerCif">
+            </div>
+            <button id="saveSellerBtn" class="btn-success">Guardar Vendedor</button>
+        </div>
+    </div>
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+
+    <script type="module" src="app.js"></script>
+
+</body>
+</html>

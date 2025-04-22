@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Documentos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Lista de Documentos</h1>
+        <!-- Filtro de documentos -->
+        <div class="filters">
+            <label for="docType">Tipo de documento:</label>
+            <select id="docType">
+                <option value="">Todos</option>
+                <option value="invoices">Facturas</option>
+                <option value="budgets">Presupuestos</option>
+            </select>
+
+            <label for="clientName">Cliente:</label>
+            <input type="text" id="clientName" placeholder="Buscar cliente">
+
+            <label for="sellerName">Vendedor:</label>
+            <input type="text" id="sellerName" placeholder="Buscar vendedor">
+
+            <button id="filterBtn">Filtrar</button>
+        </div>
+
+        <!-- Resultados de documentos -->
+        <table id="documentsTable">
+            <thead>
+                <tr>
+                    <th>Número</th>
+                    <th>Tipo</th>
+                    <th>Cliente</th>
+                    <th>Vendedor</th>
+                    <th>Total</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody id="documentsList">
+                <!-- Los documentos generados se mostrarán aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Cargar Firebase desde el CDN -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.7.0/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.7.0/firebase-firestore.js";
+        
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDSl5uJ607YcuDsgCjh2v8Q2VE9L77hXXY",
+            authDomain: "punctobill.firebaseapp.com",
+            projectId: "punctobill",
+            storageBucket: "punctobill.firebasestorage.app",
+            messagingSenderId: "55340577315",
+            appId: "1:55340577315:web:96cc9e848a89cb716b7796",
+            measurementId: "G-N1CW12BCJ9"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const filterBtn = document.getElementById('filterBtn');
+        const docTypeSelect = document.getElementById('docType');
+        const clientNameInput = document.getElementById('clientName');
+        const sellerNameInput = document.getElementById('sellerName');
+        const documentsList = document.getElementById('documentsList');
+
+        // Función para obtener documentos filtrados
+        const getDocuments = async (docType = '', clientName = '', sellerName = '') => {
+            let q = query(collection(db, docType || 'invoices'));  // Default a 'invoices' si no se selecciona tipo
+
+            if (clientName) {
+                q = query(q, where('client.name', '>=', clientName), where('client.name', '<=', clientName + '\uf8ff'));
+            }
+
+            if (sellerName) {
+                q = query(q, where('seller.name', '>=', sellerName), where('seller.name', '<=', sellerName + '\uf8ff'));
+            }
+
+            const querySnapshot = await getDocs(q);
+            documentsList.innerHTML = ''; // Limpiar lista antes de mostrar los resultados
+
+            querySnapshot.forEach(doc => {
+                const data = doc.data();
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${data.number}</td>
+                    <td>${docType}</td>
+                    <td>${data.client.name}</td>
+                    <td>${data.seller.name}</td>
+                    <td>${data.total}</td>
+                    <td>${new Date(data.date).toLocaleDateString()}</td>
+                `;
+                documentsList.appendChild(tr);
+            });
+        };
+
+        // Cargar documentos al inicio
+        window.onload = () => {
+            getDocuments('invoices');  // Cargar facturas por defecto
+        };
+
+        // Event listener para el filtro
+        filterBtn.addEventListener('click', () => {
+            const docType = docTypeSelect.value;
+            const clientName = clientNameInput.value.trim();
+            const sellerName = sellerNameInput.value.trim();
+
+            getDocuments(docType, clientName, sellerName);
+        });
+    </script>
+</body>
+</html>
