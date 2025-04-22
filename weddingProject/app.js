@@ -155,7 +155,7 @@ async function loadGuests(searchTerm = "") {
                   data-id="${doc.id}" 
                   data-email="${data.email || ""}" 
                   data-name="${data.name}">
-            <i class="fas fa-envelope"></i> Reenviar invitación
+            <i class="fas fa-envelope"></i> <span>Reenviar invitación</span>
           </button>
           <button class="action-btn toggle-confirm-btn" 
                   data-id="${doc.id}" 
@@ -164,13 +164,16 @@ async function loadGuests(searchTerm = "") {
                   }">
             <i class="fas fa-${
               data.confirmed == "confirmed" ? "times" : "check"
-            }"></i> 
+            }"></i> <span>
             ${data.confirmed == "confirmed" ? "Cancelar" : "Confirmar"}
+            </span>  
           </button>
           <button class="action-btn delete-btn" 
                   data-id="${doc.id}" 
                   data-name="${data.name}">
-            <i class="fas fa-trash"></i> Eliminar
+            <i class="fas fa-trash"></i><span>
+            Eliminar
+            </span> 
           </button>
         </div>
       `;
