@@ -11,8 +11,8 @@ const firebaseConfig = {
 
 // Configuración de EmailJS
 const EMAILJS_USER_ID = "ePP1jTB0KozLmd1kF";
-const SERVICE_ID = "service_mqqey1j";
-const TEMPLATE_ID = "template_ykovwyb";
+const SERVICE_ID = "service_czex81h";
+const TEMPLATE_ID = "template_wwhdcrf";
 
 // Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
