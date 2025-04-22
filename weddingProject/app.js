@@ -108,10 +108,6 @@ async function loadGuests(searchTerm = "") {
       const companionsCount = data.companions ? data.companions.length : 0;
       total += companionsCount;
 
-      // Contar al invitado principal si está confirmado
-      //if (data.confirmed === "confirmed") confirmed++;
-
-      // Contar acompañantes confirmados
       if (data.companions && data.companions.length > 0) {
         data.companions.forEach((companion) => {
           if (companion.confirmed === "confirmed") confirmed++;
@@ -134,14 +130,22 @@ async function loadGuests(searchTerm = "") {
           <span>Acompañantes: ${companionsCount - 1}</span>
           ${
             data.companions && data.companions.length > 0
-              ? `<div class="companions-list">${data.companions
-                  .map(
-                    (companion) =>
-                      `<span class="companion-name">${
-                        companion.confirmed != "pending" ? "✅" : "❌"
-                      } ${companion.name}</span>`
-                  )
-                  .join(", ")}</div>`
+              ? `<div class="companions-list">
+                  ${data.companions
+                    .map(
+                      (companion) => `
+                        <div class="companion-name ${
+                          companion.confirmed === "confirmed"
+                            ? "confirmed"
+                            : "pending"
+                        }">
+                          ${companion.confirmed === "confirmed" ? "✅" : "❌"} ${
+                        companion.name
+                      }
+                        </div>`
+                    )
+                    .join("")}
+                </div>`
               : ""
           }
           ${data.note ? `<div class="guest-note">Nota: ${data.note}</div>` : ""}

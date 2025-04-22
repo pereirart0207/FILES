@@ -222,6 +222,34 @@
     width: 100%;
   }
   
+
+  .companions-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  
+  .companion-name {
+    background-color: #f0f0f0;
+    font-size: 0.85em;
+    padding: 2px 6px;
+    border-radius: 8px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+  }
+  
+  .companion-name.confirmed {
+    background-color: #d1f7d1;
+    color: #2d6a2d;
+  }
+  
+  .companion-name.pending {
+    background-color: #f9dcdc;
+    color: #a33a3a;
+  }
+
   .companion-field {
     display: flex;
     margin-bottom: 8px;
