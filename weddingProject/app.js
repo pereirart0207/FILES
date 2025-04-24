@@ -82,6 +82,7 @@ function setupEventListeners() {
 // Función para cargar invitados
 async function loadGuests(searchTerm = "") {
   try {
+    showSpinner();
     let query = db.collection("confirmations").orderBy("timestamp", "desc");
 
     if (searchTerm) {
@@ -186,6 +187,9 @@ async function loadGuests(searchTerm = "") {
     console.error("Error cargando invitados: ", error);
     domElements.attendeesList.innerHTML =
       '<li class="error">Error al cargar los invitados</li>';
+  }
+  finally{
+    hideSpinner();
   }
 }
 
@@ -322,6 +326,7 @@ async function sendInvitationEmail(email, name, guestId) {
   };
 
   try {
+    showSpinner();
     const response = await fetch(
       "https://api.emailjs.com/api/v1.0/email/send",
       {
@@ -341,25 +346,56 @@ async function sendInvitationEmail(email, name, guestId) {
   } catch (error) {
     console.error("Error enviando invitación: ", error);
     throw error;
+  } finally {
+    hideSpinner();
   }
 }
 
 // Eliminar invitado
 async function deleteGuest(guestId, guestName) {
-  if (
-    confirm(
-      `¿Estás seguro que deseas eliminar a ${guestName}? Esta acción no se puede deshacer.`
-    )
-  ) {
-    try {
-      await db.collection("confirmations").doc(guestId).delete();
-      loadGuests(domElements.searchInput.value.trim());
-    } catch (error) {
-      console.error("Error eliminando invitado: ", error);
-      alert("Error al eliminar el invitado");
-    }
+  if (!guestId || !guestName) {
+    console.warn("ID o nombre de invitado no válido.");
+    return;
+  }
+
+  const confirmDelete = confirm(
+    `¿Estás seguro que deseas eliminar a ${guestName}? Esta acción no se puede deshacer.`
+  );
+
+  if (!confirmDelete) return;
+
+  showSpinner();
+
+  try {
+    await db.collection("confirmations").doc(guestId).delete();
+    await loadGuests(domElements.searchInput.value.trim());
+  } catch (error) {
+    console.error("Error eliminando invitado:", error);
+    alert("Ocurrió un error al eliminar el invitado.");
+  } finally {
+    hideSpinner();
   }
 }
+
+
+
+function showSpinner() {
+  const el = document.getElementById('spinner-overlay');
+  if (el) {
+    console.log("Mostrando spinner...");
+    el.style.display = 'flex';
+  }
+}
+
+function hideSpinner() {
+  const el = document.getElementById('spinner-overlay');
+  if (el) {
+    console.log("quitando spinner...");
+    el.style.display = 'none';
+  }
+}
+
+
 
 async function toggleGuestConfirmation(guestId, newStatus) {
   try {
