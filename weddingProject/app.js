@@ -327,7 +327,7 @@ async function sendInvitationEmail(email, name, guestId) {
   try {
     showSpinner();
     const response = await fetch(
-      "https://api.emailjs.com/api/v1.0/email/send",
+      "https://api.emailjs.com/api/v1.0/email/send---0",
       {
         method: "POST",
         headers: {
@@ -344,6 +344,7 @@ async function sendInvitationEmail(email, name, guestId) {
     showNotification(`Invitación enviada a ${email}`);
   } catch (error) {
     console.error("Error enviando invitación: ", error);
+    showNotification(`Error enviando la invitación, revise si le quedan correos en EmailJS`, "error");
     throw error;
   } finally {
     hideSpinner();
@@ -368,6 +369,7 @@ async function deleteGuest(guestId, guestName) {
   try {
     await db.collection("confirmations").doc(guestId).delete();
     await loadGuests(domElements.searchInput.value.trim());
+    showNotification(`Invitado ${guestName} Eliminado`);
   } catch (error) {
     console.error("Error eliminando invitado:", error);
     showNotification("Ocurrió un error al eliminar el invitado.", "error");
