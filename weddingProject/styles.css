@@ -537,3 +537,40 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/*--------------------NOTIFICATION--------------------*/
+
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 30px;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  display: none;
+  z-index: 9999;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: opacity 0.5s ease, top 0.5s ease;
+}
+
+.notification.success {
+  background-color: #4CAF50;
+}
+
+.notification.error {
+  background-color: #f44336;
+}
+
+.notification.warning {
+  background-color: #ff9800;
+}
+
+/* Mostrar la notificación */
+.notification.show {
+  display: block;
+  opacity: 1;
+  top: 30px;
+}

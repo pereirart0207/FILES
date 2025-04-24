@@ -249,7 +249,7 @@ async function handleGuestSubmission(e) {
   const note = domElements.noteInput.value.trim();
 
   if (!name || !email) {
-    alert("Por favor completa los campos obligatorios (Nombre y Email)");
+    showNotification("Por favor completa los campos obligatorios (Nombre y Email)", "warning");
     return;
   }
 
@@ -286,16 +286,15 @@ async function handleGuestSubmission(e) {
     // Enviar invitación (si hay email)
     if (email) {
       await sendInvitationEmail(email, name, docRef.id);
-      alert(`Invitado agregado exitosamente. Invitación enviada a ${email}`);
     } else {
-      alert(`Invitado agregado exitosamente.`);
+      showNotification(`Invitado agregado exitosamente,\n Invitación no enviada por falta de Email`);
     }
 
     // Recargar lista
     loadGuests(domElements.searchInput.value.trim());
   } catch (error) {
     console.error("Error:", error);
-    alert(`Error: ${error.message}`);
+    showNotification(`Error: ${error.message}`, "error");
   }
 }
 
@@ -342,7 +341,7 @@ async function sendInvitationEmail(email, name, guestId) {
       const errorText = await response.text();
       throw new Error(errorText || "Error al enviar el correo");
     }
-    alert(`Invitación reenviada a ${email}` );
+    showNotification(`Invitación enviada a ${email}`);
   } catch (error) {
     console.error("Error enviando invitación: ", error);
     throw error;
@@ -371,7 +370,7 @@ async function deleteGuest(guestId, guestName) {
     await loadGuests(domElements.searchInput.value.trim());
   } catch (error) {
     console.error("Error eliminando invitado:", error);
-    alert("Ocurrió un error al eliminar el invitado.");
+    showNotification("Ocurrió un error al eliminar el invitado.", "error");
   } finally {
     hideSpinner();
   }
@@ -430,6 +429,20 @@ async function toggleGuestConfirmation(guestId, newStatus) {
     loadGuests(domElements.searchInput.value.trim());
   } catch (error) {
     console.error("Error actualizando estado: ", error);
-    alert("Error al actualizar el estado del invitado y/o acompañantes");
+    showNotification("Error al actualizar el estado del invitado y/o acompañantes", "error");
   }
+}
+
+function showNotification(message, type = "success") {
+  const notification = document.getElementById("notification");
+
+  // Limpiar contenido y clases anteriores
+  notification.textContent = message;
+  notification.className = "notification show"; // Añadir la clase show para mostrarla
+  notification.classList.add(type); // Añadir el tipo de notificación (success, error, warning)
+
+  // Ocultar la notificación después de 4 segundos
+  setTimeout(() => {
+    notification.classList.remove("show");
+  }, 4000);
 }
