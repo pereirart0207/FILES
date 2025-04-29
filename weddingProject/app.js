@@ -327,7 +327,7 @@ async function sendInvitationEmail(email, name, guestId) {
   try {
     showSpinner();
     const response = await fetch(
-      "https://api.emailjs.com/api/v1.0/email/send---0",
+      "https://api.emailjs.com/api/v1.0/email/send",
       {
         method: "POST",
         headers: {
