@@ -396,6 +396,19 @@ function hideSpinner() {
   }
 }
 
+function showNotification(message, type = "success") {
+  const notification = document.getElementById("notification");
+
+  // Limpiar contenido y clases anteriores
+  notification.textContent = message;
+  notification.className = "notification show"; // Añadir la clase show para mostrarla
+  notification.classList.add(type); // Añadir el tipo de notificación (success, error, warning)
+
+  // Ocultar la notificación después de 4 segundos
+  setTimeout(() => {
+    notification.classList.remove("show");
+  }, 4000);
+}
 
 
 async function toggleGuestConfirmation(guestId, newStatus) {
@@ -435,16 +448,3 @@ async function toggleGuestConfirmation(guestId, newStatus) {
   }
 }
 
-function showNotification(message, type = "success") {
-  const notification = document.getElementById("notification");
-
-  // Limpiar contenido y clases anteriores
-  notification.textContent = message;
-  notification.className = "notification show"; // Añadir la clase show para mostrarla
-  notification.classList.add(type); // Añadir el tipo de notificación (success, error, warning)
-
-  // Ocultar la notificación después de 4 segundos
-  setTimeout(() => {
-    notification.classList.remove("show");
-  }, 4000);
-}
