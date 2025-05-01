@@ -147,22 +147,27 @@ h2 {
 
 #confirmAllBtn,
 #confirmSelectedBtn {
-  background: linear-gradient(to right, #7b5e42, #5c4632);
-  padding: 0.8rem 1.5rem;
-  font-size: 0.95rem;
-  color: #fff;
+  background: linear-gradient(135deg, #7b5e42, #5c4632);
+  padding: 0.9rem 2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #ffffff;
   border: none;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease, transform 0.2s ease;
+  letter-spacing: 0.5px;
 }
 
 #confirmAllBtn:hover,
 #confirmSelectedBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  opacity: 0.95;
+  background: linear-gradient(135deg, #8e6a4a, #6d5039);
+  transform: translateY(-1px);
+}
+
+#confirmAllBtn:active,
+#confirmSelectedBtn:active {
+  transform: scale(0.98);
 }
 
 
