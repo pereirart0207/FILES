@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function fetchGuestData(guestId) {
   try {
+    showSpinner();
     const docRef = db.collection("confirmations").doc(guestId);
     const docSnap = await docRef.get();
 
@@ -54,6 +55,9 @@ async function fetchGuestData(guestId) {
     console.error("Error al obtener el invitado:", error);
     document.getElementById("guestInfo").innerHTML =
       "<p>Ocurrió un error al cargar los datos.</p>";
+  } finally {
+
+    hideSpinner();
   }
 }
 
@@ -61,26 +65,21 @@ function renderGuestInfo(guestData, guestId) {
   document.getElementById("guestInfo").innerHTML = `
       <div class="guest-card">
         <h2>${guestData.name}</h2>
-        <p><i class="fas fa-envelope"></i> ${
-          guestData.email || "No especificado"
-        }</p>
-        <p class="status ${
-          guestData.confirmed === "confirmed" ? "confirmed" : "pending"
-        }">
-          <i class="fas ${
-            guestData.confirmed === "confirmed" ? "fa-check-circle" : "fa-clock"
-          }"></i>
-          ${
-            guestData.confirmed === "confirmed"
-              ? "Confirmado"
-              : "Pendiente de confirmación"
-          }
+        <p><i class="fas fa-envelope"></i> ${guestData.email || "No especificado"
+    }</p>
+        <p class="status ${guestData.confirmed === "confirmed" ? "confirmed" : "pending"
+    }">
+          <i class="fas ${guestData.confirmed === "confirmed" ? "fa-check-circle" : "fa-clock"
+    }"></i>
+          ${guestData.confirmed === "confirmed"
+      ? "Confirmado"
+      : "Pendiente de confirmación"
+    }
         </p>
-        ${
-          guestData.note
-            ? `<p class="note"><i class="fas fa-comment"></i> ${guestData.note}</p>`
-            : ""
-        }
+        ${guestData.note
+      ? `<p class="note"><i class="fas fa-comment"></i> ${guestData.note}</p>`
+      : ""
+    }
       </div>
     `;
 }
@@ -141,6 +140,7 @@ function setupConfirmationControls(guestId) {
 
 async function confirmSelectedCompanions(guestId, companionIndexes = []) {
   try {
+    showSpinner();
     const docRef = db.collection("confirmations").doc(guestId);
     const doc = await docRef.get();
     const data = doc.data();
@@ -171,21 +171,25 @@ async function confirmSelectedCompanions(guestId, companionIndexes = []) {
   } catch (error) {
     console.error("Error al confirmar:", error);
     showStatusMessage("Error al confirmar", "error");
+
+  } finally {
+    hideSpinner();
   }
 }
 
 async function confirmAll(guestId) {
   try {
+    showSpinner();
     const docRef = db.collection("confirmations").doc(guestId);
     const doc = await docRef.get();
     const data = doc.data();
 
     const updatedCompanions = data.companions
       ? data.companions.map((companion) => ({
-          ...companion,
-          confirmed: "confirmed",
-          confirmedAt: new Date().toISOString(),
-        }))
+        ...companion,
+        confirmed: "confirmed",
+        confirmedAt: new Date().toISOString(),
+      }))
       : [];
 
     await docRef.update({
@@ -200,6 +204,8 @@ async function confirmAll(guestId) {
   } catch (error) {
     console.error("Error al confirmar todos:", error);
     showStatusMessage("Error al confirmar", "error");
+  } finally {
+    hideSpinner();
   }
 }
 
@@ -233,4 +239,21 @@ function confettiEffect() {
   setTimeout(() => {
     emoji.remove();
   }, 1500);
+}
+
+
+function showSpinner() {
+  const el = document.getElementById('spinner-overlay');
+  if (el) {
+    console.log("Mostrando spinner...");
+    el.style.display = 'flex';
+  }
+}
+
+function hideSpinner() {
+  const el = document.getElementById('spinner-overlay');
+  if (el) {
+    console.log("quitando spinner...");
+    el.style.display = 'none';
+  }
 }

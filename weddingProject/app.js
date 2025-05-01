@@ -10,9 +10,9 @@ const firebaseConfig = {
 };
 
 // Configuración de EmailJS
-const EMAILJS_USER_ID = "ePP1jTB0KozLmd1kF";
-const SERVICE_ID = "service_mqqey1j";
-const TEMPLATE_ID = "template_ykovwyb";
+const EMAILJS_USER_ID = "-Q-hV4bAlYnHn7l7V";
+const SERVICE_ID = "service_czex81h";
+const TEMPLATE_ID = "template_94r2yir";
 
 // Inicializar Firebase
 firebase.initializeApp(firebaseConfig);
@@ -82,6 +82,7 @@ function setupEventListeners() {
 // Función para cargar invitados
 async function loadGuests(searchTerm = "") {
   try {
+    showSpinner();
     let query = db.collection("confirmations").orderBy("timestamp", "desc");
 
     if (searchTerm) {
@@ -108,10 +109,6 @@ async function loadGuests(searchTerm = "") {
       const companionsCount = data.companions ? data.companions.length : 0;
       total += companionsCount;
 
-      // Contar al invitado principal si está confirmado
-      //if (data.confirmed === "confirmed") confirmed++;
-
-      // Contar acompañantes confirmados
       if (data.companions && data.companions.length > 0) {
         data.companions.forEach((companion) => {
           if (companion.confirmed === "confirmed") confirmed++;
@@ -134,14 +131,22 @@ async function loadGuests(searchTerm = "") {
           <span>Acompañantes: ${companionsCount - 1}</span>
           ${
             data.companions && data.companions.length > 0
-              ? `<div class="companions-list">${data.companions
-                  .map(
-                    (companion) =>
-                      `<span class="companion-name">${
-                        companion.confirmed != "pending" ? "✅" : "❌"
-                      } ${companion.name}</span>`
-                  )
-                  .join(", ")}</div>`
+              ? `<div class="companions-list">
+                  ${data.companions
+                    .map(
+                      (companion) => `
+                        <div class="companion-name ${
+                          companion.confirmed === "confirmed"
+                            ? "confirmed"
+                            : "pending"
+                        }">
+                          ${
+                            companion.confirmed === "confirmed" ? "✅" : "❌"
+                          } ${companion.name}
+                        </div>`
+                    )
+                    .join("")}
+                </div>`
               : ""
           }
           ${data.note ? `<div class="guest-note">Nota: ${data.note}</div>` : ""}
@@ -151,7 +156,7 @@ async function loadGuests(searchTerm = "") {
                   data-id="${doc.id}" 
                   data-email="${data.email || ""}" 
                   data-name="${data.name}">
-            <i class="fas fa-envelope"></i> Reenviar invitación
+            <i class="fas fa-envelope"></i> <span>Reenviar invitación</span>
           </button>
           <button class="action-btn toggle-confirm-btn" 
                   data-id="${doc.id}" 
@@ -160,13 +165,16 @@ async function loadGuests(searchTerm = "") {
                   }">
             <i class="fas fa-${
               data.confirmed == "confirmed" ? "times" : "check"
-            }"></i> 
+            }"></i> <span>
             ${data.confirmed == "confirmed" ? "Cancelar" : "Confirmar"}
+            </span>  
           </button>
           <button class="action-btn delete-btn" 
                   data-id="${doc.id}" 
                   data-name="${data.name}">
-            <i class="fas fa-trash"></i> Eliminar
+            <i class="fas fa-trash"></i><span>
+            Eliminar
+            </span> 
           </button>
         </div>
       `;
@@ -179,6 +187,8 @@ async function loadGuests(searchTerm = "") {
     console.error("Error cargando invitados: ", error);
     domElements.attendeesList.innerHTML =
       '<li class="error">Error al cargar los invitados</li>';
+  } finally {
+    hideSpinner();
   }
 }
 
@@ -238,7 +248,10 @@ async function handleGuestSubmission(e) {
   const note = domElements.noteInput.value.trim();
 
   if (!name || !email) {
-    alert("Por favor completa los campos obligatorios (Nombre y Email)");
+    showNotification(
+      "Por favor completa los campos obligatorios (Nombre y Email)",
+      "warning"
+    );
     return;
   }
 
@@ -275,16 +288,17 @@ async function handleGuestSubmission(e) {
     // Enviar invitación (si hay email)
     if (email) {
       await sendInvitationEmail(email, name, docRef.id);
-      alert(`Invitado agregado exitosamente. Invitación enviada a ${email}`);
     } else {
-      alert(`Invitado agregado exitosamente.`);
+      showNotification(
+        `Invitado agregado exitosamente,\n Invitación no enviada por falta de Email`
+      );
     }
 
     // Recargar lista
     loadGuests(domElements.searchInput.value.trim());
   } catch (error) {
     console.error("Error:", error);
-    alert(`Error: ${error.message}`);
+    showNotification(`Error: ${error.message}`, "error");
   }
 }
 
@@ -309,12 +323,13 @@ async function sendInvitationEmail(email, name, guestId) {
       event_location: "12201 SW 26th St Miami, FL 33175, United States",
       party_address:
         "7707 NW 103rd St Hialeah Gardens, FL 33016, United States",
-      reply_to: "+1(772)204-6309",
+      reply_to: "+1 (786) 247-9736",
       confirm_link: confirmLink,
     },
   };
 
   try {
+    showSpinner();
     const response = await fetch(
       "https://api.emailjs.com/api/v1.0/email/send",
       {
@@ -330,27 +345,74 @@ async function sendInvitationEmail(email, name, guestId) {
       const errorText = await response.text();
       throw new Error(errorText || "Error al enviar el correo");
     }
+    showNotification(`Invitación enviada a ${email}`);
   } catch (error) {
     console.error("Error enviando invitación: ", error);
+    showNotification(
+      `Error enviando la invitación, revise si le quedan correos en EmailJS`,
+      "error"
+    );
     throw error;
+  } finally {
+    hideSpinner();
   }
 }
 
 // Eliminar invitado
 async function deleteGuest(guestId, guestName) {
-  if (
-    confirm(
-      `¿Estás seguro que deseas eliminar a ${guestName}? Esta acción no se puede deshacer.`
-    )
-  ) {
-    try {
-      await db.collection("confirmations").doc(guestId).delete();
-      loadGuests(domElements.searchInput.value.trim());
-    } catch (error) {
-      console.error("Error eliminando invitado: ", error);
-      alert("Error al eliminar el invitado");
-    }
+  if (!guestId || !guestName) {
+    console.warn("ID o nombre de invitado no válido.");
+    return;
   }
+
+  const confirmDelete = confirm(
+    `¿Estás seguro que deseas eliminar a ${guestName}? Esta acción no se puede deshacer.`
+  );
+
+  if (!confirmDelete) return;
+
+  showSpinner();
+
+  try {
+    await db.collection("confirmations").doc(guestId).delete();
+    await loadGuests(domElements.searchInput.value.trim());
+    showNotification(`Invitado ${guestName} Eliminado`);
+  } catch (error) {
+    console.error("Error eliminando invitado:", error);
+    showNotification("Ocurrió un error al eliminar el invitado.", "error");
+  } finally {
+    hideSpinner();
+  }
+}
+
+function showSpinner() {
+  const el = document.getElementById("spinner-overlay");
+  if (el) {
+    console.log("Mostrando spinner...");
+    el.style.display = "flex";
+  }
+}
+
+function hideSpinner() {
+  const el = document.getElementById("spinner-overlay");
+  if (el) {
+    console.log("quitando spinner...");
+    el.style.display = "none";
+  }
+}
+
+function showNotification(message, type = "success") {
+  const notification = document.getElementById("notification");
+
+  // Limpiar contenido y clases anteriores
+  notification.textContent = message;
+  notification.className = "notification show"; // Añadir la clase show para mostrarla
+  notification.classList.add(type); // Añadir el tipo de notificación (success, error, warning)
+
+  // Ocultar la notificación después de 4 segundos
+  setTimeout(() => {
+    notification.classList.remove("show");
+  }, 4000);
 }
 
 async function toggleGuestConfirmation(guestId, newStatus) {
@@ -386,6 +448,9 @@ async function toggleGuestConfirmation(guestId, newStatus) {
     loadGuests(domElements.searchInput.value.trim());
   } catch (error) {
     console.error("Error actualizando estado: ", error);
-    alert("Error al actualizar el estado del invitado y/o acompañantes");
+    showNotification(
+      "Error al actualizar el estado del invitado y/o acompañantes",
+      "error"
+    );
   }
 }

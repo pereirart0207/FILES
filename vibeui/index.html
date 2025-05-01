@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>viveUI – Lightweight UI Module for Web Apps</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
+      color: #333;
+    }
+
+    header {
+      background: #4CAF50;
+      color: white;
+      padding: 40px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 3em;
+      margin: 0;
+    }
+
+    header p {
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+
+    section {
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    h2 {
+      color: #4CAF50;
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+
+    pre {
+      background: #eee;
+      padding: 15px;
+      border-radius: 6px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    th {
+      background: #f0f0f0;
+    }
+
+    .button {
+      display: inline-block;
+      margin-top: 20px;
+      background: #4CAF50;
+      color: white;
+      padding: 14px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .button:hover {
+      background: #45a049;
+    }
+
+    .example-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #222;
+      color: #aaa;
+      margin-top: 60px;
+    }
+
+    a {
+      color: #2196F3;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 2em;
+      }
+
+      .example-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>viveUI</h1>
+    <p>Spinners. Toasts. Modals. All in one minimal JS module.</p>
+  </header>
+
+  <section>
+    <h2>What is viveUI?</h2>
+    <p><strong>viveUI</strong> is a tiny JavaScript module that lets you display stylish spinners, toast notifications, and modals without relying on any frameworks or external libraries.</p>
+    <ul>
+      <li>✅ Clean, modern UI</li>
+      <li>✅ No dependencies</li>
+      <li>✅ Plug-and-play in seconds</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Quick Integration</h2>
+    <p>1. Include the script:</p>
+    <pre>&lt;script src="viveUI.js"&gt;&lt;/script&gt;</pre>
+    <p>2. Use its methods:</p>
+    <pre>
+viveUI.showSpinner({ message: "Loading..." });
+viveUI.showNotification({ message: "Success!", type: "success" });
+viveUI.showModal("&lt;h2&gt;Hello!&lt;/h2&gt;&lt;p&gt;This is a custom modal.&lt;/p&gt;");
+    </pre>
+  </section>
+
+  <section>
+    <h2>Live Examples</h2>
+    <div class="example-buttons">
+      <button class="button" onclick="viveUI.showSpinner({ message: 'Loading...', color: '#4CAF50' }); setTimeout(() => viveUI.hideSpinner(), 2000)">Show Spinner</button>
+      <button class="button" onclick="viveUI.showNotification({ message: 'This is a success toast!', type: 'success' })">Show Toast</button>
+      <button class="button" onclick="viveUI.showModal('<h2>Hello!</h2><p>This modal is powered by viveUI.</p>')">Show Modal</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Included Components</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Description</th>
+          <th>Customizable</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Spinner</strong></td>
+          <td>Animated loading indicator</td>
+          <td>Color, size, background, text</td>
+        </tr>
+        <tr>
+          <td><strong>Toast</strong></td>
+          <td>Floating notification alerts</td>
+          <td>Type, color, duration, message</td>
+        </tr>
+        <tr>
+          <td><strong>Modal</strong></td>
+          <td>Centered popup window</td>
+          <td>Any HTML content</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Where to use viveUI?</h2>
+    <p>Perfect for dashboards, web apps, form feedback, or any site that needs quick and modern user interactions.</p>
+  </section>
+
+  <section>
+    <h2>Get viveUI</h2>
+    <p>
+      📦 <a href="viveui.js" download>Download viveUI.js</a><br/>
+      🔗 <a href="#" target="_blank">View GitHub Repo</a>
+    </p>
+    <a class="button" href="vibui.js" download>Download viveUI</a>
+  </section>
+
+  <section>
+    <h2>Need Help?</h2>
+    <p>Email us at <a href="mailto:punctoapp@gmail.com">support@viveUI.dev</a> or visit our <a href="#">GitHub page</a>.</p>
+  </section>
+
+  <footer>
+    &copy; 2025 viveUI · Crafted with 💚 for developers.
+  </footer>
+
+  <!-- Load viveUI module -->
+  <script src="viveui.js"></script>
+
+</body>
+</html>

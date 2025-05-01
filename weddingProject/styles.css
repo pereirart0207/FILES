@@ -222,6 +222,34 @@
     width: 100%;
   }
   
+
+.companions-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.companion-name {
+  background-color: #f0f0f0;
+  font-size: 0.85em;
+  padding: 2px 6px;
+  border-radius: 8px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+}
+
+.companion-name.confirmed {
+  background-color: #d1f7d1;
+  color: #2d6a2d;
+}
+
+.companion-name.pending {
+  background-color: #f9dcdc;
+  color: #a33a3a;
+}
+
   .companion-field {
     display: flex;
     margin-bottom: 8px;
@@ -272,86 +300,99 @@
     margin-right: 8px;
   }
   
- 
   .action-btn {
     padding: 6px 12px;
     font-size: 13px;
     border: none;
     cursor: pointer;
-    border-radius: 4px;
+    border-radius: 6px;
     margin: 0 4px;
     transition: all 0.2s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-}
-
-.action-btn i {
-    margin-right: 5px;
-    font-size: 11px;
-}
-
-/* --- ESTILOS RESPONSIVE --- */
-@media (max-width: 768px) {
-    /* Ocultar texto en botones y mostrar solo iconos en móvil */
+    color: #fff;
+  }
+  
+  /* Icono dentro del botón */
+  .action-btn i {
+    margin-right: 6px;
+    font-size: 13px;
+  }
+  
+  /* Aseguramos que los botones estén uno al lado del otro */
+  .btn-group {
+    display: flex;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 6px; /* Espacio entre los botones */
+  }
+  
+  @media (max-width: 768px) {
     .action-btn {
-        padding: 5px 8px; /* Hacer más pequeños los botones */
-        min-width: auto; /* Eliminar ancho mínimo */
+      padding: 6px;
+      margin: 0 2px;
+      min-width: auto;
     }
-    
+  
     .action-btn span {
-        display: none; /* Ocultar el texto */
+      display: none; /* Ocultar el texto */
     }
-    
+  
     .action-btn i {
-        margin-right: 0; /* Eliminar margen del icono */
-        font-size: 12px; /* Ajustar tamaño del icono */
+      margin-right: 0;
+      font-size: 14px;
     }
-}
-
-/* Ajustes adicionales para pantallas muy pequeñas */
-@media (max-width: 480px) {
+  }
+  
+  @media (max-width: 480px) {
     .action-btn {
-        padding: 4px 6px; /* Hacer aún más pequeños */
+      padding: 5px;
+      /* Hacer que el botón sea cuadrado */
+      min-width: 40px;  /* Establecer un tamaño mínimo */
+      height: 40px;     /* Establecer una altura fija */
+      border-radius: 8px; /* Bordes redondeados */
     }
-    
+  
+    .action-btn span {
+      display: none; /* Ocultar texto */
+    }
+  
     .action-btn i {
-        font-size: 11px;
+      font-size: 16px; /* Ajustar tamaño de ícono */
+      padding: 0; /* Eliminar padding extra en el icono */
     }
-}
-  /* Botón de confirmación */
+  }
+  
+  /* Estilos de color por tipo de acción */
   .toggle-confirm-btn {
-    background-color: #a68c6d;
-    color: #ffffff;
+    background-color: #b08d57; /* Tierra media */
   }
   
   .toggle-confirm-btn:hover {
-    background-color: #8a755c;
+    background-color: #9c7b49;
   }
   
-  /* Botón de enviar invitación */
   .send-invite-btn {
-    background-color: #d2b48c;
+    background-color: #d7b98d; /* Beige cálido */
     color: #3e2f1c;
   }
   
   .send-invite-btn:hover {
-    background-color: #c8b6a6;
+    background-color: #c9a97e;
   }
   
-  /* Botón de eliminar */
   .delete-btn {
-    background-color: #6b4e2e;
-    color: #ffffff;
+    background-color: #8b5a3c; /* Marrón fuerte */
   }
   
   .delete-btn:hover {
-    background-color: #5e4a35;
+    background-color: #754b32;
   }
   
   .action-btn:hover {
-    opacity: 0.9;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    opacity: 0.95;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
   }
   
   #statusMessage {
@@ -374,7 +415,7 @@
   
   .guest-actions .action-btn {
     flex-grow: 1;
-    min-width: 100px;
+    /*min-width: 100px;*/
   }
   
   #attendeesList li {
@@ -432,12 +473,12 @@
     }
   
     .guest-actions {
-      flex-direction: column;
+      flex-direction: row;
     }
-  
+  /*
     .guest-actions .action-btn {
-      width: 100%;
-    }
+      width: 33%;
+    }*/
   }
   
   @media (max-width: 480px) {
@@ -461,13 +502,75 @@
       padding: 10px 15px;
       font-size: 14px;
     }
-  
-    .action-btn {
-      font-size: 12px;
-      padding: 6px 10px;
-    }
+
   
     .input-group i {
       top: 12px;
     }
   }
+ /* --------------------------SPINNER--------------------------*/
+ #spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(60, 40, 20, 0.4); /* marrón oscuro con opacidad */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  display: none;
+}
+
+.spinner {
+  border: 6px solid #f5f0e6;            /* beige claro */
+  border-top: 6px solid #6b4f3b;         /* marrón elegante */
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  box-shadow: 0 0 10px rgba(107, 79, 59, 0.6); /* sombra marrón */
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/*--------------------NOTIFICATION--------------------*/
+
+.notification {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 30px;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  display: none;
+  z-index: 9999;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transition: opacity 0.5s ease, top 0.5s ease;
+}
+
+.notification.success {
+  background-color: #4CAF50;
+}
+
+.notification.error {
+  background-color: #f44336;
+}
+
+.notification.warning {
+  background-color: #ff9800;
+}
+
+/* Mostrar la notificación */
+.notification.show {
+  display: block;
+  opacity: 1;
+  top: 30px;
+}
