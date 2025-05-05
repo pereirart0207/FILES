@@ -1,9 +1,9 @@
 (function () {
-  if (window.viveUI) {
-      console.warn('viveUI ya está cargado. Evitando duplicación.');
-      return;
+  if (window.tUI) {
+    console.warn("tUI ya está cargado. Evitando duplicación.");
+    return;
   }
-  const style = document.createElement('style');
+  const style = document.createElement("style");
   style.innerHTML = `
     /* --- SPINNER --- */
     #ui-spinner-overlay {
@@ -118,7 +118,7 @@
   document.head.appendChild(style);
 
   // --- CREAR ESTRUCTURA HTML ---
-  const wrapper = document.createElement('div');
+  const wrapper = document.createElement("div");
   wrapper.innerHTML = `
     <div id="ui-spinner-overlay">
       <div class="ui-spinner-modal">
@@ -137,24 +137,24 @@
   document.body.appendChild(wrapper);
 
   const toastColors = {
-    success: '#4CAF50',
-    error: '#f44336',
-    warning: '#ff9800',
-    info: '#2196F3',
-    dark: '#333'
+    success: "#4CAF50",
+    error: "#f44336",
+    warning: "#ff9800",
+    info: "#2196F3",
+    dark: "#333",
   };
 
   // --- FUNCIONES GLOBALES ---
-  window.viveUI = {
+  window.tUI = {
     showSpinner: function (options = {}) {
       const config = {
         message: "Cargando...",
         color: "#333",
         size: 50,
         background: "#fff",
-        ...options
+        ...options,
       };
-      
+
       const overlay = document.getElementById("ui-spinner-overlay");
       const spinner = overlay.querySelector(".ui-spinner");
       const msg = overlay.querySelector(".ui-spinner-message");
@@ -181,17 +181,21 @@
         backgroundColor: null,
         color: "#fff",
         fontSize: "14px",
-        ...options
+        ...options,
       };
-      
+
       const container = document.getElementById("ui-toast-container");
       const toast = document.createElement("div");
 
       toast.className = "ui-toast";
-      toast.style.backgroundColor = config.backgroundColor || toastColors[config.type] || toastColors.dark;
+      toast.style.backgroundColor =
+        config.backgroundColor || toastColors[config.type] || toastColors.dark;
       toast.style.color = config.color;
       toast.style.fontSize = config.fontSize;
-      toast.style.setProperty("--duration", `${(config.duration - 500) / 1000}s`);
+      toast.style.setProperty(
+        "--duration",
+        `${(config.duration - 500) / 1000}s`
+      );
       toast.textContent = config.message;
 
       container.appendChild(toast);
@@ -207,13 +211,15 @@
 
     closeModal: function () {
       document.getElementById("ui-modal-overlay").classList.remove("active");
-    }
+    },
   };
 
   // Cerrar modal al hacer clic fuera o en el botón de cerrar
-  document.getElementById("ui-modal-overlay").addEventListener("click", function (e) {
-    if (e.target === this || e.target.classList.contains('ui-modal-close')) {
-      window.viveUI.closeModal();
-    }
-  });
+  document
+    .getElementById("ui-modal-overlay")
+    .addEventListener("click", function (e) {
+      if (e.target === this || e.target.classList.contains("ui-modal-close")) {
+        window.tUI.closeModal();
+      }
+    });
 })();

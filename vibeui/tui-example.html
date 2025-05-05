@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ejemplo viveUI</title>
+    <title>Ejemplo tUI</title>
   
     <style>
         body {
@@ -45,15 +45,15 @@
     </style>
 </head>
 <body>
-    <h1>Ejemplo de Uso de viveUI</h1>
+    <h1>Ejemplo de Uso de tUI</h1>
     
     <div class="section">
         <h2>Spinner</h2>
         <p>Muestra un indicador de carga con mensaje personalizable.</p>
         <div class="button-group">
-            <button onclick="viveUI.showSpinner()">Mostrar Spinner (default)</button>
-            <button onclick="viveUI.showSpinner({message: 'Procesando...', color: '#4CAF50', size: 60})">Spinner Personalizado</button>
-            <button onclick="viveUI.hideSpinner()">Ocultar Spinner</button>
+            <button onclick="tUI.showSpinner()">Mostrar Spinner (default)</button>
+            <button onclick="tUI.showSpinner({message: 'Procesando...', color: '#4CAF50', size: 60})">Spinner Personalizado</button>
+            <button onclick="tUI.hideSpinner()">Ocultar Spinner</button>
         </div>
     </div>
     
@@ -61,11 +61,11 @@
         <h2>Notificaciones (Toast)</h2>
         <p>Muestra mensajes temporales en la esquina inferior derecha.</p>
         <div class="button-group">
-            <button onclick="viveUI.showNotification({message: 'Operación exitosa', type: 'success'})">Éxito</button>
-            <button onclick="viveUI.showNotification({message: 'Error al guardar', type: 'error'})">Error</button>
-            <button onclick="viveUI.showNotification({message: 'Advertencia importante', type: 'warning'})">Advertencia</button>
-            <button onclick="viveUI.showNotification({message: 'Información del sistema', type: 'info'})">Información</button>
-            <button onclick="viveUI.showNotification({
+            <button onclick="tUI.showNotification({message: 'Operación exitosa', type: 'success'})">Éxito</button>
+            <button onclick="tUI.showNotification({message: 'Error al guardar', type: 'error'})">Error</button>
+            <button onclick="tUI.showNotification({message: 'Advertencia importante', type: 'warning'})">Advertencia</button>
+            <button onclick="tUI.showNotification({message: 'Información del sistema', type: 'info'})">Información</button>
+            <button onclick="tUI.showNotification({
                 message: 'Mensaje personalizado con fondo azul',
                 backgroundColor: '#1565C0',
                 duration: 5000
@@ -77,7 +77,7 @@
         <h2>Modal</h2>
         <p>Muestra contenido en una ventana modal centrada.</p>
         <div class="button-group">
-            <button onclick="viveUI.showModal('<h3>Modal Simple</h3><p>Este es un modal básico con contenido HTML.</p>')">Modal Simple</button>
+            <button onclick="tUI.showModal('<h3>Modal Simple</h3><p>Este es un modal básico con contenido HTML.</p>')">Modal Simple</button>
             <button onclick="showComplexModal()">Modal Complejo</button>
         </div>
     </div>
@@ -90,7 +90,7 @@
         </div>
     </div>
 
-    <script src="viveui.js"></script>
+    <script src="tui.js"></script>
 
     <script>
         function showComplexModal() {
@@ -105,27 +105,27 @@
                 <img src="https://via.placeholder.com/300x100" alt="Placeholder">
                 <p><button onclick="alert('Acción en modal')">Botón en modal</button></p>
             `;
-            viveUI.showModal(html);
+            tUI.showModal(html);
         }
         
         function simulateAsyncOperation() {
             // Mostrar spinner
-            viveUI.showSpinner({message: 'Procesando datos...', color: '#9C27B0'});
+            tUI.showSpinner({message: 'Procesando datos...', color: '#9C27B0'});
             
             // Simular operación asíncrona
             setTimeout(() => {
                 // Ocultar spinner
-                viveUI.hideSpinner();
+                tUI.hideSpinner();
                 
                 // Mostrar resultado
                 const success = Math.random() > 0.3;
                 if (success) {
-                    viveUI.showNotification({
+                    tUI.showNotification({
                         message: 'Operación completada con éxito!',
                         type: 'success'
                     });
                 } else {
-                    viveUI.showNotification({
+                    tUI.showNotification({
                         message: 'Error en la operación. Intente nuevamente.',
                         type: 'error'
                     });
