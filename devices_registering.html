@@ -190,6 +190,9 @@
         transform: translateY(-2px);
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
       }
+      .device-item i {
+        color: #777;
+      }
 
       .device-info {
         flex: 1;
@@ -386,6 +389,19 @@
       let allDevices = [];
       let currentFilter = "all";
 
+      const deleteDevice = async (id) => {
+        if (!confirm("Está seguro de eliminar el elemento?")) {
+          return;
+        }
+        try {
+          await devicesRef.doc(id).delete();
+          showMessage("Dispositivo Eliminado con éxito");
+        } catch (e) {
+          showMessage("Hubo un error al eliminar el dispositivo");
+          console.error(e); // <-- útil para depuración
+        }
+        await loadDevices();
+      };
       // Mostrar/ocultar contraseña
       togglePassword.addEventListener("click", function () {
         const type =
@@ -400,8 +416,10 @@
       registerBtn.addEventListener("click", async function () {
         const deviceId = deviceIdInput.value.trim();
         const wifiPassword = wifiPasswordInput.value.trim();
-        const deviceVersion = deviceVersionInput.value.trim() || "v1.0.0";
-        const deviceLocation = deviceLocationInput.value.trim();
+        const deviceVersion =
+          deviceVersionInput.value.trim() || "not specified";
+        const deviceLocation =
+          deviceLocationInput.value.trim() || "not specified";
 
         if (!deviceId || !wifiPassword) {
           showMessage(
@@ -437,6 +455,7 @@
           deviceIdInput.value = "";
           wifiPasswordInput.value = "";
           deviceVersionInput.value = "";
+          deviceLocationInput.value = "";
         } catch (error) {
           console.error("Error al registrar dispositivo: ", error);
           showMessage(
@@ -520,7 +539,10 @@
                         <div class="device-wifi">${device.wifiPassword}</div>
                         
                     </div>
-                    <div class="device-version">${device.version}</div>
+                    
+                    <div class="device-version">${device.version} </div>
+                    &nbsp;
+                    <i class="fas fa-trash" onClick="deleteDevice('${device.id}')"></i>
                 `;
           devicesContainer.appendChild(deviceElement);
         });
