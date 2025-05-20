@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Dispositivos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4895ef;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --warning-color: #f72585;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .form-container {
+            padding: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            outline: none;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(to right, #6c757d, #5a6268);
+        }
+        
+        .device-list {
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        
+        .device-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .device-list h2 {
+            font-size: 18px;
+            color: var(--dark-color);
+        }
+        
+        .search-container {
+            position: relative;
+            width: 60%;
+        }
+        
+        .search-container input {
+            width: 100%;
+            padding: 8px 15px 8px 35px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        
+        .search-container i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+        
+        .device-item {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .device-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        
+        .device-info {
+            flex: 1;
+        }
+        
+        .device-id {
+            font-weight: 500;
+            color: var(--primary-color);
+        }
+        
+        .device-wifi {
+            font-size: 13px;
+            color: #666;
+            margin-top: 3px;
+        }
+        
+        .device-version {
+            font-size: 12px;
+            background-color: var(--accent-color);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+        }
+        
+        .status-message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+        }
+        
+        .success {
+            background-color: rgba(76, 201, 240, 0.2);
+            color: #0a9396;
+            display: block;
+        }
+        
+        .error {
+            background-color: rgba(247, 37, 133, 0.2);
+            color: #ae2012;
+            display: block;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 35px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .no-devices {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .filter-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .filter-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            background-color: #e9ecef;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Registro de Dispositivos</h1>
+            <p>Administra tus dispositivos IoT de forma sencilla</p>
+        </div>
+        
+        <div class="form-container">
+            <div id="statusMessage" class="status-message"></div>
+            
+            <div class="form-group">
+                <label for="deviceId">ID del Dispositivo</label>
+                <input type="text" id="deviceId" placeholder="Ej: ESP32-001" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="wifiPassword">Contraseña WiFi</label>
+                <input type="password" id="wifiPassword" placeholder="Ingresa la contraseña" required>
+                <span class="password-toggle" id="togglePassword">👁️</span>
+            </div>
+            
+            <div class="form-group">
+                <label for="deviceVersion">Versión del Firmware (opcional)</label>
+                <input type="text" id="deviceVersion" placeholder="Ej: v1.0.2">
+            </div>
+            
+            <button class="btn" id="registerBtn">Registrar Dispositivo</button>
+            
+            <div class="device-list">
+                <div class="device-list-header">
+                    <h2>Dispositivos Registrados</h2>
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="Buscar dispositivos...">
+                    </div>
+                </div>
+                
+                <div class="filter-options">
+                    <button class="filter-btn active" data-filter="all">Todos</button>
+                    <button class="filter-btn" data-filter="v1">Versión 1.x</button>
+                    <button class="filter-btn" data-filter="v2">Versión 2.x</button>
+                    <button class="filter-btn" data-filter="other">Otras versiones</button>
+                </div>
+                
+                <div id="devicesContainer">
+                    <!-- Los dispositivos aparecerán aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de Firebase (reemplaza con tus propios datos)
+const firebaseConfig = {
+  apiKey: "AIzaSyAJc1Ky89akhCc7roV8IQYzS9jBbVpT5Zs",
+  authDomain: "devices-8b0a8.firebaseapp.com",
+  projectId: "devices-8b0a8",
+  storageBucket: "devices-8b0a8.firebasestorage.app",
+  messagingSenderId: "524615038066",
+  appId: "1:524615038066:web:55782e9d7d37809f213eeb",
+  measurementId: "G-XY8QDTRGNR"
+};
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Referencia a la colección de dispositivos
+        const devicesRef = db.collection("devices");
+
+        // Elementos del DOM
+        const deviceIdInput = document.getElementById("deviceId");
+        const wifiPasswordInput = document.getElementById("wifiPassword");
+        const deviceVersionInput = document.getElementById("deviceVersion");
+        const registerBtn = document.getElementById("registerBtn");
+        const togglePassword = document.getElementById("togglePassword");
+        const devicesContainer = document.getElementById("devicesContainer");
+        const statusMessage = document.getElementById("statusMessage");
+        const searchInput = document.getElementById("searchInput");
+        const filterButtons = document.querySelectorAll(".filter-btn");
+
+        // Variables de estado
+        let allDevices = [];
+        let currentFilter = "all";
+
+        // Mostrar/ocultar contraseña
+        togglePassword.addEventListener("click", function() {
+            const type = wifiPasswordInput.getAttribute("type") === "password" ? "text" : "password";
+            wifiPasswordInput.setAttribute("type", type);
+            this.textContent = type === "password" ? "👁️" : "👁️‍🗨️";
+        });
+
+        // Registrar dispositivo
+        registerBtn.addEventListener("click", async function() {
+            const deviceId = deviceIdInput.value.trim();
+            const wifiPassword = wifiPasswordInput.value.trim();
+            const deviceVersion = deviceVersionInput.value.trim() || "v1.0.0";
+
+            if (!deviceId || !wifiPassword) {
+                showMessage("Por favor completa todos los campos requeridos", "error");
+                return;
+            }
+
+            try {
+                // Verificar si el dispositivo ya existe
+                const doc = await devicesRef.doc(deviceId).get();
+                
+                if (doc.exists) {
+                    showMessage("Este ID de dispositivo ya está registrado", "error");
+                    return;
+                }
+
+                // Crear nuevo dispositivo
+                await devicesRef.doc(deviceId).set({
+                    id: deviceId,
+                    wifiPassword: wifiPassword,
+                    version: deviceVersion,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                showMessage("Dispositivo registrado con éxito!", "success");
+                loadDevices();
+                
+                // Limpiar formulario
+                deviceIdInput.value = "";
+                wifiPasswordInput.value = "";
+                deviceVersionInput.value = "";
+                
+            } catch (error) {
+                console.error("Error al registrar dispositivo: ", error);
+                showMessage("Error al registrar el dispositivo: " + error.message, "error");
+            }
+        });
+
+        // Buscar dispositivos
+        searchInput.addEventListener("input", function() {
+            filterDevices();
+        });
+
+        // Filtros por versión
+        filterButtons.forEach(button => {
+            button.addEventListener("click", function() {
+                filterButtons.forEach(btn => btn.classList.remove("active"));
+                this.classList.add("active");
+                currentFilter = this.dataset.filter;
+                filterDevices();
+            });
+        });
+
+        // Filtrar y buscar dispositivos
+        function filterDevices() {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            let filteredDevices = allDevices.filter(device => {
+                // Aplicar filtro de búsqueda
+                const matchesSearch = device.id.toLowerCase().includes(searchTerm) || 
+                                     device.version.toLowerCase().includes(searchTerm);
+                
+                // Aplicar filtro por versión
+                let matchesFilter = true;
+                if (currentFilter !== "all") {
+                    if (currentFilter === "v1") {
+                        matchesFilter = device.version.startsWith("v1");
+                    } else if (currentFilter === "v2") {
+                        matchesFilter = device.version.startsWith("v2");
+                    } else if (currentFilter === "other") {
+                        matchesFilter = !device.version.startsWith("v1") && !device.version.startsWith("v2");
+                    }
+                }
+                
+                return matchesSearch && matchesFilter;
+            });
+            
+            renderDevices(filteredDevices);
+        }
+
+        // Mostrar mensajes de estado
+        function showMessage(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = "status-message " + type;
+            setTimeout(() => {
+                statusMessage.style.display = "none";
+            }, 5000);
+        }
+
+        // Renderizar dispositivos en el DOM
+        function renderDevices(devices) {
+            devicesContainer.innerHTML = "";
+            
+            if (devices.length === 0) {
+                devicesContainer.innerHTML = '<div class="no-devices">No se encontraron dispositivos</div>';
+                return;
+            }
+            
+            devices.forEach((device) => {
+                const deviceElement = document.createElement("div");
+                deviceElement.className = "device-item";
+                deviceElement.innerHTML = `
+                    <div class="device-info">
+                        <div class="device-id">${device.id}</div>
+                        <div class="device-wifi">Contraseña: ${'•'.repeat(device.wifiPassword.length)}</div>
+                    </div>
+                    <div class="device-version">${device.version}</div>
+                `;
+                devicesContainer.appendChild(deviceElement);
+            });
+        }
+
+        // Cargar dispositivos registrados
+        function loadDevices() {
+            devicesRef.orderBy("createdAt", "desc").get().then((querySnapshot) => {
+                allDevices = [];
+                
+                if (querySnapshot.empty) {
+                    renderDevices([]);
+                    return;
+                }
+                
+                querySnapshot.forEach((doc) => {
+                    allDevices.push(doc.data());
+                });
+                
+                filterDevices();
+            }).catch((error) => {
+                console.error("Error al cargar dispositivos: ", error);
+            });
+        }
+
+        // Cargar dispositivos al iniciar
+        document.addEventListener("DOMContentLoaded", loadDevices);
+    </script>
+</body>
+</html>
