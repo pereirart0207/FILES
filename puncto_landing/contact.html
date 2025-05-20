@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contact Us</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="apple-touch-icon" href="src/img/logo-short.png" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="src/img/logo-short.png"
+      sizes="32x32"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      rel="stylesheet"
+    />
+    <link href="src/contact.css" rel="stylesheet" />
+    <!-- AOS Animation Library -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-dark text-light">
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <div class="contact-wrapper">
+            <div class="row g-0">
+              <!-- Contact Info -->
+              <div class="col-md-5">
+                <section class="contact-info h-100">
+                  <a href="index.html" class="back-btn">
+                    <i class="fas fa-arrow-left"></i>
+                  </a>
+
+                  <h3 class="mb-4">Ponte en contacto</h3>
+                  <p class="mb-4">
+                    Nos encantaería escuchar de ti, por favor llena el
+                    formulario de contactanos usando la siguiente información.
+                  </p>
+
+                  <!--
+                  <div class="contact-item">
+                    <div class="contact-icon">
+                      <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                  <div>
+                      <h6 class="mb-0">Address</h6>
+                      <p class="mb-0">
+                        My<br />New York, NY 10001
+                      </p>
+                    </div>
+                  </div>
+                -->
+                  <div class="contact-item">
+                    <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                    <div>
+                      <h6 class="mb-0">Teléfono</h6>
+                      <p class="mb-0">+34 640 96 82 19</p>
+                    </div>
+                  </div>
+
+                  <div class="contact-item">
+                    <div class="contact-icon">
+                      <i class="fas fa-envelope"></i>
+                    </div>
+                    <div>
+                      <h6 class="mb-0">Email</h6>
+                      <p class="mb-0">punctoapp@gmail.com</p>
+                    </div>
+                  </div>
+
+                  <div class="social-links">
+                    <h6 class="mb-3">Síguenos</h6>
+                    <a
+                      href="https://www.facebook.com/profile.php?id=61569513330453"
+                      class="social-icon"
+                      ><i class="fab fa-facebook-f"></i
+                    ></a>
+                    <a href="https://x.com/puncto_" class="social-icon"
+                      ><i class="fab fa-x"></i
+                    ></a>
+                    <!--
+                    <a href="#" class="social-icon"
+                      ><i class="fab fa-linkedin-in"></i
+                    ></a>
+                   -->
+                    <a
+                      href="https://www.instagram.com/puncto_/"
+                      class="social-icon"
+                      ><i class="fab fa-instagram"></i
+                    ></a>
+                  </div>
+                </section>
+              </div>
+
+              <!-- Contact Form -->
+              <div class="col-md-7">
+                <section class="contact-form">
+                  <h3 class="mb-4">Envíanos un mensaje</h3>
+                  <form id="contactForm">
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder="Nombre"
+                          id="firstName"
+                        />
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label">Apellido</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          placeholder="Apellido"
+                          id="lastName"
+                        />
+                      </div>
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">Email</label>
+                      <input
+                        type="email"
+                        class="form-control"
+                        placeholder="nombre@ejamplo.com"
+                        id="fromEmail"
+                      />
+                    </div>
+
+                    <div class="mb-3">
+                      <label class="form-label">Asunto</label>
+                      <input
+                        type="text"
+                        class="form-control"
+                        placeholder="¿Cómo te podemos ayudar?"
+                        id="emailSubject"
+                      />
+                    </div>
+
+                    <div class="mb-4">
+                      <label class="form-label"> Mensajes </label>
+                      <textarea
+                        class="form-control"
+                        rows="5"
+                        placeholder="Tu mensaje aquí..."
+                        id="emailMessage"
+                      ></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-submit text-white">
+                      Send Message
+                    </button>
+                  </form>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      // Wait for the page to load completely and then add the 'loaded' class to animate the content
+      window.onload = () => {
+        document.querySelector(".contact-wrapper").classList.add("loaded");
+        document.querySelectorAll(".contact-item").forEach((item) => {
+          item.classList.add("loaded");
+        });
+        document.querySelectorAll(".social-icon").forEach((icon) => {
+          icon.classList.add("loaded");
+        });
+      };
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="src/mailer.js"></script>
+    <script src="src/tui.js"></script>
+  </body>
+</html>
