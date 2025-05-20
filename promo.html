@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envío de Correos Promocionales | Premium</title>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPjxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9IiM0MzYxZWUiLz48c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiMzZjM3YzkiLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cGF0aCBmaWxsPSJ1cmwoI2cpIiBkPSJNNDY0IDY0SDQ4QTI0IDI0IDAgMCAwIDI0IDg4djMyMGEyNCAyNCAwIDAgMCAyNCAyNGg0MTZhMjQgMjQgMCAwIDAgMjQtMjRWODhBMjQgMjQgMCAwIDAgNDY0IDY0em0tNjEuNiAxNjcuMkwzNTkuNCAzMjBjLTQuNyA1LjItMTIuOCA1LjItMTcuNiAwTDI1NiAyNjMuMiAxMDkuNiAzMjBjLTQuNyA1LjItMTIuOCA1LjItMTcuNiAwTDkuNiAyMzEuMmMtNS4zLTUuOC01LjItMTUuMy4zLTIxTDIzNi43IDY3LjJjOS40LTkuOCAyNS4yLTkuOCAzNC42IDBsMjI2LjggMjQzYzUuNSA1LjcgNS42IDE1LjIuMyAyMXoiLz48L3N2Zz4=" type="image/svg+xml">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --error: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --border-radius: 12px;
+            --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            line-height: 1.6;
+            color: var(--dark);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            position: relative;
+            transform: translateY(0);
+            opacity: 1;
+            transition: var(--transition);
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3QgZmlsbD0idXJsKCNwYXR0ZXJuKSIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIvPjwvc3ZnPg==');
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-weight: 300;
+            font-size: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray);
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .tab:hover:not(.active) {
+            color: var(--dark);
+            background-color: #f8f9fa;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 18px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e9ecef;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: #f8f9fa;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            background-color: white;
+            outline: none;
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 97, 238, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #e9ecef;
+            color: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+            color: var(--primary-dark);
+        }
+
+        .status {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .success {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: var(--success);
+            border: 1px solid rgba(76, 201, 240, 0.3);
+            display: flex;
+        }
+
+        .error {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(247, 37, 133, 0.3);
+            display: flex;
+        }
+
+        .warning {
+            background-color: rgba(248, 150, 30, 0.1);
+            color: var(--warning);
+            border: 1px solid rgba(248, 150, 30, 0.3);
+            display: flex;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 13px;
+            color: var(--gray);
+        }
+
+        .config-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .config-info p {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        .config-info a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .config-info a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            .tab-content {
+                padding: 25px 20px;
+            }
+            
+            .header {
+                padding: 25px 20px;
+            }
+            
+            .header h1 {
+                font-size: 24px;
+            }
+            
+            .tabs {
+                flex-wrap: wrap;
+            }
+            
+            .tab {
+                flex: 1;
+                text-align: center;
+                padding: 12px;
+                font-size: 14px;
+            }
+        }
+
+        /* Floating animation */
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-paper-plane floating" style="margin-right: 10px;"></i> Campaña Promocional</h1>
+            <p>Envía ofertas especiales a tus clientes</p>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="send">Enviar Correos</div>
+            <div class="tab" data-tab="config">Configuración</div>
+        </div>
+        
+        <div class="tab-content active" id="send-tab">
+            <form id="promo-form">
+                <div class="form-group">
+                    <label for="name">Nombre del Cliente/Empresa</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="name" name="name" placeholder="Ej: Juan Pérez o Empresa XYZ" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Correo Electrónico</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="Ej: contacto@empresa.com" required>
+                    </div>
+                </div>
+                
+                <button type="submit" id="submit-btn">
+                    <span id="btn-text">Enviar Promoción</span>
+                    <i class="fas fa-paper-plane" id="btn-icon"></i>
+                </button>
+            </form>
+            
+            <div id="status-message" class="status"></div>
+            
+            <div class="footer">
+                <p>Sistema seguro de envío de correos promocionales</p>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="config-tab">
+            <div class="config-info">
+                <p><i class="fas fa-info-circle"></i> Necesitas tus credenciales de EmailJS. Si no las tienes, regístrate en <a href="https://www.emailjs.com/" target="_blank">emailjs.com</a> y crea un servicio y plantilla.</p>
+            </div>
+            
+            <form id="config-form">
+                <div class="form-group">
+                    <label for="user-id">EmailJS User ID</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-key"></i>
+                        <input type="text" id="user-id" name="user-id" placeholder="Tu User ID de EmailJS" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="service-id">Service ID</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-server"></i>
+                        <input type="text" id="service-id" name="service-id" placeholder="ID del servicio de email" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="template-id">Template ID</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-file-alt"></i>
+                        <input type="text" id="template-id" name="template-id" placeholder="ID de la plantilla de email" required>
+                    </div>
+                </div>
+                
+                <button type="submit" id="save-config-btn">
+                    <span id="save-btn-text">Guardar Configuración</span>
+                    <i class="fas fa-save" id="save-btn-icon"></i>
+                </button>
+            </form>
+            
+            <div id="config-status-message" class="status"></div>
+            
+            <div class="footer">
+                <p>Configuración segura - tus credenciales se guardan localmente</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para cambiar entre pestañas
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remover clase active de todas las pestañas y contenidos
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Agregar clase active a la pestaña clickeada
+                this.classList.add('active');
+                
+                // Mostrar el contenido correspondiente
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+
+        // Cargar configuración guardada
+        function loadConfig() {
+            const config = JSON.parse(localStorage.getItem('emailjsConfig')) || {};
+            document.getElementById('user-id').value = config.userId || '';
+            document.getElementById('service-id').value = config.serviceId || '';
+            document.getElementById('template-id').value = config.templateId || '';
+            
+            // Si hay configuración guardada, inicializar EmailJS
+            if (config.userId) {
+                emailjs.init(config.userId);
+                showConfigStatus('Configuración cargada correctamente', 'success');
+            }
+        }
+
+        // Guardar configuración
+        document.getElementById('config-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const saveBtn = document.getElementById('save-config-btn');
+            const saveBtnText = document.getElementById('save-btn-text');
+            const saveBtnIcon = document.getElementById('save-btn-icon');
+            
+            // Deshabilitar el botón
+            saveBtn.disabled = true;
+            saveBtnText.textContent = 'Guardando...';
+            saveBtnIcon.className = 'fas fa-spinner fa-spin';
+            
+            // Obtener valores
+            const userId = document.getElementById('user-id').value.trim();
+            const serviceId = document.getElementById('service-id').value.trim();
+            const templateId = document.getElementById('template-id').value.trim();
+            
+            // Validar
+            if (!userId || !serviceId || !templateId) {
+                showConfigStatus('Por favor completa todos los campos', 'error');
+                saveBtn.disabled = false;
+                saveBtnText.textContent = 'Guardar Configuración';
+                saveBtnIcon.className = 'fas fa-save';
+                return;
+            }
+            
+            // Guardar en localStorage
+            const config = {
+                userId: userId,
+                serviceId: serviceId,
+                templateId: templateId
+            };
+            
+            localStorage.setItem('emailjsConfig', JSON.stringify(config));
+            
+            // Inicializar EmailJS
+            emailjs.init(userId);
+            
+            // Mostrar mensaje de éxito
+            showConfigStatus('Configuración guardada correctamente', 'success');
+            
+            // Restablecer botón
+            setTimeout(() => {
+                saveBtn.disabled = false;
+                saveBtnText.textContent = 'Guardar Configuración';
+                saveBtnIcon.className = 'fas fa-save';
+            }, 1000);
+        });
+
+        // Mostrar estado de la configuración
+        function showConfigStatus(message, type) {
+            const statusMessage = document.getElementById('config-status-message');
+            statusMessage.className = `status ${type}`;
+            statusMessage.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> <span>${message}</span>`;
+        }
+
+        // Envío de correos (similar al anterior pero con configuración dinámica)
+        document.getElementById('promo-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Verificar si hay configuración guardada
+            const config = JSON.parse(localStorage.getItem('emailjsConfig')) || {};
+            if (!config.userId || !config.serviceId || !config.templateId) {
+                showStatus('Por favor configura tus credenciales de EmailJS primero', 'error');
+                document.querySelector('.tab[data-tab="config"]').click();
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const btnText = document.getElementById('btn-text');
+            const btnIcon = document.getElementById('btn-icon');
+            const statusMessage = document.getElementById('status-message');
+            
+            // Obtener los valores del formulario
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            // Deshabilitar el botón para evitar múltiples envíos
+            submitBtn.disabled = true;
+            btnText.textContent = 'Enviando...';
+            btnIcon.className = 'fas fa-spinner fa-spin';
+            
+            // Limpiar mensajes anteriores
+            statusMessage.className = 'status';
+            statusMessage.innerHTML = '';
+            
+            // Parámetros para EmailJS
+            const templateParams = {
+                name: name,
+                email: email
+            };
+            
+            // Enviar el correo usando EmailJS con la configuración guardada
+            emailjs.send(config.serviceId, config.templateId, templateParams)
+                .then(function(response) {
+                    console.log('SUCCESS!', response.status, response.text);
+                    
+                    // Mostrar mensaje de éxito
+                    statusMessage.className = 'status success';
+                    statusMessage.innerHTML = '<i class="fas fa-check-circle"></i> <span>Correo enviado con éxito a <strong>' + email + '</strong></span>';
+                    
+                    // Limpiar el formulario
+                    document.getElementById('promo-form').reset();
+                    
+                    // Animación de éxito
+                    submitBtn.style.background = 'linear-gradient(135deg, #4cc9f0 0%, #4895ef 100%)';
+                    setTimeout(() => {
+                        submitBtn.style.background = 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)';
+                    }, 2000);
+                }, function(error) {
+                    console.log('FAILED...', error);
+                    
+                    // Mostrar mensaje de error
+                    statusMessage.className = 'status error';
+                    statusMessage.innerHTML = '<i class="fas fa-exclamation-circle"></i> <span>Error al enviar el correo: ' + error.text + '</span>';
+                    
+                    // Animación de error
+                    submitBtn.style.background = 'linear-gradient(135deg, #f72585 0%, #b5179e 100%)';
+                    setTimeout(() => {
+                        submitBtn.style.background = 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)';
+                    }, 2000);
+                })
+                .finally(function() {
+                    // Restablecer el botón
+                    setTimeout(() => {
+                        submitBtn.disabled = false;
+                        btnText.textContent = 'Enviar Promoción';
+                        btnIcon.className = 'fas fa-paper-plane';
+                    }, 1000);
+                });
+        });
+
+        // Mostrar estado del envío
+        function showStatus(message, type) {
+            const statusMessage = document.getElementById('status-message');
+            statusMessage.className = `status ${type}`;
+            statusMessage.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> <span>${message}</span>`;
+        }
+
+        // Cargar configuración al iniciar
+        document.addEventListener('DOMContentLoaded', loadConfig);
+    </script>
+</body>
+</html>
