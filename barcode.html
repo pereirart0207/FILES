@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Código de Barras</title>
+    <link rel="icon" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/svgs/solid/barcode.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.0/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin-top: 50px;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        label {
+            font-size: 18px;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+        }
+
+        button {
+            margin-top: 15px;
+        }
+
+        #barcode {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            background-color: white;
+            border-radius: 5px;
+            width: 100%;
+            height: auto;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #777;
+            text-align: center;
+        }
+
+        /* Ocultar por defecto la sección de generar en serie */
+        #seriesSection {
+            display: none;
+            transition: max-height 0.5s ease, opacity 0.5s ease;
+            overflow: hidden;
+            opacity: 0;
+            max-height: 0;
+        }
+
+        /* Estilo del switch */
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .form-check-input {
+            display: none;
+        }
+
+        .switch-label {
+            position: relative;
+            cursor: pointer;
+            padding-left: 40px;
+            user-select: none;
+        }
+
+        .switch-label:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 40px;
+            height: 20px;
+            background-color: #ccc;
+            border-radius: 20px;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .switch-label:after {
+            content: '';
+            position: absolute;
+            left: 3px;
+            top: 2px;
+            width: 16px;
+            height: 16px;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .form-check-input:checked+.switch-label:before {
+            background-color: #007bff;
+        }
+
+        .form-check-input:checked+.switch-label:after {
+            transform: translateX(20px);
+        }
+
+        .github-link {
+            color: #000;
+            font-size: 24px;
+            margin-top: 10px;
+            display: inline-block;
+            transition: color 0.3s;
+        }
+
+        .github-link:hover {
+            color: #007bff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Generador de Código de Barras</h1>
+        <div class="form-group">
+            <label for="barcodeInput">Introduce el código de barras:</label>
+            <input type="text" class="form-control" id="barcodeInput" placeholder="Ejemplo: 123456789012" value="12312312313" />
+        </div>
+        <button class="btn btn-primary btn-block" id="generateBtn">
+            <i class="fas fa-barcode"></i> Generar Código de Barras
+        </button>
+        <svg id="barcode" class="mt-3"></svg>
+
+        <button class="btn btn-success btn-block mt-3" id="printBtn">
+            <i class="fas fa-print"></i> Imprimir PDF
+        </button>
+        <br>
+        <hr>
+
+        <!-- Checkbox para mostrar/ocultar la sección de generar en serie -->
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="toggleSeries" />
+            <label class="switch-label" for="toggleSeries">Generar en serie</label>
+        </div>
+
+        <!-- Sección de generar en serie -->
+        <div id="seriesSection">
+            <div class="form-group">
+                <label for="startCodeInput">Código Inicial:</label>
+                <input type="text" class="form-control" id="startCodeInput" placeholder="Ejemplo: 250000000000" value="250000000000" />
+            </div>
+            <div class="form-group">
+                <label for="quantityInput">Cantidad:</label>
+                <input type="number" class="form-control" id="quantityInput" placeholder="Cantidad deseada" value="100" />
+            </div>
+            <button class="btn btn-warning btn-block mt-3" id="print100Btn">
+                <i class="fas fa-print"></i> Generar en serie
+            </button>
+        </div>
+
+    </div>
+
+    <footer>
+        &copy; 2024 Generador de Códigos de Barras
+        <br>
+        <!-- Enlace a GitHub -->
+        <a href="https://github.com/pereirart0207" target="_blank" class="github-link">
+            <i class="fab fa-github"></i>
+        </a>
+    </footer>
+
+    <script>
+        // Generar código de barras
+        document.getElementById('generateBtn').addEventListener('click', function () {
+            const barcodeValue = document.getElementById('barcodeInput').value;
+            JsBarcode("#barcode", barcodeValue, {
+                format: "CODE128",
+                lineColor: "#000",
+                width: 2,
+                height: 100,
+                displayValue: true,
+                fontSize: 20,
+                textMargin: 5
+            });
+        });
+
+        // Función para mostrar/ocultar la sección de generar en serie
+        document.getElementById('toggleSeries').addEventListener('change', function () {
+            const seriesSection = document.getElementById('seriesSection');
+            if (this.checked) {
+                seriesSection.style.display = 'block';
+                seriesSection.style.maxHeight = '500px'; // Ajustar según el contenido
+                seriesSection.style.opacity = '1';
+            } else {
+                seriesSection.style.maxHeight = '0';
+                seriesSection.style.opacity = '0';
+                setTimeout(() => {
+                    seriesSection.style.display = 'none';
+                }, 500); // Espera a que termine la transición
+            }
+        });
+
+        // Función para generar códigos consecutivos
+        function generateConsecutiveCodes(start, quantity) {
+            const codes = [];
+            for (let i = 0; i < quantity; i++) {
+                codes.push((BigInt(start) + BigInt(i)).toString().padStart(12, '0'));
+            }
+            return codes;
+        }
+
+        // Generar códigos en serie
+        document.getElementById('print100Btn').addEventListener('click', function () {
+            const { jsPDF } = window.jspdf; // Asegurarse de que jsPDF se carga correctamente
+            const startCode = document.getElementById('startCodeInput').value;
+            const quantity = parseInt(document.getElementById('quantityInput').value, 10);
+            const codes = generateConsecutiveCodes(startCode, quantity); // Generar los códigos
+
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const margin = 5; // Margen superior
+            const barWidth = 62; // Ancho del código de barras en mm
+            const barHeight = 24; // Altura del código de barras en mm
+            const codesPerPage = 20; // Cantidad de códigos por página
+            const spaceBetween = 5; // Espacio entre códigos en mm
+            const codesPerRow = 3; // Cantidad de códigos por fila
+
+            let y = margin; // Posición inicial en el eje Y
+            let x = margin; // Posición inicial en el eje X
+
+            codes.forEach((code, index) => {
+                // Generar el código de barras en el canvas
+                const canvas = document.createElement("canvas");
+                canvas.width = barWidth * 3.7795275591; // Convertir mm a píxeles
+                canvas.height = barHeight * 3.7795275591; // Convertir mm a píxeles
+
+                JsBarcode(canvas, code, { format: "CODE128", width: 2, height: 24, displayValue: true });
+                const barcodeImage = canvas.toDataURL("image/png");
+
+                doc.addImage(barcodeImage, 'PNG', x, y, barWidth, barHeight); // Añadir imagen al PDF
+
+                // Actualizar la posición X
+                x += barWidth + margin; // Mover a la siguiente columna
+
+                // Si se alcanzan los códigos por fila, mover a la siguiente fila
+                if ((index + 1) % codesPerRow === 0) {
+                    x = margin; // Reiniciar posición X para la nueva fila
+                    y += barHeight + spaceBetween; // Mover hacia abajo para la siguiente fila
+                }
+
+                // Si se alcanzan los códigos por página, agregar una nueva página
+                if ((index + 1) % codesPerPage === 0 && index + 1 < codes.length) {
+                    doc.addPage();
+                    y = margin; // Reiniciar la posición Y para la nueva página
+                    x = margin; // Reiniciar posición X para la nueva página
+                }
+            });
+
+            // Guardar el PDF después de añadir todos los códigos
+            doc.save("códigos_de_barras.pdf");
+        });
+
+        // Imprimir el código de barras en PDF
+        document.getElementById('printBtn').addEventListener('click', function () {
+            const jsPDF = window.jspdf.jsPDF; // Cambiado aquí
+            const svg = document.getElementById("barcode");
+            const svgString = new XMLSerializer().serializeToString(svg);
+            const svgBlob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+            const url = URL.createObjectURL(svgBlob);
+            const img = new Image();
+
+            img.onload = function () {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+
+                // Establecer dimensiones del canvas
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+
+                // Convertir el canvas a dataURL
+                const barcodeImage = canvas.toDataURL("image/png");
+
+                // Crear PDF y establecer dimensiones
+                const doc = new jsPDF({
+                    orientation: "landscape",
+                    unit: "px",
+                    format: [canvas.width, canvas.height],
+                    hotfixes: []
+                });
+
+                // Añadir la imagen al PDF
+                doc.addImage(barcodeImage, 'PNG', 0, 0, canvas.width, canvas.height);
+                doc.text("Código de Barras: " + document.getElementById('barcodeInput').value, 10, canvas.height + 20);
+                doc.save("codigo_de_barras.pdf");
+                URL.revokeObjectURL(url); // Limpiar el objeto URL
+            };
+
+            img.src = url; // Asignar la URL del blob a la imagen
+        });
+    </script>
+</body>
+
+</html>
