@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="theme-color" content="#111827"/>
+  <title>PUNCTO SCAN</title>
+  <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --background: #111827;
+      --surface: #1f2937;
+      --surface-light: #374151;
+      --text: #f9fafb;
+      --text-muted: #9ca3af;
+      --border: #374151;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--background);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+      touch-action: manipulation;
+    }
+
+    .header {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text);
+      text-align: center;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    label {
+      font-weight: 500;
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+      display: block;
+      color: var(--text);
+    }
+
+    input, button, select {
+      font-size: 1rem;
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-light);
+      color: var(--text);
+      transition: all 0.15s ease;
+      appearance: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+
+    button {
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      user-select: none;
+      background: var(--primary);
+      color: white;
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    }
+
+    #inputDisplay {
+      font-family: 'Roboto Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 500;
+      text-align: center;
+      margin: 0.5rem 0 1rem;
+      padding: 1rem;
+      background: var(--surface);
+      border-radius: 8px;
+      width: 100%;
+      letter-spacing: 1px;
+      border: 1px solid var(--border);
+      color: var(--text);
+      box-shadow: var(--shadow);
+    }
+
+   .keyboard {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: auto;
+  margin-top: auto;
+  box-sizing: border-box;
+  padding-bottom: 1rem;
+}
+
+.keyboard button {
+  aspect-ratio: 1;
+  padding: 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+  background: var(--surface-light);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 50px;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+    .keyboard button:active {
+      background: var(--surface);
+    }
+
+    #status {
+      margin: 1rem 0;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      text-align: center;
+      min-height: 1.25rem;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Botones especiales */
+    #borrarBtn, #enviarBtn {
+      grid-column: span 2;
+      aspect-ratio: auto;
+      min-height: 60px;
+    }
+
+    #borrarBtn {
+      background: var(--danger);
+      color: white;
+    }
+
+    #borrarBtn:active {
+      background: var(--danger-hover);
+    }
+
+    #enviarBtn {
+      background: var(--primary);
+      color: white;
+    }
+
+    #enviarBtn:active {
+      background: var(--primary-hover);
+    }
+
+    /* Full height layout */
+    #mainInterface {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* Config section */
+    .config-section {
+      background: var(--surface);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--surface);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--surface-light);
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>PUNCTO</h1>
+  </div>
+
+  <div class="content">
+    <div id="setup" class="hidden config-section">
+      <label for="subnet">Subred (ej: 192.168.1):</label>
+      <input id="subnet" type="text" placeholder="192.168.1" inputmode="numeric"/>
+      <button onclick="saveSubnet()">Guardar subred</button>
+    </div>
+
+    <div id="devices" class="hidden config-section">
+      <label for="deviceSelect">Dispositivo:</label>
+      <select id="deviceSelect" onchange="onDeviceSelect()"></select>
+    </div>
+
+    <div id="mainInterface" class="hidden">
+      <div id="inputDisplay">—</div>
+      <div id="status">Conectado</div>
+      <div class="keyboard" id="hexKeys"></div>
+    </div>
+  </div>
+
+  <script>
+    const savedSubnet = localStorage.getItem('subnet');
+    let devices = [];
+    let selectedDevice = null;
+    let inputValue = "";
+
+    window.onload = async () => {
+      if (!savedSubnet) {
+        document.getElementById('setup').classList.remove('hidden');
+        return;
+      }
+      await scanNetwork(savedSubnet);
+    };
+
+    function saveSubnet() {
+      const input = document.getElementById('subnet').value.trim();
+      if (!/^(\d{1,3}\.){2}\d{1,3}$/.test(input)) {
+        showStatus("Formato inválido. Usa: 192.168.1");
+        return;
+      }
+      localStorage.setItem('subnet', input);
+      location.reload();
+    }
+
+  async function scanNetwork(subnet) {
+  showStatus("Buscando dispositivos...");
+  document.getElementById('setup').classList.add('hidden');
+
+  const maxConcurrent = 20;
+  const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const results = [];
+  
+  for (let start = 1; start < 255; start += maxConcurrent) {
+    const requests = [];
+
+    for (let i = start; i < start + maxConcurrent && i < 255; i++) {
+      const ip = `${subnet}.${i}`;
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 600);
+
+      requests.push(
+        fetch(`http://${ip}/ispuncto`, { signal: controller.signal })
+          .then(res => res.json().then(data => ({ ip, devname: data.devname })))
+          .catch(() => null)
+          .finally(() => clearTimeout(timeoutId))
+      );
+    }
+
+    const batchResults = await Promise.all(requests);
+    results.push(...batchResults.filter(Boolean));
+
+    await delay(100); // Pequeña pausa para no saturar
+  }
+
+  devices = results;
+
+  if (devices.length === 0) {
+    showStatus("No hay dispositivos");
+    document.getElementById('setup').classList.remove('hidden');
+  } else if (devices.length === 1) {
+    selectedDevice = devices[0];
+    showStatus(`Conectado a ${selectedDevice.devname}`);
+    initKeyboard();
+  } else {
+    showDeviceSelection();
+  }
+}
+
+    function showDeviceSelection() {
+      const select = document.getElementById('deviceSelect');
+      select.innerHTML = devices.map(d => `<option value="${d.ip}">${d.devname} (${d.ip})</option>`).join('');
+      document.getElementById('devices').classList.remove('hidden');
+      showStatus("Selecciona dispositivo");
+    }
+
+    function onDeviceSelect() {
+      const ip = document.getElementById('deviceSelect').value;
+      selectedDevice = devices.find(d => d.ip === ip);
+      showStatus(`Conectado a ${selectedDevice.devname}`);
+      initKeyboard();
+    }
+
+    function initKeyboard() {
+      document.getElementById('devices').classList.add('hidden');
+      document.getElementById('mainInterface').classList.remove('hidden');
+      
+      const keys = "0123456789ABCDEF".split("");
+      const hexKeys = document.getElementById('hexKeys');
+      hexKeys.innerHTML = "";
+
+      keys.forEach(k => {
+        const btn = document.createElement("button");
+        btn.textContent = k;
+        btn.onclick = () => addChar(k);
+        hexKeys.appendChild(btn);
+      });
+
+      const borrarBtn = document.createElement("button");
+      borrarBtn.textContent = "Borrar";
+      borrarBtn.id = "borrarBtn";
+      borrarBtn.onclick = () => {
+        inputValue = "";
+        updateInputDisplay();
+      };
+      hexKeys.appendChild(borrarBtn);
+
+      const enviarBtn = document.createElement("button");
+      enviarBtn.textContent = "Enviar";
+      enviarBtn.id = "enviarBtn";
+      enviarBtn.onclick = sendNumber;
+      hexKeys.appendChild(enviarBtn);
+
+      updateInputDisplay();
+    }
+
+    function addChar(char) {
+      if (inputValue.length >= 16) return;
+      inputValue += char;
+      updateInputDisplay();
+    }
+
+    function updateInputDisplay() {
+      document.getElementById('inputDisplay').textContent = inputValue || "—";
+    }
+
+    async function sendNumber() {
+      if (!inputValue) {
+        showStatus("Ingresa un valor");
+        return;
+      }
+
+      try {
+        showStatus("Enviando...");
+        const form = new FormData();
+        form.append("number", inputValue);
+        const res = await fetch(`http://${selectedDevice.ip}/number`, {
+          method: "POST",
+          body: form
+        });
+        await res.text();
+        showStatus("Enviado ✓");
+      } catch (err) {
+        showStatus("Error de envío");
+      }
+
+      inputValue = "";
+      updateInputDisplay();
+    }
+
+    function showStatus(msg) {
+      document.getElementById('status').textContent = msg;
+    }
+  </script>
+</body>
+</html>
