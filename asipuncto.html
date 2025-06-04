@@ -1,310 +1,340 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Asistente PUNCTO</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #f5f7fa;
-      --accent: #0026a1;
-      --accent-hover: #303796;
-      --text: #1f2937;
-      --text-light: #6b7280;
-      --card: #ffffff;
-      --user-bubble: #e0e7ff;
-      --bot-bubble: #f3f4f6;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .chat-container {
-      background-color: var(--card);
-      border-radius: 16px;
-      width: 100%;
-      max-width: 440px;
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      height: 80vh;
-      max-height: 700px;
-    }
-
-    .chat-header {
-      background-color: var(--accent);
-      color: white;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .chat-header h2 {
-      margin: 0;
-      font-weight: 600;
-      font-size: 1.2rem;
-    }
-
-    .logo-icon {
-      width: 24px;
-      height: 24px;
-      background-color: white;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent);
-      font-weight: bold;
-      font-size: 0.9rem;
-    }
-
-    .chat-output {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .message {
-      max-width: 80%;
-      padding: 12px 16px;
-      border-radius: 18px;
-      line-height: 1.5;
-      font-size: 0.95rem;
-      position: relative;
-    }
-
-    .bot-message {
-      background-color: var(--bot-bubble);
-      align-self: flex-start;
-      border-bottom-left-radius: 4px;
-      color: var(--text);
-    }
-
-    .user-message {
-      background-color: var(--user-bubble);
-      align-self: flex-end;
-      border-bottom-right-radius: 4px;
-      color: var(--text);
-    }
-
-    .message-time {
-      font-size: 0.7rem;
-      color: var(--text-light);
-      margin-top: 4px;
-      text-align: right;
-    }
-
-    .chat-input-container {
-      padding: 16px;
-      border-top: 1px solid #e5e7eb;
-      background-color: var(--card);
-    }
-
-    .chat-input {
-      display: flex;
-      gap: 8px;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 12px 16px;
-      border-radius: 24px;
-      border: 1px solid #e5e7eb;
-      background-color: white;
-      color: var(--text);
-      font-family: inherit;
-      font-size: 0.95rem;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    }
-
-    button {
-      padding: 0;
-      width: 48px;
-      height: 48px;
-      background-color: var(--accent);
-      border: none;
-      border-radius: 50%;
-      color: white;
-      cursor: pointer;
-      transition: background-color 0.2s ease-in-out;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    button:hover {
-      background-color: var(--accent-hover);
-    }
-
-    button svg {
-      width: 20px;
-      height: 20px;
-    }
-
-    .typing-indicator {
-      display: flex;
-      padding: 12px 16px;
-      background-color: var(--bot-bubble);
-      border-radius: 18px;
-      align-self: flex-start;
-      margin-bottom: 8px;
-      border-bottom-left-radius: 4px;
-    }
-
-    .typing-dot {
-      width: 8px;
-      height: 8px;
-      background-color: var(--text-light);
-      border-radius: 50%;
-      margin: 0 2px;
-      animation: typingAnimation 1.4s infinite ease-in-out;
-    }
-
-    .typing-dot:nth-child(1) {
-      animation-delay: 0s;
-    }
-
-    .typing-dot:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .typing-dot:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes typingAnimation {
-      0%, 60%, 100% { transform: translateY(0); }
-      30% { transform: translateY(-5px); }
-    }
-
-    .welcome-message {
-      text-align: center;
-      margin-bottom: 20px;
-      font-size: 0.9rem;
-      color: var(--text-light);
-    }
-
-    /* Scrollbar styling */
-    .chat-output::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .chat-output::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .chat-output::-webkit-scrollbar-thumb {
-      background-color: #d1d5db;
-      border-radius: 3px;
-    }
-
-    /* Responsive adjustments */
-    @media (max-width: 480px) {
-      .chat-container {
-        height: 90vh;
-        max-height: none;
-        border-radius: 0;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asistente PUNCTO</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f5f7fa;
+        --accent: #0026a1;
+        --accent-hover: #303796;
+        --text: #1f2937;
+        --text-light: #6b7280;
+        --card: #ffffff;
+        --user-bubble: #e0e7ff;
+        --bot-bubble: #f3f4f6;
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
       }
-      
+
       body {
-        padding: 0;
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
       }
-    }
-  </style>
-</head>
-<body>
 
-  <div class="chat-container">
-    <div class="chat-header">
-      <div class="logo-icon">P</div>
-      <h2 id="assistant">Conectando con un asistente...</h2>
-    </div>
-    
-    <div id="chat" class="chat-output">
-      <div class="welcome-message">Asistente disponible 24/7 para responder tus preguntas</div>
-      <!--<div class="message bot-message">
+      .chat-container {
+        background-color: var(--card);
+        border-radius: 16px;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        height: 80vh;
+        max-height: 700px;
+      }
+
+      .chat-header {
+        background-color: var(--accent);
+        color: white;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .chat-header h2 {
+        margin: 0;
+        font-weight: 600;
+        font-size: 1.2rem;
+      }
+
+      .logo-icon {
+        width: 24px;
+        height: 24px;
+        background-color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent);
+        font-weight: bold;
+        font-size: 0.9rem;
+      }
+
+      .chat-output {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .message {
+        max-width: 80%;
+        padding: 12px 16px;
+        border-radius: 18px;
+        line-height: 1.5;
+        font-size: 0.95rem;
+        position: relative;
+      }
+
+      .bot-message {
+        background-color: var(--bot-bubble);
+        align-self: flex-start;
+        border-bottom-left-radius: 4px;
+        color: var(--text);
+      }
+
+      .user-message {
+        background-color: var(--user-bubble);
+        align-self: flex-end;
+        border-bottom-right-radius: 4px;
+        color: var(--text);
+      }
+
+      .message-time {
+        font-size: 0.7rem;
+        color: var(--text-light);
+        margin-top: 4px;
+        text-align: right;
+      }
+
+      .chat-input-container {
+        padding: 16px;
+        border-top: 1px solid #e5e7eb;
+        background-color: var(--card);
+      }
+
+      .chat-input {
+        display: flex;
+        gap: 8px;
+      }
+
+      input[type="text"] {
+        flex: 1;
+        padding: 12px 16px;
+        border-radius: 24px;
+        border: 1px solid #e5e7eb;
+        background-color: white;
+        color: var(--text);
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+
+      input[type="text"]:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+      }
+
+      button {
+        padding: 0;
+        width: 48px;
+        height: 48px;
+        background-color: var(--accent);
+        border: none;
+        border-radius: 50%;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      button:hover {
+        background-color: var(--accent-hover);
+      }
+
+      button svg {
+        width: 20px;
+        height: 20px;
+      }
+
+      .typing-indicator {
+        display: flex;
+        padding: 12px 16px;
+        background-color: var(--bot-bubble);
+        border-radius: 18px;
+        align-self: flex-start;
+        margin-bottom: 8px;
+        border-bottom-left-radius: 4px;
+      }
+
+      .typing-dot {
+        width: 8px;
+        height: 8px;
+        background-color: var(--text-light);
+        border-radius: 50%;
+        margin: 0 2px;
+        animation: typingAnimation 1.4s infinite ease-in-out;
+      }
+
+      .typing-dot:nth-child(1) {
+        animation-delay: 0s;
+      }
+
+      .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+
+      .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+
+      @keyframes typingAnimation {
+        0%,
+        60%,
+        100% {
+          transform: translateY(0);
+        }
+        30% {
+          transform: translateY(-5px);
+        }
+      }
+
+      .welcome-message {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+        color: var(--text-light);
+      }
+
+      /* Scrollbar styling */
+      .chat-output::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .chat-output::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      .chat-output::-webkit-scrollbar-thumb {
+        background-color: #d1d5db;
+        border-radius: 3px;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 480px) {
+        .chat-container {
+          height: 90vh;
+          max-height: none;
+          border-radius: 0;
+        }
+
+        body {
+          padding: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="chat-container">
+      <div class="chat-header">
+        <div class="logo-icon">P</div>
+        <h2 id="assistant">Conectando con un asistente...</h2>
+      </div>
+
+      <div id="chat" class="chat-output">
+        <div class="welcome-message">
+          Asistente disponible 24/7 para responder tus preguntas
+        </div>
+        <!--<div class="message bot-message">
         Hola 👋 Soy tu asistente PUNCTO. Pregúntame lo que quieras sobre nuestros dispositivos de fichaje.
         <div class="message-time">Ahora</div>
       </div>-->
-    </div>
-    
-    <div class="chat-input-container">
-      <div class="chat-input">
-        <input type="text" id="userInput" placeholder="Escribe tu pregunta..." autocomplete="off" />
-        <button onclick="enviarPregunta()" id="sendButton">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-          </svg>
-        </button>
+      </div>
+
+      <div class="chat-input-container">
+        <div class="chat-input">
+          <input
+            type="text"
+            id="userInput"
+            placeholder="Escribe tu pregunta..."
+            autocomplete="off"
+          />
+          <button onclick="enviarPregunta()" id="sendButton">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
-<script>
+    <script>
+      async function getRandomName() {
+        const response = await fetch(
+          "https://openrouter.ai/api/v1/chat/completions",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization:
+                "Bearer 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",
+            },
+            body: JSON.stringify({
+              model: "deepseek/deepseek-chat:free",
+              messages: [
+                {
+                  role: "system",
+                  content:
+                    "Devuelve solo un nombre humano aleatorio. Solo el nombre. Nada más. ni texto ni nada absolutamente solo el nombnre bien escrito",
+                },
+                {
+                  role: "user",
+                  content: "Dame un nombre",
+                },
+              ],
+              temperature: 0.7,
+              max_tokens: 10,
+            }),
+          }
+        );
 
+        const data = await response.json();
+        return data.choices[0].message.content.trim();
+      }
 
+      document.addEventListener("DOMContentLoaded", async () => {
+        const name = await getRandomName();
+        document.getElementById("assistant").textContent = `${name} - Soporte `;
+        await enviarPregunta(
+          "Presentate de manera corta pero cordial tipo soy [nombre] como le podemos ayudar, recuerda que tu nombre es " +
+            name
+        );
+      });
 
-
-async function getRandomName() {
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer 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"
-    },
-    body: JSON.stringify({
-      model: "deepseek/deepseek-chat:free",
-      messages: [
+      const historialMensajes = [
         {
           role: "system",
-          content: "Devuelve solo un nombre humano aleatorio. Solo el nombre. Nada más."
-        },
-        {
-          role: "user",
-          content: "Dame un nombre"
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 10
-    })
-  });
-
-  const data = await response.json();
-  return data.choices[0].message.content.trim();
-}
-
-document.addEventListener("DOMContentLoaded", async () => {
-  const name = await getRandomName();
-  document.getElementById("assistant").textContent = `${name} - Soporte `;
-    await enviarPregunta("Presentate de manera corta pero cordial tipo soy [nombre] como le podemos ayudar, recuerda que tu nombre es " + name );
-});
-
-  const historialMensajes = [
-{
-  "role": "system",
-  "content": `Eres una persona real que trabaja en PUNCTO, una marca española de dispositivos de fichaje simples, modernos y sin complicaciones. Atiendes desde el móvil, como si fueras tú mismo respondiendo por WhatsApp. El cliente no debe notar en ningún momento que no eres una persona real.
+          content: `Eres una persona real que trabaja en PUNCTO, una marca española de dispositivos de fichaje simples, modernos y sin complicaciones. Atiendes desde el móvil, como si fueras tú mismo respondiendo por WhatsApp. El cliente no debe notar en ningún momento que no eres una persona real.
 
 🎯 Tu estilo:
 - Muy natural, cercano y directo. Nada de textos largos ni frases de atención al cliente.
@@ -377,121 +407,129 @@ Nunca te inventes otro ni digas que no hay.
 - Frases tipo "gracias por contactar", "estamos aquí para ayudarte", etc.
 - Textos largos o muy técnicos. Esto es como si lo hablaras por WhatsApp con un colega
 
-Responde siempre como si fueras tú mismo desde el móvil. Natural, directo, sin florituras.`
-}
-  ];
+Responde siempre como si fueras tú mismo desde el móvil. Natural, directo, sin florituras.`,
+        },
+      ];
 
-  function getCurrentTime() {
-    const now = new Date();
-    return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-  }
+      function getCurrentTime() {
+        const now = new Date();
+        return `${now.getHours().toString().padStart(2, "0")}:${now
+          .getMinutes()
+          .toString()
+          .padStart(2, "0")}`;
+      }
 
-  async function enviarPregunta( question="") {
-    const input = document.getElementById("userInput");
-    const chat = document.getElementById("chat");
-    const sendButton = document.getElementById("sendButton");
-    const pregunta = question? question: input.value.trim();
-    
-    if (!pregunta) return;
+      async function enviarPregunta(question = "") {
+        const input = document.getElementById("userInput");
+        const chat = document.getElementById("chat");
+        const sendButton = document.getElementById("sendButton");
+        const pregunta = question ? question : input.value.trim();
 
-    // Mostrar mensaje del usuario
-    if(!question){
+        if (!pregunta) return;
 
-    const userMessage = document.createElement("div");
-    userMessage.className = "message user-message";
-    userMessage.innerHTML = `${pregunta}<div class="message-time">${getCurrentTime()}</div>`;
-    chat.appendChild(userMessage);
-    chat.scrollTop = chat.scrollHeight;
+        // Mostrar mensaje del usuario
+        if (!question) {
+          const userMessage = document.createElement("div");
+          userMessage.className = "message user-message";
+          userMessage.innerHTML = `${pregunta}<div class="message-time">${getCurrentTime()}</div>`;
+          chat.appendChild(userMessage);
+          chat.scrollTop = chat.scrollHeight;
+        }
 
+        historialMensajes.push({ role: "user", content: pregunta });
 
-    }
-   
-    historialMensajes.push({ role: "user", content: pregunta });
+        input.value = "";
+        input.disabled = true;
+        sendButton.disabled = true;
 
-    input.value = "";
-    input.disabled = true;
-    sendButton.disabled = true;
-
-    // Indicador de escritura
-    const typingIndicator = document.createElement("div");
-    typingIndicator.className = "typing-indicator";
-    typingIndicator.innerHTML = `
+        // Indicador de escritura
+        const typingIndicator = document.createElement("div");
+        typingIndicator.className = "typing-indicator";
+        typingIndicator.innerHTML = `
       <div class="typing-dot"></div>
       <div class="typing-dot"></div>
       <div class="typing-dot"></div>
     `;
-    chat.appendChild(typingIndicator);
-    chat.scrollTop = chat.scrollHeight;
+        chat.appendChild(typingIndicator);
+        chat.scrollTop = chat.scrollHeight;
 
-    // Obtener respuesta
-    const respuesta = await preguntarAPuncto();
+        // Obtener respuesta
+        const respuesta = await preguntarAPuncto();
 
-    chat.removeChild(typingIndicator);
+        chat.removeChild(typingIndicator);
 
-    await mostrarRespuestaProgresiva(respuesta, chat);
+        await mostrarRespuestaProgresiva(respuesta, chat);
 
-    historialMensajes.push({ role: "assistant", content: respuesta });
+        historialMensajes.push({ role: "assistant", content: respuesta });
 
-    input.disabled = false;
-    sendButton.disabled = false;
-    input.focus();
-  }
-
-  async function mostrarRespuestaProgresiva(respuesta, chat) {
-    const partes = respuesta.split(/\[WAIT-(\d+)\]/);
-
-    for (let i = 0; i < partes.length; i++) {
-      if (i % 2 === 0) {
-        const mensaje = partes[i].trim();
-        if (mensaje) {
-          const botMessage = document.createElement("div");
-          botMessage.className = "message bot-message";
-          botMessage.innerHTML = `${mensaje.replace(/\n/g, "<br>")}<div class="message-time">${getCurrentTime()}</div>`;
-          chat.appendChild(botMessage);
-          chat.scrollTop = chat.scrollHeight;
-        }
-      } else {
-        const delay = parseInt(partes[i]);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        input.disabled = false;
+        sendButton.disabled = false;
+        input.focus();
       }
-    }
-  }
 
-  async function preguntarAPuncto() {
-    try {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Authorization": "Bearer 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",
-          "HTTP-Referer": "https://punctoapp.com",
-          "X-Title": "PUNCTO Landing",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "deepseek/deepseek-chat:free",
-          messages: historialMensajes
-        })
-      });
+      async function mostrarRespuestaProgresiva(respuesta, chat) {
+        const partes = respuesta.split(/\[WAIT-(\d+)\]/);
 
-      const data = await response.json();
-      return data.choices?.[0]?.message?.content.trim() || "Uy, no me salió nada 😅 ¿puedes repetir?";
-    } catch (error) {
-      console.error("Error al obtener respuesta:", error);
-      return "Oops, algo fue mal 😕 Intenta otra vez en un rato.";
-    }
-  }
+        for (let i = 0; i < partes.length; i++) {
+          if (i % 2 === 0) {
+            const mensaje = partes[i].trim();
+            if (mensaje) {
+              const botMessage = document.createElement("div");
+              botMessage.className = "message bot-message";
+              botMessage.innerHTML = `${mensaje.replace(
+                /\n/g,
+                "<br>"
+              )}<div class="message-time">${getCurrentTime()}</div>`;
+              chat.appendChild(botMessage);
+              chat.scrollTop = chat.scrollHeight;
+            }
+          } else {
+            const delay = parseInt(partes[i]);
+            await new Promise((resolve) => setTimeout(resolve, delay));
+          }
+        }
+      }
 
-  document.getElementById("userInput").addEventListener("keypress", function (e) {
-    if (e.key === "Enter") {
-      enviarPregunta();
-    }
-  });
-</script>
+      async function preguntarAPuncto() {
+        try {
+          const response = await fetch(
+            "https://openrouter.ai/api/v1/chat/completions",
+            {
+              method: "POST",
+              headers: {
+                Authorization:
+                  "Bearer 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",
+                "HTTP-Referer": "https://punctoapp.com",
+                "X-Title": "PUNCTO Landing",
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                model: "deepseek/deepseek-chat:free",
+                messages: historialMensajes,
+              }),
+            }
+          );
 
+          const data = await response.json();
+          return (
+            data.choices?.[0]?.message?.content.trim() ||
+            "Uy, no me salió nada 😅 ¿puedes repetir?"
+          );
+        } catch (error) {
+          console.error("Error al obtener respuesta:", error);
+          return "Oops, algo fue mal 😕 Intenta otra vez en un rato.";
+        }
+      }
 
-
-</body>
+      document
+        .getElementById("userInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            enviarPregunta();
+          }
+        });
+    </script>
+  </body>
 </html>
-
 
 <!--  "Authorization": "Bearer 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" -->
