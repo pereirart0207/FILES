@@ -268,11 +268,10 @@
 
 
 async function getRandomName() {
-  const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+  const response = await fetch("https://assistant-api-99j9.onrender.com/ask", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": "Bearer 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"
     },
     body: JSON.stringify({
       model: "deepseek/deepseek-chat:free",
@@ -459,10 +458,9 @@ Responde siempre como si fueras tú mismo desde el móvil. Natural, directo, sin
 
   async function preguntarAPuncto() {
     try {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      const response = await fetch("https://assistant-api-99j9.onrender.com/ask", {
         method: "POST",
         headers: {
-          "Authorization": "Bearer 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",
           "HTTP-Referer": "https://punctoapp.com",
           "X-Title": "PUNCTO Landing",
           "Content-Type": "application/json"
