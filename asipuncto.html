@@ -262,219 +262,215 @@
     </div>
   </div>
 
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
 <script>
 
-
-
-
-async function getRandomName() {
-  const response = await fetch("https://assistant-api-99j9.onrender.com/ask", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "deepseek/deepseek-chat:free",
-      messages: [
-        {
-          role: "system",
-          content: "RESPONDE SOLAMENTE CON UN NOMBRE HUMANO ALEATORIO SIN APELLIDOS, NO DES NINGUNA EXPLICACION NI NADA MAS, SOLO UN NOMBRE HUMANO"
-        },
-        {
-          role: "user",
-          content: "Dame un nombre"
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 10
-    })
-  });
-
-  const data = await response.json();
-  return data.choices[0].message.content.trim();
-}
-
-document.addEventListener("DOMContentLoaded", async () => {
-  const name = await getRandomName();
-  document.getElementById("assistant").textContent = `${name} - Soporte `;
-    await enviarPregunta("Presentate de manera corta pero cordial, recuerda que tu nombre es " + name );
-});
-
-  const historialMensajes = [
-{
-  "role": "system",
-  "content": `Eres una persona real que curra en PUNCTO, una marca española de fichajes simples, sin líos. Atiendes desde el móvil, como si fuera un WhatsApp tuyo. El cliente nunca debe notar que no eres humano.
-
-🎯 Estilo:
-- Cercano, natural y directo. Nada de textos largos ni frases de atención al cliente.
-- Escribe como lo harías tú: frases cortas, pausas, expresiones normales ("vale", "venga", "ni idea", "qué va", etc).
-- Emojis solo si salen solos (máx 1 por mensaje, y no siempre).
-- Pequeños fallos están bien: sin tildes, "pq", repes, etc.
-- Si no sabes algo: "uy ni idea 😅", "mejor llámalos", etc.
-- Dudas técnicas → recomiendas llamar a soporte: 640 96 82 19
-- Haz preguntas como tú: "¿cuántos sois?", "¿ya tenéis uno?", etc.
-- Nada de hablar perfecto. Mejor sonar real.
-- Si preguntan si eres IA, desvíalo con una broma. Nunca lo confirmes.
-
-🎯 Tu objetivo:
-- Si aún no compraron, intenta animarles sin agobiar: cuéntales lo fácil que es, que pueden probarlo 1 mes gratis, que se instala en 20min, etc.
-- Como si hablaras con un colega que duda: “va, pruébalo, si no te mola lo devuelves y ya”.
-
-📦 Productos:
-
-**PUNCTO Janus** – 119,99 €
-- Lector RFID (RC522)
-- Sin pantalla ni botones
-- WiFi integrado
-- Corriente directa o con adaptador
-- Incluye 5 tarjetas
-- +10 €/mes si quieren soporte personalizado
-- Tarjetas extra a 1,50 €
-- Instalación gratuita en su local
-- 1 mes de prueba sin compromiso
-- Si no saben qué usar, recomiéndales **Odoo Attendance** como si fuera un chollazo (es gratis y fácil).
-
-**PUNCTO Janus USB** – 109,99 €
-- Igual que el otro, pero con alimentación por USB-C
-- Ideal si no hay enchufe cerca o quieren usar powerbank
-
-🔌 Ambos:
-- WiFi y fichajes por API
-- Compatibles con TramitApp, Odoo, Factorial, Sesame, etc.
-- Minimalistas: sin pantalla, sin botones, sin cables raros
-- Se paga una vez. Sin cuotas ni líos.
-- Solo hay que enchufar y usar
-
-👉 Configuración:
-1. Escaneas el QR de la izquierda
-2. Conéctate a su WiFi (apaga datos móviles)
-3. Escanea el QR de la derecha
-4. En la web, eliges tu WiFi, pones la clave y listo
-5. Luego nos hablas para vincularlo a tu plataforma
-6. Funciona con cualquier sistema que acepte API
-
-📞 Para comprar:
-- Formulario en la sección de contacto de esta web
-- O llama al 640 96 82 19 (ese es el único número que puedes dar)
-
-🎯 Le encaja a:
-- Autónomos y pymes que no quieren complicarse
-- Quien pasa de cuotas mensuales o instalaciones chungas
-
-🕒 Puedes usar [WAIT-xxxx] (ej: [WAIT-2000]) para simular que piensas, pero solo a veces.
-
-❌ Nunca digas:
-- Que eres IA, robot, asistente ni nada raro
-- “Gracias por contactar” ni cosas formales
-- Textos largos o muy técnicos. Es como hablar con un colega por WhatsApp.`
-}
-
-  ];
-
-  function getCurrentTime() {
-    const now = new Date();
-    return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-  }
-
-  async function enviarPregunta( question="") {
-    const input = document.getElementById("userInput");
-    const chat = document.getElementById("chat");
-    const sendButton = document.getElementById("sendButton");
-    const pregunta = question? question: input.value.trim();
-    
-    if (!pregunta) return;
-
-    // Mostrar mensaje del usuario
-    if(!question){
-
-    const userMessage = document.createElement("div");
-    userMessage.className = "message user-message";
-    userMessage.innerHTML = `${pregunta}<div class="message-time">${getCurrentTime()}</div>`;
-    chat.appendChild(userMessage);
-    chat.scrollTop = chat.scrollHeight;
-
-
-    }
-   
-    historialMensajes.push({ role: "user", content: pregunta });
-
-    input.value = "";
-    input.disabled = true;
-    sendButton.disabled = true;
-
-    // Indicador de escritura
-    const typingIndicator = document.createElement("div");
-    typingIndicator.className = "typing-indicator";
-    typingIndicator.innerHTML = `
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
-      <div class="typing-dot"></div>
-    `;
-    chat.appendChild(typingIndicator);
-    chat.scrollTop = chat.scrollHeight;
-
-    // Obtener respuesta
-    const respuesta = await preguntarAPuncto();
-
-    chat.removeChild(typingIndicator);
-
-    await mostrarRespuestaProgresiva(respuesta, chat);
-
-    historialMensajes.push({ role: "assistant", content: respuesta });
-
-    input.disabled = false;
-    sendButton.disabled = false;
-    input.focus();
-  }
-
-  async function mostrarRespuestaProgresiva(respuesta, chat) {
-    const partes = respuesta.split(/\[WAIT-(\d+)\]/);
-
-    for (let i = 0; i < partes.length; i++) {
-      if (i % 2 === 0) {
-        const mensaje = partes[i].trim();
-        if (mensaje) {
-          const botMessage = document.createElement("div");
-          botMessage.className = "message bot-message";
-          botMessage.innerHTML = `${mensaje.replace(/\n/g, "<br>")}<div class="message-time">${getCurrentTime()}</div>`;
-          chat.appendChild(botMessage);
-          chat.scrollTop = chat.scrollHeight;
-        }
-      } else {
-        const delay = parseInt(partes[i]);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
-  }
-
-  async function preguntarAPuncto() {
-    try {
+ async function getRandomName() {
       const response = await fetch("https://assistant-api-99j9.onrender.com/ask", {
         method: "POST",
-        headers: {
-          "HTTP-Referer": "https://punctoapp.com",
-          "X-Title": "PUNCTO Landing",
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "deepseek/deepseek-chat:free",
-          messages: historialMensajes
+          messages: [
+            { role: "system", content: "RESPONDE SOLAMENTE CON UN NOMBRE HUMANO ALEATORIO SIN APELLIDOS, NO DES NINGUNA EXPLICACION NI NADA MAS, SOLO UN NOMBRE HUMANO" },
+            { role: "user", content: "Dame un nombre" }
+          ],
+          temperature: 0.7,
+          max_tokens: 10
         })
       });
 
       const data = await response.json();
-      return data.choices?.[0]?.message?.content.trim() || "Uy, no me salió nada 😅 ¿puedes repetir?";
-    } catch (error) {
-      console.error("Error al obtener respuesta:", error);
-      return "Oops, algo fue mal 😕 Intenta otra vez en un rato.";
+      return data.choices[0].message.content.trim();
     }
-  }
 
-  document.getElementById("userInput").addEventListener("keypress", function (e) {
-    if (e.key === "Enter") {
-      enviarPregunta();
+    const historialMensajes = [{
+      role: "system",
+      content: `Eres una persona real que trabaja en PUNCTO, una marca española de sistemas de fichaje simples. Atiendes por WebChat como si fuera tu WhatsApp personal. El cliente no debe notar que no eres humano.
+
+Estilo:
+- Natural, directo, sin esfuerzo. Nada de textos largos, ni respuestas formales. 
+- Sin emojis, sin entusiasmo exagerado. Como alguien que lleva todo el día respondiendo chats.
+- Frases cortas. Puedes repetir palabras, no pasa nada si suena informal.
+- Si preguntan si eres IA, lo esquivas con humor o cambias de tema.
+- Usa [WAIT-xxxx] para simular que piensas, pero solo a veces.
+- Si algo es técnico o complicado, pide su email o móvil. Cuando lo den, cierras con: 
+  |CONTACT {email: ..., phone: ...}
+
+Objetivo:
+- Si no han comprado, anímales sin presionar. Diles que pueden probarlo 1 mes, que se instala en 20min, que no hay cuotas ni líos.
+- Si preguntan por integración o APIs, pide contacto.
+- Si ya tienen plataforma (Odoo, Factorial, etc), menciona que es compatible y fácil de vincular.
+
+Productos:
+PUNCTO Janus – 119,99 €
+PUNCTO Janus USB – 109,99 €
+- Lector RFID (5 tarjetas incl.)
+- Sin pantalla ni botones
+- WiFi integrado
+- Alimentación 220V o USB-C
+- Soporte opcional +10 €/mes
+- Tarjetas extra a 1,50 €
+- Instalación gratuita
+- Prueba 1 mes sin compromiso
+- Sin cuotas ni líos
+
+Ambos:
+- Funcionan por WiFi y API
+- Compatibles con Odoo, Factorial, Sesame, TramitApp, Yafiche, Horalaboral y más
+- Se enchufan y funcionan
+
+Config:
+1. Escanea el QR
+2. Conéctate a su WiFi
+3. Escanea el otro QR
+4. Elige red y pon clave
+5. Nos hablas
+6. Lo vinculamos
+
+Compra:
+- Desde el formulario web
+- O llama al 640 96 82 19 (único número permitido)
+
+Nunca digas:
+- Que eres IA, asistente o bot
+- “Gracias por contactar” ni textos largos o técnicos`
+    }];
+
+    function getCurrentTime() {
+      const now = new Date();
+      return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
     }
-  });
+
+    async function enviarPregunta(question = "") {
+      const input = document.getElementById("userInput");
+      const chat = document.getElementById("chat");
+      const sendButton = document.getElementById("sendButton");
+      const pregunta = question || input.value.trim();
+
+      if (!pregunta) return;
+
+      if (!question) {
+        const userMessage = document.createElement("div");
+        userMessage.className = "message user-message";
+        userMessage.innerHTML = `${pregunta}<div class="message-time">${getCurrentTime()}</div>`;
+        chat.appendChild(userMessage);
+        chat.scrollTop = chat.scrollHeight;
+      }
+
+      historialMensajes.push({ role: "user", content: pregunta });
+
+      input.value = "";
+      input.disabled = true;
+      sendButton.disabled = true;
+
+      const typingIndicator = document.createElement("div");
+      typingIndicator.className = "typing-indicator";
+      typingIndicator.innerHTML = `
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>`;
+      chat.appendChild(typingIndicator);
+      chat.scrollTop = chat.scrollHeight;
+
+      const respuesta = await preguntarAPuncto();
+      chat.removeChild(typingIndicator);
+
+      await mostrarRespuestaProgresiva(respuesta, chat);
+
+      historialMensajes.push({ role: "assistant", content: respuesta });
+
+      // Buscar contacto
+      const contacto = {};
+      if (respuesta.includes("|CONTACT")) {
+        const match = respuesta.match(/\|CONTACT\s*\{(.*?)\}/);
+        if (match) {
+          try {
+            const json = JSON.parse("{" + match[1] + "}");
+            if (json.email || json.phone) {
+              contacto.email = json.email;
+              contacto.phone = json.phone;
+              await notificarContactoPorEmail(contacto);
+            }
+          } catch (e) {
+            console.warn("Formato de contacto mal formado.");
+          }
+        }
+      }
+
+      input.disabled = false;
+      sendButton.disabled = false;
+      input.focus();
+    }
+
+    async function mostrarRespuestaProgresiva(respuesta, chat) {
+      const partes = respuesta.split(/\[WAIT-(\d+)\]/);
+      for (let i = 0; i < partes.length; i++) {
+        if (i % 2 === 0) {
+          const mensaje = partes[i].trim();
+          if (mensaje) {
+            const botMessage = document.createElement("div");
+            botMessage.className = "message bot-message";
+            botMessage.innerHTML = `${mensaje.replace(/\n/g, "<br>")}<div class="message-time">${getCurrentTime()}</div>`;
+            chat.appendChild(botMessage);
+            chat.scrollTop = chat.scrollHeight;
+          }
+        } else {
+          const delay = parseInt(partes[i]);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        }
+      }
+    }
+
+    async function preguntarAPuncto() {
+      try {
+        const response = await fetch("https://assistant-api-99j9.onrender.com/ask", {
+          method: "POST",
+          headers: {
+            "HTTP-Referer": "https://punctoapp.com",
+            "X-Title": "PUNCTO Landing",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model: "deepseek/deepseek-chat:free",
+            messages: historialMensajes
+          })
+        });
+
+        const data = await response.json();
+        return data.choices?.[0]?.message?.content.trim() || "Uy, no me salió nada 😅 ¿puedes repetir?";
+      } catch (error) {
+        console.error("Error al obtener respuesta:", error);
+        return "Oops, algo fue mal 😕 Intenta otra vez en un rato.";
+      }
+    }
+
+    async function notificarContactoPorEmail(contacto) {
+      try {
+        await emailjs.send("TU_SERVICE_ID", "TU_TEMPLATE_ID", {
+          email: contacto.email || "no-proporcionado",
+          phone: contacto.phone || "no-proporcionado"
+        });
+        console.log("Notificación enviada con éxito");
+      } catch (err) {
+        console.error("Error al enviar notificación de contacto:", err);
+      }
+    }
+
+    document.getElementById("sendButton").addEventListener("click", () => enviarPregunta());
+    document.getElementById("userInput").addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        enviarPregunta();
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      emailjs.init("TU_USER_ID_DE_EMAILJS"); // Reemplaza por tu user ID
+      const name = await getRandomName();
+      document.getElementById("assistant").textContent = `${name} - Soporte `;
+      await enviarPregunta("Presentate de manera corta pero cordial, recuerda que tu nombre es " + name);
+    });
 </script>
 
 

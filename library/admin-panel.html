@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Librería Azul</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <style>
+        :root {
+            --primary-blue: #1a4b8c;
+            --secondary-blue: #2a6fba;
+            --light-blue: #e6f0fa;
+            --accent-blue: #3a8ee0;
+            --dark-blue: #0d2b4e;
+            --text-dark: #333;
+            --text-light: #f8f9fa;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --danger: #F44336;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--text-dark);
+            background-color: #f5f7fa;
+            line-height: 1.6;
+        }
+
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--dark-blue);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-title i {
+            margin-right: 10px;
+            color: var(--accent-blue);
+        }
+
+        .admin-user {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: 700;
+        }
+
+        .admin-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .admin-role {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .nav-menu {
+            padding: 1.5rem 0;
+        }
+
+        .nav-item {
+            list-style: none;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-blue);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+            color: var(--text-dark);
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--primary-blue);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th, .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .table th {
+            background-color: var(--light-blue);
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        .table tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background-color: #e8f5e9;
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background-color: #ffebee;
+            color: var(--danger);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-danger {
+            background-color: #ffebee;
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 992px) {
+            .admin-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                padding: 1rem 0;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">
+                    <i class="fas fa-book"></i>
+                    <span>Librería Azul</span>
+                </div>
+                <div class="admin-user">
+                    <div class="admin-avatar" id="admin-avatar">A</div>
+                    <div>
+                        <div class="admin-name" id="admin-name">Administrador</div>
+                        <div class="admin-role">Super Admin</div>
+                    </div>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">
+                        <i class="fas fa-book"></i>
+                        <span>Libros</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span>Usuarios</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Reservas</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Estadísticas</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span>Configuración</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <div class="admin-header">
+                <h1 class="page-title">Gestión de Libros</h1>
+                <button class="btn btn-primary" id="add-book-btn">
+                    <i class="fas fa-plus"></i> Agregar Libro
+                </button>
+            </div>
+
+            <div id="alert-container"></div>
+
+            <div class="card">
+                <h2 class="card-title">Listado de Libros</h2>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Portada</th>
+                                <th>Título</th>
+                                <th>Autor</th>
+                                <th>Género</th>
+                                <th>Disponibilidad</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="books-table-body">
+                            <!-- Libros se cargarán aquí -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal para agregar/editar libros -->
+    <div id="book-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="card" style="width: 90%; max-width: 700px; max-height: 90vh; overflow-y: auto;">
+            <h2 class="card-title" id="modal-title">Agregar Nuevo Libro</h2>
+            <form id="book-form">
+                <input type="hidden" id="book-id">
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="title" class="form-label">Título *</label>
+                            <input type="text" id="title" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="author" class="form-label">Autor *</label>
+                            <input type="text" id="author" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description" class="form-label">Descripción</label>
+                    <textarea id="description" class="form-control form-textarea"></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="genre" class="form-label">Género *</label>
+                            <input type="text" id="genre" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="cover" class="form-label">URL de la Portada *</label>
+                            <input type="url" id="cover" class="form-control" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="available" class="form-label">Disponibilidad</label>
+                    <select id="available" class="form-control">
+                        <option value="true">Disponible</option>
+                        <option value="false">No disponible</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="text-align: right;">
+                    <button type="button" class="btn" onclick="closeModal()" style="margin-right: 10px;">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="submit-btn">
+                        <span id="submit-text">Guardar</span>
+                        <span id="submit-spinner" class="loading-spinner" style="display: none;"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de Firebase (reemplaza con tus credenciales)
+const firebaseConfig = {
+  apiKey: "AIzaSyAhtBiiYGI5T5v6Kr1HhkCFBZFVGNtQa1o",
+  authDomain: "library-e411e.firebaseapp.com",
+  projectId: "library-e411e",
+  storageBucket: "library-e411e.firebasestorage.app",
+  messagingSenderId: "547023237247",
+  appId: "1:547023237247:web:25d519d3f2d6a0454f4f4a",
+  measurementId: "G-BJ0BQT2VFP"
+};
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Referencias a elementos del DOM
+        const booksTableBody = document.getElementById('books-table-body');
+        const addBookBtn = document.getElementById('add-book-btn');
+        const bookForm = document.getElementById('book-form');
+        const bookModal = document.getElementById('book-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const submitText = document.getElementById('submit-text');
+        const submitSpinner = document.getElementById('submit-spinner');
+        const alertContainer = document.getElementById('alert-container');
+
+        // Variables de estado
+        let editingBookId = null;
+
+        // Función para mostrar alertas
+        function showAlert(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Función para abrir el modal
+        function openModal(book = null) {
+            if (book) {
+                // Modo edición
+                editingBookId = book.id;
+                modalTitle.textContent = 'Editar Libro';
+                document.getElementById('book-id').value = book.id;
+                document.getElementById('title').value = book.title;
+                document.getElementById('author').value = book.author;
+                document.getElementById('description').value = book.description || '';
+                document.getElementById('genre').value = book.genre;
+                document.getElementById('cover').value = book.cover;
+                document.getElementById('available').value = book.available;
+                submitText.textContent = 'Actualizar';
+            } else {
+                // Modo agregar
+                editingBookId = null;
+                modalTitle.textContent = 'Agregar Nuevo Libro';
+                bookForm.reset();
+                submitText.textContent = 'Guardar';
+            }
+            bookModal.style.display = 'flex';
+        }
+
+        // Función para cerrar el modal
+        function closeModal() {
+            bookModal.style.display = 'none';
+        }
+
+        // Función para cargar libros en la tabla
+        async function loadBooks() {
+            try {
+                booksTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Cargando libros...</td></tr>';
+                
+                const querySnapshot = await db.collection("books").get();
+                
+                if (querySnapshot.empty) {
+                    booksTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay libros registrados</td></tr>';
+                    return;
+                }
+                
+                booksTableBody.innerHTML = '';
+                
+                querySnapshot.forEach((doc) => {
+                    const book = doc.data();
+                    const row = document.createElement('tr');
+                    
+                    row.innerHTML = `
+                        <td><img src="${book.cover}" alt="${book.title}" style="width: 50px; height: 70px; object-fit: cover;"></td>
+                        <td>${book.title}</td>
+                        <td>${book.author}</td>
+                        <td>${book.genre}</td>
+                        <td>
+                            <span class="badge ${book.available ? 'badge-success' : 'badge-danger'}">
+                                ${book.available ? 'Disponible' : 'No disponible'}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn btn-warning edit-btn" data-id="${doc.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger delete-btn" data-id="${doc.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    
+                    booksTableBody.appendChild(row);
+                });
+                
+                // Agregar event listeners a los botones
+                document.querySelectorAll('.edit-btn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        const doc = await db.collection("books").doc(btn.dataset.id).get();
+                        openModal({ id: btn.dataset.id, ...doc.data() });
+                    });
+                });
+                
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        if (confirm('¿Estás seguro de que deseas eliminar este libro?')) {
+                            deleteBook(btn.dataset.id);
+                        }
+                    });
+                });
+                
+            } catch (error) {
+                console.error("Error al cargar libros:", error);
+                booksTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error al cargar los libros</td></tr>';
+            }
+        }
+
+        // Función para guardar/actualizar un libro
+        async function saveBook(e) {
+            e.preventDefault();
+            
+            try {
+                submitText.style.display = 'none';
+                submitSpinner.style.display = 'inline-block';
+                submitBtn.disabled = true;
+                
+                const bookData = {
+                    title: document.getElementById('title').value,
+                    author: document.getElementById('author').value,
+                    description: document.getElementById('description').value,
+                    genre: document.getElementById('genre').value,
+                    cover: document.getElementById('cover').value,
+                    available: document.getElementById('available').value === 'true',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                if (editingBookId) {
+                    // Actualizar libro existente
+                    await db.collection("books").doc(editingBookId).update(bookData);
+                    showAlert('Libro actualizado con éxito');
+                } else {
+                    // Crear nuevo libro
+                    bookData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                    await db.collection("books").add(bookData);
+                    showAlert('Libro agregado con éxito');
+                }
+                
+                closeModal();
+                loadBooks();
+                
+            } catch (error) {
+                console.error("Error al guardar libro:", error);
+                showAlert('Error al guardar el libro', 'danger');
+            } finally {
+                submitText.style.display = 'inline-block';
+                submitSpinner.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Función para eliminar un libro
+        async function deleteBook(bookId) {
+            try {
+                await db.collection("books").doc(bookId).delete();
+                showAlert('Libro eliminado con éxito');
+                loadBooks();
+            } catch (error) {
+                console.error("Error al eliminar libro:", error);
+                showAlert('Error al eliminar el libro', 'danger');
+            }
+        }
+
+        // Event Listeners
+        addBookBtn.addEventListener('click', () => openModal());
+        bookForm.addEventListener('submit', saveBook);
+
+        // Cerrar modal al hacer clic fuera del contenido
+        bookModal.addEventListener('click', (e) => {
+            if (e.target === bookModal) {
+                closeModal();
+            }
+        });
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', () => {
+            // Verificar autenticación (simplificado para el ejemplo)
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // Mostrar información del usuario admin
+                    document.getElementById('admin-name').textContent = user.displayName || 'Administrador';
+                    document.getElementById('admin-avatar').textContent = user.displayName ? user.displayName.charAt(0).toUpperCase() : 'A';
+                    
+                    // Cargar libros
+                    loadBooks();
+                } else {
+                    // Redirigir a página de login si no está autenticado
+                    window.location.href = 'admin-login.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
