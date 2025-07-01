@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "+5cstUNzq6pq743MRw040Um7wzmVicuYLNgN6CV+ZsC++tdEyd9eqmZALmUw032BhBpYKH0rwkqib84T74RbWQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\FRANK\\source\\repos\\afich\\afich.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\FRANK\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
