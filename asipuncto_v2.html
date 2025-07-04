@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asistente PUNCTO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --primary-light: #93c5fd;
+      --background: #f8fafc;
+      --surface: #ffffff;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --border: #e2e8f0;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius-sm: 0.375rem;
+      --radius-md: 0.5rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --radius-2xl: 1.5rem;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text-primary);
+      font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+
+    .chat-container {
+      background-color: var(--surface);
+      border-radius: var(--radius-2xl);
+      width: 100%;
+      max-width: 28rem;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 90vh;
+      max-height: 48rem;
+      border: 1px solid var(--border);
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 1.25rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: var(--shadow-sm);
+      position: relative;
+      z-index: 10;
+    }
+
+    .chat-header h2 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 1.125rem;
+      letter-spacing: -0.025em;
+    }
+
+    .logo-icon {
+      width: 2rem;
+      height: 2rem;
+      background-color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .chat-output {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      background-color: var(--background);
+    }
+
+    .message {
+      max-width: 85%;
+      padding: 0.75rem 1rem;
+      border-radius: var(--radius-xl);
+      line-height: 1.5;
+      font-size: 0.9375rem;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+      word-wrap: break-word;
+    }
+
+    .bot-message {
+      background-color: var(--surface);
+      align-self: flex-start;
+      border-bottom-left-radius: var(--radius-sm);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .user-message {
+      background: linear-gradient(135deg, var(--primary-light), var(--primary));
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: var(--radius-sm);
+    }
+
+    .message-time {
+      font-size: 0.6875rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+      text-align: right;
+      opacity: 0.8;
+    }
+
+    .user-message .message-time {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .chat-input-container {
+      padding: 1rem;
+      border-top: 1px solid var(--border);
+      background-color: var(--surface);
+    }
+
+    .chat-input {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 0.75rem 1.25rem;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      background-color: var(--surface);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.9375rem;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
+    button {
+      padding: 0;
+      width: 3rem;
+      height: 3rem;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      border: none;
+      border-radius: 50%;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow-sm);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    .typing-indicator {
+      display: flex;
+      padding: 0.75rem 1rem;
+      background-color: var(--surface);
+      border-radius: var(--radius-xl);
+      align-self: flex-start;
+      margin-bottom: 0.5rem;
+      border-bottom-left-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .typing-dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      background-color: var(--text-secondary);
+      border-radius: 50%;
+      margin: 0 0.125rem;
+      animation: typingAnimation 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) {
+      animation-delay: 0s;
+    }
+
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes typingAnimation {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-0.25rem); }
+    }
+
+    .welcome-message {
+      text-align: center;
+      margin-bottom: 1.25rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      padding: 0.5rem;
+      background-color: var(--surface);
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--border);
+    }
+
+    /* Scrollbar styling */
+    .chat-output::-webkit-scrollbar {
+      width: 0.375rem;
+    }
+
+    .chat-output::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .chat-output::-webkit-scrollbar-thumb {
+      background-color: var(--border);
+      border-radius: var(--radius-md);
+    }
+
+    .chat-output::-webkit-scrollbar-thumb:hover {
+      background-color: var(--text-secondary);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 480px) {
+      .chat-container {
+        height: 100vh;
+        max-height: none;
+        border-radius: 0;
+      }
+      
+      body {
+        padding: 0;
+      }
+      
+      .chat-header {
+        padding: 1rem;
+      }
+      
+      .chat-output {
+        padding: 1rem;
+      }
+    }
+
+    /* Animation for new messages */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(0.5rem); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .message {
+      animation: fadeIn 0.2s ease-out forwards;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="logo-icon">P</div>
+      <h2 id="assistant">Conectando con un asistente...</h2>
+    </div>
+    
+    <div id="chat" class="chat-output">
+      <div class="welcome-message">Asistente disponible 24/7 para responder tus preguntas</div>
+    </div>
+    
+    <div class="chat-input-container">
+      <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Escribe tu pregunta..." autocomplete="off" />
+        <button onclick="enviarPregunta()" id="sendButton">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+// Configuración centralizada
+const CONFIG = {
+  API_ENDPOINT: "https://assistant-api-99j9.onrender.com/ask",
+  EMAILJS: {
+    SERVICE_ID: "service_mqqey1j", // Reemplazar con tus credenciales
+    TEMPLATE_ID: "template_ykovwyb", // Template que creaste en EmailJS
+    USER_ID: "ePP1jTB0KozLmd1kF" // Tu EmailJS user ID
+  },
+  COMPANY: {
+    NAME: "PUNCTO",
+    PHONE: "640 96 82 19",
+    PRODUCTS: {
+      JANUS: { price: 119.99, features: "WiFi integrado" },
+      JANUS_USB: { price: 109.99, features: "Conexión USB" }
+    }
+  }
+};
+
+// Cache de elementos del DOM
+const DOM = {
+  input: document.getElementById("userInput"),
+  chat: document.getElementById("chat"),
+  sendButton: document.getElementById("sendButton"),
+  assistantName: document.getElementById("assistant")
+};
+
+// Variables globales
+let historialMensajes = [];
+let nombreAsistente = "";
+let esperandoContacto = false;
+
+// Obtener nombre aleatorio para el asistente
+async function getRandomName() {
+  try {
+    const response = await fetch(CONFIG.API_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "deepseek/deepseek-chat:free",
+        messages: [
+          { 
+            role: "system", 
+            content: "Proporciona SOLO un nombre español común sin apellidos ni explicaciones." 
+          },
+          { 
+            role: "user", 
+            content: "Nombre español aleatorio:" 
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 8
+      })
+    });
+
+    const data = await response.json();
+    return data.choices[0]?.message?.content.trim().replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '') || "Soporte";
+  } catch (error) {
+    console.error("Error al obtener nombre:", error);
+    return "Soporte";
+  }
+}
+
+// Inicializar chat
+async function initializeChat() {
+  // Inicializar EmailJS primero
+  try {
+    await emailjs.init(CONFIG.EMAILJS.USER_ID);
+    console.log("EmailJS inicializado correctamente");
+  } catch (error) {
+    console.error("Error inicializando EmailJS:", error);
+  }
+
+  nombreAsistente = await getRandomName();
+  DOM.assistantName.textContent = `${nombreAsistente} - ${CONFIG.COMPANY.NAME}`;
+  
+  historialMensajes = [{
+    role: "system",
+    content: `Eres ${nombreAsistente}, del equipo de ${CONFIG.COMPANY.NAME} (sistemas de fichaje profesionales). Responde como humano:
+
+- Estilo: WhatsApp profesional (frases cortas, lenguaje natural)
+- Productos:
+  • Janus: ${CONFIG.COMPANY.PRODUCTS.JANUS.price}€ (${CONFIG.COMPANY.PRODUCTS.JANUS.features})
+  • Janus USB: ${CONFIG.COMPANY.PRODUCTS.JANUS_USB.price}€
+- Características: 5 tarjetas, prueba 1 mes, soporte +10€/mes
+- Flujo: Pregunta necesidades → destaca instalación fácil → ofrece prueba
+- Contacto: Si es técnico, pide "Déjame tu móvil/email" y guarda como |CONTACT {phone:...} o |CONTACT {email:...}
+- Prohibido: Revelar ser IA, mensajes largos, formalidades robóticas`
+  }];
+
+  await enviarPregunta(`Preséntate brevemente como ${nombreAsistente} de ${CONFIG.COMPANY.NAME} mencionando que puedes ayudar con sistemas de fichaje profesionales.`);
+}
+
+// Función para formatear hora
+function getCurrentTime() {
+  return new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+}
+
+// Función principal
+async function enviarPregunta(question = "") {
+  const pregunta = question || DOM.input.value.trim();
+  if (!pregunta) return;
+
+  // Mostrar mensaje del usuario
+  if (!question) {
+    mostrarMensaje(pregunta, 'user-message');
+    DOM.input.value = "";
+  }
+
+  // Deshabilitar inputs durante el procesamiento
+  DOM.input.disabled = true;
+  DOM.sendButton.disabled = true;
+
+  // Actualizar historial
+  historialMensajes.push({ role: "user", content: pregunta });
+
+  // Si estábamos esperando datos de contacto, procesarlos
+  if (esperandoContacto) {
+    procesarDatosContacto(pregunta);
+    esperandoContacto = false;
+    return;
+  }
+
+  // Mostrar indicador de escritura
+  mostrarTypingIndicator();
+
+  try {
+    const respuesta = await obtenerRespuesta();
+    await procesarRespuesta(respuesta);
+  } catch (error) {
+    console.error("Error:", error);
+    mostrarMensaje("Vaya, ha habido un problema. ¿Podrías repetirlo?", 'bot-message');
+  } finally {
+    DOM.input.disabled = false;
+    DOM.sendButton.disabled = false;
+    DOM.input.focus();
+  }
+}
+
+// Procesar datos de contacto del usuario
+function procesarDatosContacto(respuestaUsuario) {
+  const email = extraerEmail(respuestaUsuario);
+  const phone = extraerTelefono(respuestaUsuario);
+
+  if (email || phone) {
+    // Construir mensaje de confirmación
+    let mensajeConfirmacion = "Gracias, ";
+    if (email) mensajeConfirmacion += `hemos registrado tu email (${email}) `;
+    if (phone) mensajeConfirmacion += `y tu teléfono (${phone}) `;
+    mensajeConfirmacion += "para contactarte pronto.";
+
+    mostrarMensaje(mensajeConfirmacion, 'bot-message');
+    
+    // Enviar datos a soporte (sin mostrar al usuario)
+    enviarContactoASoporte(email, phone);
+  } else {
+    mostrarMensaje("No he detectado datos de contacto válidos. ¿Podrías indicarme tu email o teléfono?", 'bot-message');
+    esperandoContacto = true;
+  }
+
+  DOM.input.disabled = false;
+  DOM.sendButton.disabled = false;
+  DOM.input.focus();
+}
+
+// Función mejorada para enviar a EmailJS
+async function enviarContactoASoporte(email, phone) {
+  try {
+    const templateParams = {
+      asistente: nombreAsistente,
+      fecha: new Date().toLocaleString('es-ES', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }),
+      email: email || "No proporcionado",
+      phone: phone || "No proporcionado",
+      historial: generarResumenHistorial(),
+      mensaje: "Contacto generado automáticamente desde el chat"
+    };
+
+    console.log("Enviando a EmailJS con estos parámetros:", templateParams);
+    
+    const response = await emailjs.send(
+      CONFIG.EMAILJS.SERVICE_ID,
+      CONFIG.EMAILJS.TEMPLATE_ID,
+      templateParams
+    );
+    
+    console.log("EmailJS response:", response);
+    return true;
+  } catch (error) {
+    console.error("Error al enviar a EmailJS:", error);
+    return false;
+  }
+}
+
+// Generar resumen del historial para el email
+function generarResumenHistorial() {
+  return historialMensajes
+    .filter(msg => msg.role === 'user')
+    .map(msg => `Cliente: ${msg.content}`)
+    .join('\n\n');
+}
+
+// Mostrar mensaje en el chat
+function mostrarMensaje(texto, tipo) {
+  const mensaje = document.createElement("div");
+  mensaje.className = `message ${tipo}`;
+  mensaje.innerHTML = `${texto.replace(/\n/g, "<br>")}<div class="message-time">${getCurrentTime()}</div>`;
+  DOM.chat.appendChild(mensaje);
+  DOM.chat.scrollTop = DOM.chat.scrollHeight;
+}
+
+// Mostrar indicador de typing
+function mostrarTypingIndicator() {
+  const indicator = document.createElement("div");
+  indicator.className = "typing-indicator";
+  indicator.innerHTML = `<div class="typing-dot"></div>`.repeat(3);
+  DOM.chat.appendChild(indicator);
+  DOM.chat.scrollTop = DOM.chat.scrollHeight;
+  return indicator;
+}
+
+// Obtener respuesta de la API
+async function obtenerRespuesta() {
+  const response = await fetch(CONFIG.API_ENDPOINT, {
+    method: "POST",
+    headers: {
+      "HTTP-Referer": "https://punctoapp.com",
+      "X-Title": "PUNCTO Landing",
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "deepseek/deepseek-chat:free",
+      messages: historialMensajes
+    })
+  });
+
+  if (!response.ok) throw new Error("API error");
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content.trim() || "No he entendido bien, ¿puedes reformularlo?";
+}
+
+// Función modificada para procesar la respuesta de la API
+async function procesarRespuesta(respuesta) {
+  // Eliminar typing indicator
+  const indicator = DOM.chat.querySelector(".typing-indicator");
+  if (indicator) DOM.chat.removeChild(indicator);
+
+  // Mostrar respuesta al usuario (sin estructuras internas)
+  const respuestaUsuario = respuesta.replace(/\|CONTACT\s*\{.*?\}.*?/g, '').trim();
+  await mostrarRespuestaProgresiva(respuestaUsuario);
+
+  // Actualizar historial
+  historialMensajes.push({ role: "assistant", content: respuesta });
+
+  // Procesar contacto si existe en la respuesta API
+  procesarContactoDesdeAPI(respuesta);
+}
+
+// Nueva función para procesar contactos desde la respuesta API
+function procesarContactoDesdeAPI(respuesta) {
+  const contactoMatch = respuesta.match(/\|CONTACT\s*\{(.*?)\}/);
+  if (!contactoMatch) return;
+
+  try {
+    const contactoData = contactoMatch[1];
+    let phone = null;
+    let email = null;
+
+    // Extraer phone
+    const phoneMatch = contactoData.match(/phone:\s*([^,}]+)/);
+    if (phoneMatch) {
+      phone = phoneMatch[1].trim().replace(/['"]/g, '');
+      // Validar formato de teléfono
+      if (!/^[\d+]{9,15}$/.test(phone)) {
+        console.warn("Formato de teléfono inválido:", phone);
+        phone = null;
+      }
+    }
+
+    // Extraer email
+    const emailMatch = contactoData.match(/email:\s*([^,}]+)/);
+    if (emailMatch) {
+      email = emailMatch[1].trim().replace(/['"]/g, '');
+      // Validar formato de email
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        console.warn("Formato de email inválido:", email);
+        email = null;
+      }
+    }
+
+    // Validar y enviar
+    if (phone || email) {
+      enviarContactoASoporte(email, phone);
+    }
+  } catch (error) {
+    console.error("Error procesando contacto desde API:", error);
+  }
+}
+
+// Mostrar respuesta progresivamente
+async function mostrarRespuestaProgresiva(respuesta) {
+  const partes = respuesta.split(/\[WAIT-(\d+)\]/);
+  
+  for (let i = 0; i < partes.length; i++) {
+    if (i % 2 === 0 && partes[i].trim()) {
+      mostrarMensaje(partes[i].trim(), 'bot-message');
+    } else if (i % 2 !== 0) {
+      await new Promise(resolve => setTimeout(resolve, parseInt(partes[i])));
+    }
+  }
+}
+
+// Extraer email del texto
+function extraerEmail(texto) {
+  const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/;
+  const match = texto.match(emailRegex);
+  return match ? match[0] : null;
+}
+
+// Extraer teléfono del texto
+function extraerTelefono(texto) {
+  const phoneRegex = /(\+?\d{1,3}[\s-]?)?(\d{2,3}[\s-]?){2,3}\d{2,3}/;
+  const match = texto.match(phoneRegex);
+  return match ? match[0].replace(/\s/g, '') : null;
+}
+
+// Configurar event listeners
+function setupEventListeners() {
+  DOM.sendButton.addEventListener("click", () => enviarPregunta());
+  DOM.input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      enviarPregunta();
+    }
+  });
+}
+
+// Inicialización al cargar la página
+document.addEventListener("DOMContentLoaded", () => {
+  setupEventListeners();
+  initializeChat();
+});
+</script>
+</body>
+</html>
