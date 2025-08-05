@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <title>Walkie-Talkie</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
-    /* Reset básico */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -13,8 +15,8 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #1e1e2f, #12121b);
-      color: #e0e0e0;
+      background: linear-gradient(145deg, #0e0e1c, #1c1c32);
+      color: #fff;
       padding: 20px;
       min-height: 100vh;
       display: flex;
@@ -23,239 +25,146 @@
     }
 
     h1 {
-      font-weight: 700;
-      font-size: 2.8rem;
+      font-size: 2rem;
+      color: #7dcfff;
       margin-bottom: 20px;
-      color: #82cfff;
-      text-shadow: 0 0 10px #52a8ff77;
-      user-select: none;
     }
 
-    /* Contenedor general */
     #register, #app, #incoming-call {
-      background: #222538;
-      padding: 20px 25px;
-      border-radius: 12px;
+      background: #1f2235;
+      padding: 20px;
+      border-radius: 14px;
       width: 100%;
       max-width: 400px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
       margin-bottom: 25px;
     }
 
-    /* Input y botones */
     input[type="text"] {
-      width: calc(100% - 110px);
-      padding: 12px 15px;
-      font-size: 1rem;
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
       border: none;
-      border-radius: 8px 0 0 8px;
+      font-size: 1rem;
+      margin-bottom: 10px;
       outline: none;
-      color: #222;
-      transition: box-shadow 0.25s ease;
-    }
-
-    input[type="text"]:focus {
-      box-shadow: 0 0 8px #52a8ffaa;
     }
 
     button {
-      background: #52a8ff;
-      color: #fff;
+      width: 100%;
+      padding: 14px;
       border: none;
-      padding: 12px 18px;
-      font-weight: 600;
+      border-radius: 10px;
+      background-color: #4a90e2;
+      color: white;
+      font-weight: bold;
       font-size: 1rem;
-      border-radius: 0 8px 8px 0;
+      margin-bottom: 10px;
       cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      box-shadow: 0 4px 12px #52a8ff88;
-      user-select: none;
+      transition: background 0.2s ease, transform 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
-    button:hover:not(:disabled) {
-      background-color: #3f8ede;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px #3f8edecc;
+    button:hover {
+      background-color: #357ab8;
+      transform: scale(1.02);
     }
 
     button:disabled {
-      background-color: #5a5f72;
-      cursor: default;
-      box-shadow: none;
-      transform: none;
+      background-color: #888;
+      cursor: not-allowed;
     }
 
-    /* Lista de usuarios */
     #users {
-      margin-top: 15px;
-      max-height: 230px;
+      max-height: 250px;
       overflow-y: auto;
-      border: 1px solid #444966;
-      border-radius: 8px;
-      background: #1a1c2a;
-      padding: 8px 12px;
-      box-shadow: inset 0 0 5px #111633;
+      margin-top: 10px;
     }
 
     .user {
-      padding: 10px 14px;
-      margin-bottom: 8px;
-      background: #2e314d;
+      padding: 12px;
+      background-color: #2b2f4e;
+      margin-bottom: 10px;
       border-radius: 8px;
+      text-align: center;
       cursor: pointer;
-      font-weight: 600;
-      color: #a3b1ff;
-      transition: background-color 0.25s ease, color 0.25s ease;
-      user-select: none;
+      transition: background-color 0.2s ease;
     }
 
     .user:hover {
-      background-color: #4169e1;
-      color: #fff;
-      box-shadow: 0 0 12px #4169e1cc;
+      background-color: #3a3f66;
     }
 
-    /* Estado y botones colgar */
     #status {
-      margin-top: 18px;
+      margin-top: 10px;
+      text-align: center;
       font-style: italic;
-      color: #cfd9ffcc;
+      color: #cce;
       min-height: 24px;
-      user-select: none;
     }
 
     #hangupBtn {
-      margin-top: 15px;
-      width: 100%;
-      border-radius: 10px;
-      background-color: #f44336;
-      box-shadow: 0 4px 12px #f4433677;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      transition: background-color 0.3s ease, transform 0.2s ease;
+      background-color: #e74c3c;
     }
 
-    #hangupBtn:hover {
-      background-color: #d32f2f;
-      transform: translateY(-2px);
-      box-shadow: 0 6px 18px #d32f2fcc;
-    }
-
-    /* Incoming call panel */
     #incoming-call {
       display: none;
-      background: #2c2f4a;
-      padding: 20px 25px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px #607d8bbb;
       text-align: center;
-      user-select: none;
     }
 
     #callerName {
-      font-size: 1.25rem;
-      font-weight: 700;
-      margin-bottom: 18px;
-      color: #82cfff;
-      text-shadow: 0 0 6px #52a8ffcc;
+      font-size: 1.2rem;
+      margin-bottom: 15px;
     }
 
     #incoming-call button {
       width: 48%;
-      padding: 12px 0;
-      font-size: 1rem;
-      font-weight: 600;
-      border-radius: 10px;
-      border: none;
-      margin: 0 1% 0 1%;
-      cursor: pointer;
-      box-shadow: 0 3px 10px #52a8ffaa;
-      transition: background-color 0.25s ease, transform 0.2s ease;
+      display: inline-block;
+      margin: 1%;
     }
 
     #incoming-call button:first-child {
-      background-color: #4caf50;
-      color: white;
-    }
-
-    #incoming-call button:first-child:hover {
-      background-color: #3a9b38;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px #3a9b3877;
+      background-color: #2ecc71;
     }
 
     #incoming-call button:last-child {
-      background-color: #f44336;
-      color: white;
+      background-color: #e74c3c;
     }
 
-    #incoming-call button:last-child:hover {
-      background-color: #d32f2f;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px #d32f2f77;
-    }
-
-    /* Scrollbar personalizado para #users */
-    #users::-webkit-scrollbar {
-      width: 8px;
-    }
-    #users::-webkit-scrollbar-track {
-      background: #1a1c2a;
-      border-radius: 8px;
-    }
-    #users::-webkit-scrollbar-thumb {
-      background: #4169e1aa;
-      border-radius: 8px;
-      transition: background-color 0.25s ease;
-    }
-    #users::-webkit-scrollbar-thumb:hover {
-      background: #4169e1cc;
-    }
-
-    /* Responsive */
     @media (max-width: 480px) {
-      body {
-        padding: 15px 10px;
+      h1 {
+        font-size: 1.6rem;
       }
-      #register, #app, #incoming-call {
-        max-width: 100%;
-        padding: 15px 20px;
-      }
-      input[type="text"] {
-        width: 100%;
-        border-radius: 8px;
-        margin-bottom: 10px;
-      }
-      button {
-        width: 100%;
-        border-radius: 8px;
-      }
-      #incoming-call button {
-        width: 48%;
-        margin: 0 1%;
+
+      input, button {
+        font-size: 1rem;
       }
     }
   </style>
 </head>
 <body>
-  <h1>Walkie-Talkie</h1>
+  <h1><i class="fas fa-headset"></i> Walkie-Talkie</h1>
 
   <div id="register">
-    <input type="text" id="username" placeholder="Tu nombre" autocomplete="off" />
-    <button onclick="register()">Entrar</button>
+    <input type="text" id="username" placeholder="Tu nombre" />
+    <button onclick="register()"><i class="fas fa-door-open"></i> Entrar</button>
   </div>
 
   <div id="app" style="display:none;">
-    <h2>Usuarios conectados:</h2>
+    <h2><i class="fas fa-users"></i> Usuarios disponibles</h2>
     <div id="users"></div>
     <p id="status"></p>
-    <button id="hangupBtn" onclick="endCall()" style="display:none;">Colgar</button>
+    <button id="hangupBtn" onclick="endCall()" style="display:none;"><i class="fas fa-phone-slash"></i> Colgar</button>
+    <button onclick="changeName()"><i class="fas fa-user-edit"></i> Cambiar nombre</button>
   </div>
 
   <div id="incoming-call">
     <p id="callerName"></p>
-    <button onclick="acceptCall()">Aceptar</button>
-    <button onclick="rejectCall()">Rechazar</button>
+    <button onclick="acceptCall()"><i class="fas fa-phone"></i> Aceptar</button>
+    <button onclick="rejectCall()"><i class="fas fa-times-circle"></i> Rechazar</button>
   </div>
 
   <script>
@@ -265,11 +174,19 @@
     let incomingSignal = null;
     let caller = "";
 
-    function register() {
-      myName = document.getElementById('username').value.trim();
-      if (!myName) return alert("Pon un nombre");
+    window.onload = () => {
+      const savedName = localStorage.getItem("username");
+      if (savedName) {
+        document.getElementById("username").value = savedName;
+        register(true);
+      }
+    };
 
-      // Cambiado a wss y tu URL en Render
+    function register(auto = false) {
+      myName = document.getElementById('username').value.trim();
+      if (!myName) return alert("Pon tu nombre primero");
+      localStorage.setItem("username", myName);
+
       ws = new WebSocket(`wss://call-center-zhwp.onrender.com`);
       ws.onopen = () => {
         ws.send(JSON.stringify({ type: 'register', name: myName }));
@@ -293,15 +210,13 @@
     function updateUserList(users) {
       const container = document.getElementById('users');
       container.innerHTML = '';
-      users
-        .filter(u => u !== myName)
-        .forEach(user => {
-          const div = document.createElement('div');
-          div.className = 'user';
-          div.textContent = user;
-          div.onclick = () => startCall(user);
-          container.appendChild(div);
-        });
+      users.filter(u => u !== myName).forEach(user => {
+        const div = document.createElement('div');
+        div.className = 'user';
+        div.textContent = user;
+        div.onclick = () => startCall(user);
+        container.appendChild(div);
+      });
     }
 
     async function startCall(user) {
@@ -310,7 +225,6 @@
 
       localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       pc = createPeerConnection();
-
       localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
@@ -326,14 +240,14 @@
       if (signal.type === 'offer') {
         caller = from;
         incomingSignal = signal;
-        document.getElementById('callerName').textContent = `Llamada entrante de ${from}`;
+        document.getElementById('callerName').textContent = `📞 Llamada de ${from}`;
         document.getElementById('incoming-call').style.display = 'block';
       }
 
       if (signal.type === 'answer') {
         await pc.setRemoteDescription(new RTCSessionDescription(signal));
         document.getElementById('status').textContent = `Conectado con ${from}`;
-        document.getElementById('hangupBtn').style.display = 'inline';
+        document.getElementById('hangupBtn').style.display = 'inline-block';
       }
 
       if (signal.candidate && pc) {
@@ -346,7 +260,6 @@
       targetName = caller;
       localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
       pc = createPeerConnection();
-
       localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
       await pc.setRemoteDescription(new RTCSessionDescription(incomingSignal));
       const answer = await pc.createAnswer();
@@ -358,22 +271,30 @@
         signal: { type: 'answer', sdp: answer.sdp }
       }));
 
+      // Nueva llamada desde el que contesta (para garantizar bidireccional)
+      const offerBack = await pc.createOffer();
+      await pc.setLocalDescription(offerBack);
+      ws.send(JSON.stringify({
+        type: 'signal',
+        to: caller,
+        signal: { type: 'offer', sdp: offerBack.sdp }
+      }));
+
       document.getElementById('status').textContent = `Conectado con ${caller}`;
-      document.getElementById('hangupBtn').style.display = 'inline';
+      document.getElementById('hangupBtn').style.display = 'inline-block';
       caller = "";
       incomingSignal = null;
     }
 
     function rejectCall() {
       document.getElementById('incoming-call').style.display = 'none';
-      document.getElementById('status').textContent = `Llamada de ${caller} rechazada`;
+      document.getElementById('status').textContent = `Llamada rechazada`;
       caller = "";
       incomingSignal = null;
     }
 
     function createPeerConnection() {
       const pc = new RTCPeerConnection();
-
       pc.onicecandidate = (event) => {
         if (event.candidate) {
           ws.send(JSON.stringify({
@@ -383,19 +304,16 @@
           }));
         }
       };
-
       pc.ontrack = (event) => {
         const remoteAudio = new Audio();
         remoteAudio.srcObject = event.streams[0];
         remoteAudio.play();
       };
-
       pc.onconnectionstatechange = () => {
         if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
           endCall();
         }
       };
-
       return pc;
     }
 
@@ -405,6 +323,11 @@
       targetName = "";
       document.getElementById('status').textContent = "";
       document.getElementById('hangupBtn').style.display = 'none';
+    }
+
+    function changeName() {
+      localStorage.removeItem("username");
+      location.reload();
     }
 
     window.onbeforeunload = () => {
