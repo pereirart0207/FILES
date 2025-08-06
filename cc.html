@@ -168,6 +168,11 @@
   </div>
 
   <script>
+
+  navigator.mediaDevices.getUserMedia({ audio: true })
+
+
+
     let ws, localStream, pc;
     let myName = "";
     let targetName = "";
@@ -228,6 +233,8 @@
       localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
+
+
 
       ws.send(JSON.stringify({
         type: 'signal',
