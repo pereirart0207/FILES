@@ -55,23 +55,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\FRANK\\.nuget\\packages\\": {},
+    "C:\\Users\\TONY\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\FRANK\\source\\repos\\afich\\afich.csproj",
+      "projectUniqueName": "C:\\Users\\TONY\\source\\FILES\\afich\\afich.csproj",
       "projectName": "afich",
-      "projectPath": "C:\\Users\\FRANK\\source\\repos\\afich\\afich.csproj",
-      "packagesPath": "C:\\Users\\FRANK\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\FRANK\\source\\repos\\afich\\obj\\",
+      "projectPath": "C:\\Users\\TONY\\source\\FILES\\afich\\afich.csproj",
+      "packagesPath": "C:\\Users\\TONY\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\TONY\\source\\FILES\\afich\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\FRANK\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\TONY\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -81,8 +81,7 @@
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "C:\\Program Files\\dotnet\\library-packs": {},
-        "C:\\Users\\FRANK\\Downloads": {},
-        "https://www.nuget.org/api/v2/": {}
+        "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net8.0-windows7.0": {
@@ -94,6 +93,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -124,7 +128,7 @@
             "privateAssets": "none"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

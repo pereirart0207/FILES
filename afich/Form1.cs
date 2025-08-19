@@ -10,19 +10,22 @@ namespace afich
     public partial class Form1 : Form
     {
         private System.Windows.Forms.Timer autoClockTimer;
-        List<Employee> list = new List<Employee>();
-        string EmployeeFile = "employees.conf";
+        private BindingSource bindingSource = new BindingSource();
+        private List<Employee> list = new List<Employee>();
+        private string EmployeeFile = "employees.conf";
 
         public Form1()
         {
             InitializeComponent();
             StartAutoClock();
+            lbProgramming.DataSource = bindingSource;
+            lbProgramming.DisplayMember = nameof(Employee.ToString);
         }
 
         private void StartAutoClock()
         {
             autoClockTimer = new System.Windows.Forms.Timer();
-            autoClockTimer.Interval = 60 * 1000; // 1 minuto
+            autoClockTimer.Interval = 60 * 1000;
             autoClockTimer.Tick += AutoClockTimer_Tick;
             autoClockTimer.Start();
         }
@@ -44,29 +47,14 @@ namespace afich
         {
             try
             {
-                // Validaciones
-                if (string.IsNullOrWhiteSpace(tbEmployeeName.Text))
+                if (string.IsNullOrWhiteSpace(tbEmployeeName.Text) ||
+                    string.IsNullOrWhiteSpace(tbEnterpriseID.Text) ||
+                    string.IsNullOrWhiteSpace(tbEmployeeID.Text))
                 {
-                    MessageBox.Show("El nombre del empleado no puede estar vacío.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    tbEmployeeName.Focus();
+                    MessageBox.Show("Todos los campos son obligatorios.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
-                if (string.IsNullOrWhiteSpace(tbEnterpriseID.Text))
-                {
-                    MessageBox.Show("El ID de la empresa no puede estar vacío.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    tbEnterpriseID.Focus();
-                    return;
-                }
-
-                if (string.IsNullOrWhiteSpace(tbEmployeeID.Text))
-                {
-                    MessageBox.Show("El ID del empleado no puede estar vacío.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    tbEmployeeID.Focus();
-                    return;
-                }
-
-                // Obtener los días seleccionados de los checkbox
                 List<DayOfWeek> selectedDays = new List<DayOfWeek>();
                 if (cb1.Checked) selectedDays.Add(DayOfWeek.Monday);
                 if (cb2.Checked) selectedDays.Add(DayOfWeek.Tuesday);
@@ -82,38 +70,26 @@ namespace afich
                     return;
                 }
 
-                // Convertir la hora seleccionada a TimeOnly
                 TimeOnly exitTime = TimeOnly.FromDateTime(dtpOutTime.Value);
 
-                // Crear y registrar empleado
                 Employee emp = new Employee(tbEmployeeName.Text.Trim(), tbEnterpriseID.Text.Trim(), tbEmployeeID.Text.Trim())
                 {
                     ExitTime = exitTime,
                     DaysOfWeek = selectedDays
                 };
 
-                emp.Register();
-                list.Add(emp);
+                if (emp.Register())
+                {
+                    list.Add(emp);
+                    RefreshEmployeeList();
+                    MessageBox.Show("Empleado registrado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
 
-                MessageBox.Show("Empleado registrado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                // Limpiar campos
                 tbEmployeeName.Clear();
                 tbEnterpriseID.Clear();
                 tbEmployeeID.Clear();
                 dtpOutTime.Value = DateTime.Now;
-
-                // Limpiar checkboxes
-                cb1.Checked = false;
-                cb2.Checked = false;
-                cb3.Checked = false;
-                cb4.Checked = false;
-                cb5.Checked = false;
-                cb6.Checked = false;
-                cb7.Checked = false;
-
-                // Actualizar ListBox
-                RefreshEmployeeList();
+                cb1.Checked = cb2.Checked = cb3.Checked = cb4.Checked = cb5.Checked = cb6.Checked = cb7.Checked = false;
             }
             catch (Exception ex)
             {
@@ -123,120 +99,23 @@ namespace afich
 
         private void RefreshEmployeeList()
         {
-            lbProgramming.Items.Clear();
-            foreach (var emp in list)
-            {
-                string exit = emp.ExitTime.HasValue
-                    ? emp.ExitTime.Value.ToString("HH:mm", CultureInfo.InvariantCulture)
-                    : "N/A";
-
-                string days = emp.DaysOfWeek != null && emp.DaysOfWeek.Count > 0
-                    ? string.Join(", ", emp.DaysOfWeek)
-                    : "No días asignados";
-
-                string displayText = $"{emp.Name} | {exit} | Días: {days}";
-                lbProgramming.Items.Add(displayText);
-            }
+            bindingSource.DataSource = null;
+            bindingSource.DataSource = list;
         }
 
         private void Form1_Activated(object sender, EventArgs e)
         {
             try
             {
-                list = ReadEmployeesFromFile(EmployeeFile);
+                list = Employee.LoadAllEmployees();
                 RefreshEmployeeList();
+                LoadPastProgramFiles();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error cargando empleados: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
-        List<Employee> ReadEmployeesFromFile(string filename)
-        {
-            var employees = new List<Employee>();
-
-            if (!File.Exists(filename))
-                return employees;
-
-            foreach (var line in File.ReadAllLines(filename))
-            {
-                var parts = line.Split('|');
-                if (parts.Length < 6) continue; // Aseguramos que haya campo para días
-
-                string name = parts[0];
-                string enterpriseId = parts[1];
-                string employeeId = parts[2];
-
-                TimeOnly? entryTime = ParseTimeOnly(parts[3]);
-                TimeOnly? exitTime = ParseTimeOnly(parts[4]);
-
-                List<DayOfWeek> daysOfWeek = new List<DayOfWeek>();
-                string daysStr = parts[5];
-                if (!string.IsNullOrWhiteSpace(daysStr))
-                {
-                    var daysStrings = daysStr.Split(',', StringSplitOptions.RemoveEmptyEntries);
-                    foreach (var d in daysStrings)
-                    {
-                        if (Enum.TryParse<DayOfWeek>(d.Trim(), out var day))
-                        {
-                            daysOfWeek.Add(day);
-                        }
-                    }
-                }
-
-                Employee emp = new Employee(name, enterpriseId, employeeId)
-                {
-                    EntryTime = entryTime,
-                    ExitTime = exitTime,
-                    DaysOfWeek = daysOfWeek
-                };
-
-                employees.Add(emp);
-            }
-
-            return employees;
-        }
-
-        private TimeOnly? ParseTimeOnly(string timeStr)
-        {
-            if (TimeOnly.TryParseExact(timeStr, "HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out TimeOnly time))
-            {
-                return time;
-            }
-            return null;
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            // Si quieres que cargue empleados al abrir, llama aquí Form1_Activated(null, null);
-        }
-
-
-        /*public void ResetData()
-        {
-            try
-            {
-                if (File.Exists(EmployeeFile))
-                {
-                    File.Delete(EmployeeFile);
-                    MessageBox.Show("Archivo de empleados eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                    // Limpia la lista y la interfaz
-                    list.Clear();
-                    lbProgramming.Items.Clear();
-                }
-                else
-                {
-                    MessageBox.Show("No existe el archivo de empleados para eliminar.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error eliminando el archivo: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-        */
 
         public void ResetData()
         {
@@ -246,26 +125,19 @@ namespace afich
                 {
                     string directory = Path.GetDirectoryName(EmployeeFile);
                     if (string.IsNullOrEmpty(directory))
-                        directory = "."; // Carpeta actual
+                        directory = ".";
 
-                    string baseFileName = Path.GetFileNameWithoutExtension(EmployeeFile); // "employees"
-                    string extension = Path.GetExtension(EmployeeFile); // ".conf"
-
-                    // Buscar archivos que coincidan con el patrón "employees_semanaX.conf"
+                    string baseFileName = Path.GetFileNameWithoutExtension(EmployeeFile);
+                    string extension = Path.GetExtension(EmployeeFile);
                     var existingFiles = Directory.GetFiles(directory, $"{baseFileName}_semana*.conf");
-
-                    // Contar cuántos ya existen y generar el nuevo nombre
                     int count = existingFiles.Length + 1;
-
                     string newFileName = Path.Combine(directory, $"{baseFileName}_semana{count}{extension}");
-
                     File.Move(EmployeeFile, newFileName);
 
                     MessageBox.Show($"Archivo renombrado a {newFileName}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    // Limpia la lista y la interfaz
                     list.Clear();
-                    lbProgramming.Items.Clear();
+                    RefreshEmployeeList();
                 }
                 else
                 {
@@ -278,7 +150,6 @@ namespace afich
             }
         }
 
-
         private void deleteAll_Click(object sender, EventArgs e)
         {
             ResetData();
@@ -286,16 +157,104 @@ namespace afich
 
         private void btnDelSelected_Click(object sender, EventArgs e)
         {
-            if (lbProgramming.SelectedItem != null)
+            if (lbProgramming.SelectedItem is Employee emp)
             {
-                Employee emp = lbProgramming.SelectedItem as Employee;
                 emp.Delete();
-
+                list.Remove(emp);
+                RefreshEmployeeList();
             }
-            else {
-                MessageBox.Show("No hay inguna línea seleccionada para eliminar");
+            else
+            {
+                MessageBox.Show("No se pudo identificar al empleado seleccionado.");
+            }
+        }
+
+        private void LoadPastProgramFiles()
+        {
+            cbLastPrograming.Items.Clear();
+            cbLastPrograming.SelectedIndex = -1;
+
+            string directory = Path.GetDirectoryName(EmployeeFile);
+            if (string.IsNullOrEmpty(directory))
+                directory = ".";
+
+            string baseFileName = Path.GetFileNameWithoutExtension(EmployeeFile);
+            string extension = Path.GetExtension(EmployeeFile);
+            var files = Directory.GetFiles(directory, $"{baseFileName}_semana*.conf");
+
+            foreach (var file in files)
+            {
+                cbLastPrograming.Items.Add(Path.GetFileName(file));
             }
 
+            cbLastPrograming.Text = "Selecciona una programación...";
+        }
+
+        private void cbLastPrograming_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cbLastPrograming.SelectedItem == null) return;
+
+            string selectedFile = cbLastPrograming.SelectedItem.ToString();
+            string directory = Path.GetDirectoryName(EmployeeFile);
+            if (string.IsNullOrEmpty(directory))
+                directory = ".";
+
+            string selectedPath = Path.Combine(directory, selectedFile);
+            string destinationPath = Path.Combine(directory, "employees.conf");
+
+            try
+            {
+                File.Copy(selectedPath, destinationPath, overwrite: true);
+                MessageBox.Show($"Programación restaurada desde {selectedFile}", "Restaurado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                Form1_Activated(null, null);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al restaurar: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void lbProgramming_DoubleClick(object sender, EventArgs e)
+        {
+            if (lbProgramming.SelectedItem is Employee emp)
+            {
+                tbEmployeeID.Text = emp.EmployeeId;
+                tbEmployeeName.Text = emp.Name;
+                tbEnterpriseID.Text = emp.EnterpriseId;
+
+                // Cargar la hora de salida en el DateTimePicker
+                //dtpOutTime.Value = DateTime.Today.Add(emp.ExitTime.ToTimeSpan());
+
+                // Desmarcar todos los CheckBoxes
+                cb1.Checked = cb2.Checked = cb3.Checked = cb4.Checked = cb5.Checked = cb6.Checked = cb7.Checked = false;
+
+                // Marcar los días que están en la lista del empleado
+                foreach (DayOfWeek day in emp.DaysOfWeek)
+                {
+                    switch (day)
+                    {
+                        case DayOfWeek.Monday: cb1.Checked = true; break;
+                        case DayOfWeek.Tuesday: cb2.Checked = true; break;
+                        case DayOfWeek.Wednesday: cb3.Checked = true; break;
+                        case DayOfWeek.Thursday: cb4.Checked = true; break;
+                        case DayOfWeek.Friday: cb5.Checked = true; break;
+                        case DayOfWeek.Saturday: cb6.Checked = true; break;
+                        case DayOfWeek.Sunday: cb7.Checked = true; break;
+                    }
+                }
+
+                RefreshEmployeeList();
+            }
+            else
+            {
+                MessageBox.Show("No se pudo identificar al empleado seleccionado.");
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            dtpOutTime.Format = DateTimePickerFormat.Custom;
+            dtpOutTime.CustomFormat = "HH:mm";
         }
     }
 }

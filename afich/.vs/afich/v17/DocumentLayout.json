@@ -1,0 +1,153 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\TONY\\source\\FILES\\afich\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|c:\\users\\tony\\source\\files\\afich\\afich.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|",
+      "RelativeMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|solutionrelative:afich.csproj||{04B8AB82-A572-4FEF-95CE-5222444B6B64}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|c:\\users\\tony\\source\\files\\afich\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|C:\\Users\\TONY\\source\\FILES\\afich\\scheduler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|solutionrelative:scheduler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|c:\\users\\tony\\source\\files\\afich\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|solutionrelative:form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|C:\\Users\\TONY\\source\\FILES\\afich\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|solutionrelative:form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|C:\\Users\\TONY\\source\\FILES\\afich\\employee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|solutionrelative:employee.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|C:\\Users\\TONY\\source\\FILES\\afich\\files.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|solutionrelative:files.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|C:\\Users\\TONY\\source\\FILES\\afich\\clocktype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B5F59918-9B08-407D-B810-1649468BCEEF}|afich.csproj|solutionrelative:clocktype.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "afich",
+              "DocumentMoniker": "C:\\Users\\TONY\\source\\FILES\\afich\\afich.csproj",
+              "RelativeDocumentMoniker": "afich.csproj",
+              "ToolTip": "C:\\Users\\TONY\\source\\FILES\\afich\\afich.csproj",
+              "RelativeToolTip": "afich.csproj",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-07-01T21:54:02.496Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Form1.Designer.cs",
+              "DocumentMoniker": "C:\\Users\\TONY\\source\\FILES\\afich\\Form1.Designer.cs",
+              "RelativeDocumentMoniker": "Form1.Designer.cs",
+              "ToolTip": "C:\\Users\\TONY\\source\\FILES\\afich\\Form1.Designer.cs",
+              "RelativeToolTip": "Form1.Designer.cs",
+              "ViewState": "AQIAAAIBAAAAAAAAAAAiwBQBAAAnAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-01T20:35:35.51Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Scheduler.cs",
+              "DocumentMoniker": "C:\\Users\\TONY\\source\\FILES\\afich\\Scheduler.cs",
+              "RelativeDocumentMoniker": "Scheduler.cs",
+              "ToolTip": "C:\\Users\\TONY\\source\\FILES\\afich\\Scheduler.cs",
+              "RelativeToolTip": "Scheduler.cs",
+              "ViewState": "AQIAADIAAAAAAAAAAADwv0AAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-01T19:50:28.831Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Files.cs",
+              "DocumentMoniker": "C:\\Users\\TONY\\source\\FILES\\afich\\Files.cs",
+              "RelativeDocumentMoniker": "Files.cs",
+              "ToolTip": "C:\\Users\\TONY\\source\\FILES\\afich\\Files.cs",
+              "RelativeToolTip": "Files.cs",
+              "ViewState": "AQIAAD0AAAAAAAAAAAAgwAwAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-01T19:50:28.921Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Employee.cs",
+              "DocumentMoniker": "C:\\Users\\TONY\\source\\FILES\\afich\\Employee.cs",
+              "RelativeDocumentMoniker": "Employee.cs",
+              "ToolTip": "C:\\Users\\TONY\\source\\FILES\\afich\\Employee.cs",
+              "RelativeToolTip": "Employee.cs",
+              "ViewState": "AQIAALEAAAAAAAAAAADwv6MAAAAmAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-01T19:50:28.922Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Form1.cs",
+              "DocumentMoniker": "C:\\Users\\TONY\\source\\FILES\\afich\\Form1.cs",
+              "RelativeDocumentMoniker": "Form1.cs",
+              "ToolTip": "C:\\Users\\TONY\\source\\FILES\\afich\\Form1.cs",
+              "RelativeToolTip": "Form1.cs",
+              "ViewState": "AQIAANUAAAAAAAAAAAAUwPIAAAAVAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-01T19:50:28.924Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "ClockType.cs",
+              "DocumentMoniker": "C:\\Users\\TONY\\source\\FILES\\afich\\ClockType.cs",
+              "RelativeDocumentMoniker": "ClockType.cs",
+              "ToolTip": "C:\\Users\\TONY\\source\\FILES\\afich\\ClockType.cs",
+              "RelativeToolTip": "ClockType.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-01T19:50:28.927Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Form1.cs [Dise\u00F1o]",
+              "DocumentMoniker": "C:\\Users\\TONY\\source\\FILES\\afich\\Form1.cs",
+              "RelativeDocumentMoniker": "Form1.cs",
+              "ToolTip": "C:\\Users\\TONY\\source\\FILES\\afich\\Form1.cs [Dise\u00F1o]",
+              "RelativeToolTip": "Form1.cs [Dise\u00F1o]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-01T19:50:30.555Z",
+              "EditorCaption": " [Dise\u00F1o]"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

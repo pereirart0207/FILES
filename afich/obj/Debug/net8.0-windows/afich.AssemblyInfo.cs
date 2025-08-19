@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("afich")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+41a40ea214689985297e0a98f56a38810432db9a")]
 [assembly: System.Reflection.AssemblyProductAttribute("afich")]
 [assembly: System.Reflection.AssemblyTitleAttribute("afich")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

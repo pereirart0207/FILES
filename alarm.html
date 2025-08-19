@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control Remoto Alarma</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.15) 0%, transparent 50%);
+      z-index: -1;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      background: rgba(23, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(to bottom right, rgba(255,255,255,0.1), rgba(255,255,255,0.01));
+      transform: rotate(30deg);
+      z-index: -1;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 5px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header p {
+      font-size: 0.9rem;
+      color: #a0a0c0;
+    }
+
+    .status-card {
+      background: rgba(30, 30, 50, 0.6);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 25px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-label {
+      font-size: 0.9rem;
+      color: #a0a0c0;
+      margin-bottom: 8px;
+    }
+
+    #estado {
+      font-size: 1.8rem;
+      font-weight: 700;
+      display: block;
+      transition: all 0.3s ease;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .status-activated {
+      color: #4ade80;
+      text-shadow: 0 0 15px rgba(74, 222, 128, 0.5);
+    }
+
+    .status-deactivated {
+      color: #f87171;
+    }
+
+    .toggle-btn-container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      margin: 30px 0;
+    }
+
+    #toggleBtn {
+      position: relative;
+      padding: 18px 40px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+      transition: all 0.3s ease;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 180px;
+    }
+
+    #toggleBtn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #toggleBtn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+    }
+
+    #toggleBtn:hover::before {
+      opacity: 1;
+    }
+
+    #toggleBtn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 10px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-activated {
+      background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%) !important;
+      box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4) !important;
+    }
+
+    .btn-activated:hover {
+      box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5) !important;
+    }
+
+    .icon {
+      margin-right: 8px;
+      font-size: 1.2rem;
+    }
+
+    .connection-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: #a0a0c0;
+    }
+
+    .connection-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      margin-right: 8px;
+      position: relative;
+    }
+
+    .connection-dot::after {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      right: -3px;
+      bottom: -3px;
+      border-radius: 50%;
+      background: rgba(74, 222, 128, 0.4);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.8);
+        opacity: 0.8;
+      }
+      70% {
+        transform: scale(1.4);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+    }
+
+    .footer {
+      margin-top: 30px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: rgba(160, 160, 192, 0.6);
+    }
+
+    .loading {
+      animation: pulse-opacity 1.5s infinite;
+    }
+
+    @keyframes pulse-opacity {
+      0% { opacity: 0.6; }
+      50% { opacity: 1; }
+      100% { opacity: 0.6; }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px 15px;
+      }
+      
+      .header h1 {
+        font-size: 1.6rem;
+      }
+      
+      #estado {
+        font-size: 1.6rem;
+      }
+      
+      #toggleBtn {
+        padding: 16px 35px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Control de Alarma Remota</h1>
+      <p>Gestiona tu sistema de seguridad desde cualquier lugar</p>
+    </div>
+    
+    <div class="status-card">
+      <span class="status-label">ESTADO ACTUAL</span>
+      <span id="estado" class="loading">Cargando...</span>
+    </div>
+    
+    <div class="toggle-btn-container">
+      <button id="toggleBtn" class="loading">
+        <i class="icon fas fa-cog"></i>
+        <span>Cargando...</span>
+      </button>
+    </div>
+    
+    <div class="connection-status">
+      <div class="connection-dot"></div>
+      <span>Conectado en tiempo real</span>
+    </div>
+  </div>
+  
+  <div class="footer">
+    &copy; 2023 Sistema de Seguridad - Todos los derechos reservados
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    // Importa Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+    // Tu configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCBkN5Xis7blAJk2ih2fSk1dbJCnSkc-po",
+      authDomain: "remote-alarm-6ed87.firebaseapp.com",
+      projectId: "remote-alarm-6ed87",
+      storageBucket: "remote-alarm-6ed87.firebasestorage.app",
+      messagingSenderId: "21510279474",
+      appId: "1:21510279474:web:23879acd86b803ae1d072b",
+      measurementId: "G-017C6YHBY4"
+    };
+
+    // Inicializa Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const docRef = doc(db, "alarmas", "alarma1");
+    const estadoSpan = document.getElementById("estado");
+    const toggleBtn = document.getElementById("toggleBtn");
+
+    let estadoActual = false;
+
+    // Escucha en tiempo real el documento
+    onSnapshot(docRef, (snapshot) => {
+      if (snapshot.exists()) {
+        estadoActual = snapshot.data().activo;
+        estadoSpan.textContent = estadoActual ? "ACTIVADA" : "DESACTIVADA";
+        estadoSpan.className = estadoActual ? "status-activated" : "status-deactivated";
+        
+        toggleBtn.innerHTML = estadoActual ? 
+          '<i class="icon fas fa-lock-open"></i><span>Desactivar</span>' : 
+          '<i class="icon fas fa-lock"></i><span>Activar</span>';
+        
+        toggleBtn.className = estadoActual ? "btn-activated" : "";
+        
+        // Remover clase de loading una vez cargado
+        estadoSpan.classList.remove("loading");
+        toggleBtn.classList.remove("loading");
+      } else {
+        estadoSpan.textContent = "No existe registro";
+        estadoSpan.className = "status-deactivated";
+        toggleBtn.innerHTML = '<i class="icon fas fa-plus-circle"></i><span>Crear registro</span>';
+        
+        // Remover clase de loading
+        estadoSpan.classList.remove("loading");
+        toggleBtn.classList.remove("loading");
+      }
+    });
+
+    // Cambia el estado al pulsar el botón
+    toggleBtn.addEventListener("click", async () => {
+      // Efecto visual de click
+      toggleBtn.style.transform = "scale(0.98)";
+      setTimeout(() => {
+        toggleBtn.style.transform = "";
+      }, 100);
+      
+      await setDoc(docRef, { activo: !estadoActual });
+    });
+  </script>
+</body>
+</html>

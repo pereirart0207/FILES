@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             tbEmployeeName = new TextBox();
             tbEnterpriseID = new TextBox();
             dtpOutTime = new DateTimePicker();
@@ -39,7 +40,6 @@
             label5 = new Label();
             lbProgramming = new ListBox();
             label6 = new Label();
-            btnDel = new Button();
             cb1 = new CheckBox();
             cb2 = new CheckBox();
             cb3 = new CheckBox();
@@ -56,7 +56,7 @@
             // 
             tbEmployeeName.Location = new Point(12, 23);
             tbEmployeeName.Name = "tbEmployeeName";
-            tbEmployeeName.Size = new Size(226, 23);
+            tbEmployeeName.Size = new Size(291, 23);
             tbEmployeeName.TabIndex = 0;
             // 
             // tbEnterpriseID
@@ -96,18 +96,18 @@
             label1.AutoSize = true;
             label1.Location = new Point(12, 55);
             label1.Name = "label1";
-            label1.Size = new Size(52, 15);
+            label1.Size = new Size(94, 15);
             label1.TabIndex = 7;
-            label1.Text = "Empresa";
+            label1.Text = "Código Empresa";
             // 
             // lb1
             // 
             lb1.AutoSize = true;
             lb1.Location = new Point(12, 99);
             lb1.Name = "lb1";
-            lb1.Size = new Size(60, 15);
+            lb1.Size = new Size(102, 15);
             lb1.TabIndex = 8;
-            lb1.Text = "Empleado";
+            lb1.Text = "Código Empleado";
             // 
             // label4
             // 
@@ -135,6 +135,7 @@
             lbProgramming.Name = "lbProgramming";
             lbProgramming.Size = new Size(291, 124);
             lbProgramming.TabIndex = 12;
+            lbProgramming.DoubleClick += lbProgramming_DoubleClick;
             // 
             // label6
             // 
@@ -144,15 +145,6 @@
             label6.Size = new Size(82, 15);
             label6.TabIndex = 13;
             label6.Text = "Programación";
-            // 
-            // btnDel
-            // 
-            btnDel.Location = new Point(244, 23);
-            btnDel.Name = "btnDel";
-            btnDel.Size = new Size(59, 23);
-            btnDel.TabIndex = 14;
-            btnDel.Text = "DEL";
-            btnDel.UseVisualStyleBackColor = true;
             // 
             // cb1
             // 
@@ -251,6 +243,7 @@
             cbLastPrograming.Name = "cbLastPrograming";
             cbLastPrograming.Size = new Size(291, 23);
             cbLastPrograming.TabIndex = 24;
+            cbLastPrograming.SelectedIndexChanged += cbLastPrograming_SelectedIndexChanged;
             // 
             // Form1
             // 
@@ -267,7 +260,6 @@
             Controls.Add(cb3);
             Controls.Add(cb2);
             Controls.Add(cb1);
-            Controls.Add(btnDel);
             Controls.Add(label6);
             Controls.Add(lbProgramming);
             Controls.Add(label5);
@@ -279,8 +271,9 @@
             Controls.Add(dtpOutTime);
             Controls.Add(tbEnterpriseID);
             Controls.Add(tbEmployeeName);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "Form1";
-            Text = "Form1";
+            Text = "LaPuerta";
             Activated += Form1_Activated;
             Load += Form1_Load;
             ResumeLayout(false);
@@ -300,7 +293,6 @@
         private Label label5;
         private ListBox lbProgramming;
         private Label label6;
-        private Button btnDel;
         private CheckBox cb1;
         private CheckBox cb2;
         private CheckBox cb3;
