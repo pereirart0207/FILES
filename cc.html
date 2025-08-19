@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Walkie-Talkie</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(145deg, #0e0e1c, #1c1c32);
+      color: #fff;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #7dcfff;
+      margin-bottom: 20px;
+    }
+
+    #register, #app, #incoming-call {
+      background: #1f2235;
+      padding: 20px;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+      margin-bottom: 25px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background-color: #4a90e2;
+      color: white;
+      font-weight: bold;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    button:hover {
+      background-color: #357ab8;
+      transform: scale(1.02);
+    }
+
+    button:disabled {
+      background-color: #888;
+      cursor: not-allowed;
+    }
+
+    #users {
+      max-height: 250px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+
+    .user {
+      padding: 12px;
+      background-color: #2b2f4e;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    .user:hover {
+      background-color: #3a3f66;
+    }
+
+    #status {
+      margin-top: 10px;
+      text-align: center;
+      font-style: italic;
+      color: #cce;
+      min-height: 24px;
+    }
+
+    #hangupBtn {
+      background-color: #e74c3c;
+    }
+
+    #incoming-call {
+      display: none;
+      text-align: center;
+    }
+
+    #callerName {
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+    }
+
+    #incoming-call button {
+      width: 48%;
+      display: inline-block;
+      margin: 1%;
+    }
+
+    #incoming-call button:first-child {
+      background-color: #2ecc71;
+    }
+
+    #incoming-call button:last-child {
+      background-color: #e74c3c;
+    }
+
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      input, button {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1><i class="fas fa-headset"></i> Walkie-Talkie</h1>
+
+  <div id="register">
+    <input type="text" id="username" placeholder="Tu nombre" />
+    <button onclick="register()"><i class="fas fa-door-open"></i> Entrar</button>
+  </div>
+
+  <div id="app" style="display:none;">
+    <h2><i class="fas fa-users"></i> Usuarios disponibles</h2>
+    <div id="users"></div>
+    <p id="status"></p>
+    <button id="hangupBtn" onclick="endCall()" style="display:none;"><i class="fas fa-phone-slash"></i> Colgar</button>
+    <button onclick="changeName()"><i class="fas fa-user-edit"></i> Cambiar nombre</button>
+  </div>
+
+  <div id="incoming-call">
+    <p id="callerName"></p>
+    <button onclick="acceptCall()"><i class="fas fa-phone"></i> Aceptar</button>
+    <button onclick="rejectCall()"><i class="fas fa-times-circle"></i> Rechazar</button>
+  </div>
+
+  <script>
+
+  navigator.mediaDevices.getUserMedia({ audio: true })
+
+
+
+    let ws, localStream, pc;
+    let myName = "";
+    let targetName = "";
+    let incomingSignal = null;
+    let caller = "";
+
+    window.onload = () => {
+      const savedName = localStorage.getItem("username");
+      if (savedName) {
+        document.getElementById("username").value = savedName;
+        register(true);
+      }
+    };
+
+    function register(auto = false) {
+      myName = document.getElementById('username').value.trim();
+      if (!myName) return alert("Pon tu nombre primero");
+      localStorage.setItem("username", myName);
+
+      ws = new WebSocket(`wss://call-center-zhwp.onrender.com`);
+      ws.onopen = () => {
+        ws.send(JSON.stringify({ type: 'register', name: myName }));
+      };
+
+      ws.onmessage = async (event) => {
+        const data = JSON.parse(event.data);
+        if (data.type === 'error') {
+          alert(data.message);
+        } else if (data.type === 'userlist') {
+          updateUserList(data.users);
+        } else if (data.type === 'signal') {
+          await handleSignal(data);
+        }
+      };
+
+      document.getElementById('register').style.display = 'none';
+      document.getElementById('app').style.display = 'block';
+    }
+
+    function updateUserList(users) {
+      const container = document.getElementById('users');
+      container.innerHTML = '';
+      users.filter(u => u !== myName).forEach(user => {
+        const div = document.createElement('div');
+        div.className = 'user';
+        div.textContent = user;
+        div.onclick = () => startCall(user);
+        container.appendChild(div);
+      });
+    }
+
+    async function startCall(user) {
+      targetName = user;
+      document.getElementById('status').textContent = `Llamando a ${user}...`;
+
+      localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      pc = createPeerConnection();
+      localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+
+
+
+      ws.send(JSON.stringify({
+        type: 'signal',
+        to: targetName,
+        signal: { type: 'offer', sdp: offer.sdp }
+      }));
+    }
+
+    async function handleSignal({ from, signal }) {
+      if (signal.type === 'offer') {
+        caller = from;
+        incomingSignal = signal;
+        document.getElementById('callerName').textContent = `📞 Llamada de ${from}`;
+        document.getElementById('incoming-call').style.display = 'block';
+      }
+
+      if (signal.type === 'answer') {
+        await pc.setRemoteDescription(new RTCSessionDescription(signal));
+        document.getElementById('status').textContent = `Conectado con ${from}`;
+        document.getElementById('hangupBtn').style.display = 'inline-block';
+      }
+
+      if (signal.candidate && pc) {
+        await pc.addIceCandidate(signal.candidate);
+      }
+    }
+
+    async function acceptCall() {
+      document.getElementById('incoming-call').style.display = 'none';
+      targetName = caller;
+      localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      pc = createPeerConnection();
+      localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+      await pc.setRemoteDescription(new RTCSessionDescription(incomingSignal));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+
+      ws.send(JSON.stringify({
+        type: 'signal',
+        to: caller,
+        signal: { type: 'answer', sdp: answer.sdp }
+      }));
+
+      // Nueva llamada desde el que contesta (para garantizar bidireccional)
+      const offerBack = await pc.createOffer();
+      await pc.setLocalDescription(offerBack);
+      ws.send(JSON.stringify({
+        type: 'signal',
+        to: caller,
+        signal: { type: 'offer', sdp: offerBack.sdp }
+      }));
+
+      document.getElementById('status').textContent = `Conectado con ${caller}`;
+      document.getElementById('hangupBtn').style.display = 'inline-block';
+      caller = "";
+      incomingSignal = null;
+    }
+
+    function rejectCall() {
+      document.getElementById('incoming-call').style.display = 'none';
+      document.getElementById('status').textContent = `Llamada rechazada`;
+      caller = "";
+      incomingSignal = null;
+    }
+
+    function createPeerConnection() {
+      const pc = new RTCPeerConnection();
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          ws.send(JSON.stringify({
+            type: 'signal',
+            to: targetName,
+            signal: { candidate: event.candidate }
+          }));
+        }
+      };
+      pc.ontrack = (event) => {
+        const remoteAudio = new Audio();
+        remoteAudio.srcObject = event.streams[0];
+        remoteAudio.play();
+      };
+      pc.onconnectionstatechange = () => {
+        if (pc.connectionState === 'disconnected' || pc.connectionState === 'failed') {
+          endCall();
+        }
+      };
+      return pc;
+    }
+
+    function endCall() {
+      if (pc) pc.close();
+      pc = null;
+      targetName = "";
+      document.getElementById('status').textContent = "";
+      document.getElementById('hangupBtn').style.display = 'none';
+    }
+
+    function changeName() {
+      localStorage.removeItem("username");
+      location.reload();
+    }
+
+    window.onbeforeunload = () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'disconnect' }));
+        ws.close();
+      }
+    };
+  </script>
+</body>
+</html>
