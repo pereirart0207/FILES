@@ -1,737 +1,1031 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Librería Azul | Reserva tus libros favoritos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700&family=Open+Sans:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <style>
-        :root {
-            --primary-blue: #1a4b8c;
-            --secondary-blue: #2a6fba;
-            --light-blue: #e6f0fa;
-            --accent-blue: #3a8ee0;
-            --dark-blue: #0d2b4e;
-            --text-dark: #333;
-            --text-light: #f8f9fa;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      :root {
+        --primary-blue: #1a4b8c;
+        --secondary-blue: #2a6fba;
+        --light-blue: #e6f0fa;
+        --accent-blue: #3a8ee0;
+        --dark-blue: #0d2b4e;
+        --text-dark: #333;
+        --text-light: #f8f9fa;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        --success: #4caf50;
+        --warning: #ffc107;
+        --danger: #f44336;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Open Sans", sans-serif;
+        color: var(--text-dark);
+        background-color: #f5f7fa;
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      header {
+        background: linear-gradient(135deg, #fff, var(--dark-blue));
+        color: white;
+        padding: 1.5rem 0;
+        box-shadow: var(--shadow);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+
+      .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-family: "Merriweather", serif;
+        font-size: 1.8rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+      }
+
+      .logo i {
+        margin-right: 10px;
+        color: var(--light-blue);
+      }
+
+      nav ul {
+        display: flex;
+        list-style: none;
+      }
+
+      nav ul li {
+        margin-left: 1.5rem;
+      }
+
+      nav ul li a {
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s;
+      }
+
+      nav ul li a:hover {
+        color: var(--light-blue);
+      }
+
+      .hero {
+        background: linear-gradient(
+            rgba(26, 75, 140, 0.8),
+            rgba(26, 75, 140, 0.9)
+          ),
+          url("https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80");
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 4rem 0;
+        text-align: center;
+      }
+
+      .hero h1 {
+        font-family: "Merriweather", serif;
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .hero p {
+        font-size: 1.2rem;
+        max-width: 700px;
+        margin: 0 auto 2rem;
+      }
+
+      .search-bar {
+        max-width: 600px;
+        margin: 0 auto;
+        display: flex;
+      }
+
+      .search-bar input {
+        flex: 1;
+        padding: 12px 15px;
+        border: none;
+        border-radius: 4px 0 0 4px;
+        font-size: 1rem;
+      }
+
+      .search-bar button {
+        background-color: var(--accent-blue);
+        color: white;
+        border: none;
+        padding: 0 20px;
+        border-radius: 0 4px 4px 0;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .search-bar button:hover {
+        background-color: var(--secondary-blue);
+      }
+
+      .main-content {
+        padding: 3rem 0;
+      }
+
+      .section-title {
+        font-family: "Merriweather", serif;
+        color: var(--primary-blue);
+        margin-bottom: 2rem;
+        text-align: center;
+        font-size: 2rem;
+        position: relative;
+      }
+
+      .section-title::after {
+        content: "";
+        display: block;
+        width: 80px;
+        height: 4px;
+        background-color: var(--accent-blue);
+        margin: 10px auto 0;
+      }
+
+      .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+      }
+
+      .book-card {
+        background-color: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        transition: transform 0.3s, box-shadow 0.3s;
+        position: relative;
+      }
+
+      .book-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .book-cover {
+        height: 320px;
+        background-color: var(--light-blue);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .book-cover img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s;
+      }
+
+      .book-card:hover .book-cover img {
+        transform: scale(1.05);
+      }
+
+      .book-info {
+        padding: 1.5rem;
+      }
+
+      .book-title {
+        font-family: "Merriweather", serif;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+        color: var(--dark-blue);
+      }
+
+      .book-author {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+      }
+
+      .book-price {
+        color: var(--primary-blue);
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        font-weight: bolder;
+      }
+      .book-description {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .book-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .btn-reserve {
+        background-color: var(--accent-blue);
+        color: white;
+        flex: 1;
+        margin-right: 10px;
+      }
+
+      .btn-reserve:hover {
+        background-color: var(--secondary-blue);
+      }
+
+      .badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background-color: var(--danger);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .loading-spinner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 300px;
+        gap: 20px;
+      }
+
+      .book-spinner {
+        width: 80px;
+        height: 80px;
+        position: relative;
+      }
+
+      .book-spinner .page {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: var(--accent-blue);
+        border-radius: 4px;
+        animation: flip 2s infinite ease-in-out;
+        transform-origin: left center;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      .book-spinner .page:nth-child(1) {
+        animation-delay: 0s;
+        opacity: 0.2;
+      }
+      .book-spinner .page:nth-child(2) {
+        animation-delay: 0.2s;
+        opacity: 0.4;
+      }
+      .book-spinner .page:nth-child(3) {
+        animation-delay: 0.4s;
+        opacity: 0.6;
+      }
+      .book-spinner .page:nth-child(4) {
+        animation-delay: 0.6s;
+        opacity: 0.8;
+      }
+      .book-spinner .page:nth-child(5) {
+        animation-delay: 0.8s;
+        opacity: 1;
+      }
+
+      @keyframes flip {
+        0%,
+        100% {
+          transform: rotateY(0deg);
+        }
+        50% {
+          transform: rotateY(-180deg);
+        }
+      }
+
+      .loading-text {
+        font-family: "Merriweather", serif;
+        color: var(--primary-blue);
+        font-size: 1.2rem;
+        text-align: center;
+      }
+
+      .loading-quote {
+        font-style: italic;
+        color: #666;
+        margin-top: 10px;
+      }
+
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal-container {
+        background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        width: 90%;
+        max-width: 400px;
+        padding: 0;
+        overflow: hidden;
+        transform: translateY(-50px);
+        transition: transform 0.3s ease;
+      }
+
+      .modal-overlay.active .modal-container {
+        transform: translateY(0);
+      }
+
+      .modal-header {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .modal-title {
+        color: white;
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+      }
+
+      .modal-body {
+        padding: 30px;
+      }
+
+      .modal-form-group {
+        margin-bottom: 20px;
+      }
+
+      .modal-label {
+        display: block;
+        color: white;
+        margin-bottom: 8px;
+        font-weight: 500;
+        font-size: 0.9rem;
+      }
+
+      .modal-input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+      }
+
+      .modal-input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .modal-input:focus {
+        outline: none;
+        border-color: #bbdefb;
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 0 0 3px rgba(187, 222, 251, 0.3);
+      }
+
+      .modal-input:invalid {
+        border-color: #ffcdd2;
+      }
+
+      .modal-footer {
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .modal-btn {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+      }
+
+      .modal-btn-primary {
+        background: #bbdefb;
+        color: #0d47a1;
+      }
+
+      .modal-btn-primary:hover {
+        background: #90caf9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
+      }
+
+      .modal-btn-secondary {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+
+      .modal-btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      /* Responsive */
+      @media (max-width: 480px) {
+        .modal-container {
+          width: 95%;
+          margin: 20px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        .modal-body {
+          padding: 20px;
         }
 
-        body {
-            font-family: 'Open Sans', sans-serif;
-            color: var(--text-dark);
-            background-color: #f5f7fa;
-            line-height: 1.6;
+        .modal-btn {
+          padding: 10px 20px;
         }
+      }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
+      footer {
+        background-color: var(--light-blue);
+        color: var(--dark-blue);
+        padding: 2rem 0;
+        text-align: center;
+      }
 
+      .footer-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .footer-logo {
+        font-family: "Merriweather", serif;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+      }
+
+      .footer-links {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .footer-links a {
+        color: var(--dark-blue);
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      .footer-links a:hover {
+        color: var(--light-blue);
+      }
+
+      .social-icons {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .social-icons a {
+        color: white;
+        font-size: 1.2rem;
+        transition: color 0.3s;
+      }
+
+      .social-icons a:hover {
+        color: var(--accent-blue);
+      }
+
+      .copyright {
+        font-size: 0.9rem;
+        color: var(--secondary-blue);
+      }
+
+      .reserved-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background-color: #4caf50;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        z-index: 2;
+      }
+
+      @media (max-width: 768px) {
         header {
-            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
-            color: white;
-            padding: 1.5rem 0;
-            box-shadow: var(--shadow);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+          padding: 0.5rem 0; /* Reducimos padding */
         }
 
         .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+          flex-direction: column;
+          gap: 0.2rem;
         }
 
         .logo {
-            font-family: 'Merriweather', serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-        }
-
-        .logo i {
-            margin-right: 10px;
-            color: var(--light-blue);
+          font-size: 1.2rem; /* Reducimos tamaño de logo */
         }
 
         nav ul {
-            display: flex;
-            list-style: none;
+          flex-direction: column;
+          gap: 0.5rem;
+          margin-top: 0.5rem;
         }
 
         nav ul li {
-            margin-left: 1.5rem;
-        }
-
-        nav ul li a {
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-
-        nav ul li a:hover {
-            color: var(--light-blue);
+          margin: 0;
         }
 
         .hero {
-            background: linear-gradient(rgba(26, 75, 140, 0.8), rgba(26, 75, 140, 0.9)), url('https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            padding: 4rem 0;
-            text-align: center;
+          padding: 2rem 0; /* Reducimos padding del hero */
+          background-position: center top; /* Ajustamos la posición de la imagen */
         }
 
         .hero h1 {
-            font-family: 'Merriweather', serif;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
+          font-size: 1.5rem; /* Reducimos tamaño del título */
         }
 
         .hero p {
-            font-size: 1.2rem;
-            max-width: 700px;
-            margin: 0 auto 2rem;
+          font-size: 0.9rem; /* Reducimos tamaño del párrafo */
         }
-
-        .search-bar {
-            max-width: 600px;
-            margin: 0 auto;
-            display: flex;
-        }
-
-        .search-bar input {
-            flex: 1;
-            padding: 12px 15px;
-            border: none;
-            border-radius: 4px 0 0 4px;
-            font-size: 1rem;
-        }
-
-        .search-bar button {
-            background-color: var(--accent-blue);
-            color: white;
-            border: none;
-            padding: 0 20px;
-            border-radius: 0 4px 4px 0;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .search-bar button:hover {
-            background-color: var(--secondary-blue);
-        }
-
-        .main-content {
-            padding: 3rem 0;
-        }
-
-        .section-title {
-            font-family: 'Merriweather', serif;
-            color: var(--primary-blue);
-            margin-bottom: 2rem;
-            text-align: center;
-            font-size: 2rem;
-            position: relative;
-        }
-
-        .section-title::after {
-            content: '';
-            display: block;
-            width: 80px;
-            height: 4px;
-            background-color: var(--accent-blue);
-            margin: 10px auto 0;
-        }
-
-        .books-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .book-card {
-            background-color: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: transform 0.3s, box-shadow 0.3s;
-            position: relative;
-        }
-
-        .book-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-        }
-
-        .book-cover {
-            height: 320px;
-            background-color: var(--light-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .book-cover img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
-        }
-
-        .book-card:hover .book-cover img {
-            transform: scale(1.05);
-        }
-
-        .book-info {
-            padding: 1.5rem;
-        }
-
-        .book-title {
-            font-family: 'Merriweather', serif;
-            font-size: 1.2rem;
-            margin-bottom: 0.5rem;
-            color: var(--dark-blue);
-        }
-
-        .book-author {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 1rem;
-        }
-
-        .book-description {
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .book-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 4px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .btn-reserve {
-            background-color: var(--accent-blue);
-            color: white;
-            flex: 1;
-            margin-right: 10px;
-        }
-
-        .btn-reserve:hover {
-            background-color: var(--secondary-blue);
-        }
-
-        .btn-favorite {
-            background-color: transparent;
-            color: #ccc;
-            border: 1px solid #ccc;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-favorite.active {
-            color: #ff4757;
-            border-color: #ff4757;
-        }
-
-        .badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background-color: var(--accent-blue);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .loading-spinner {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 300px;
-            gap: 20px;
-        }
-
-        .book-spinner {
-            width: 80px;
-            height: 80px;
-            position: relative;
-        }
-
-        .book-spinner .page {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-color: var(--accent-blue);
-            border-radius: 4px;
-            animation: flip 2s infinite ease-in-out;
-            transform-origin: left center;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        .book-spinner .page:nth-child(1) { animation-delay: 0s; opacity: 0.2; }
-        .book-spinner .page:nth-child(2) { animation-delay: 0.2s; opacity: 0.4; }
-        .book-spinner .page:nth-child(3) { animation-delay: 0.4s; opacity: 0.6; }
-        .book-spinner .page:nth-child(4) { animation-delay: 0.6s; opacity: 0.8; }
-        .book-spinner .page:nth-child(5) { animation-delay: 0.8s; opacity: 1; }
-
-        @keyframes flip {
-            0%, 100% { transform: rotateY(0deg); }
-            50% { transform: rotateY(-180deg); }
-        }
-
-        .loading-text {
-            font-family: 'Merriweather', serif;
-            color: var(--primary-blue);
-            font-size: 1.2rem;
-            text-align: center;
-        }
-
-        .loading-quote {
-            font-style: italic;
-            color: #666;
-            margin-top: 10px;
-        }
-
-        footer {
-            background-color: var(--dark-blue);
-            color: white;
-            padding: 2rem 0;
-            text-align: center;
-        }
-
-        .footer-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .footer-logo {
-            font-family: 'Merriweather', serif;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .footer-links {
-            display: flex;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .footer-links a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: var(--light-blue);
-        }
-
-        .social-icons {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .social-icons a {
-            color: white;
-            font-size: 1.2rem;
-            transition: color 0.3s;
-        }
-
-        .social-icons a:hover {
-            color: var(--accent-blue);
-        }
-
-        .copyright {
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .reserved-badge {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background-color: #4CAF50;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            z-index: 2;
-        }
-
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            nav ul {
-                margin-top: 1rem;
-            }
-
-            nav ul li {
-                margin-left: 1rem;
-                margin-right: 1rem;
-            }
-
-            .hero h1 {
-                font-size: 2rem;
-            }
-
-            .hero p {
-                font-size: 1rem;
-            }
-
-            .books-grid {
-                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <header>
-        <div class="container header-content">
-            <div class="logo">
-                <i class="fas fa-book-open"></i>
-                <span>Librería Azul</span>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="#">Inicio</a></li>
-                    <li><a href="#">Libros</a></li>
-                    <li><a href="#">Autores</a></li>
-                    <li><a href="#">Contacto</a></li>
-                </ul>
-            </nav>
+      <div class="container header-content">
+        <div class="logo">
+          <img src="src/img/lib.png" height="70px" />
         </div>
+        <nav>
+          <ul>
+            <!--
+            <li><a id="offers" href="#">Ofertas</a></li>
+            <li><a href="#">Libros</a></li>
+            <li><a href="#">Autores</a></li>
+            <li><a href="#">Contacto</a></li>
+            -->
+          </ul>
+        </nav>
+      </div>
     </header>
 
     <section class="hero">
-        <div class="container">
-            <h1>Descubre tu próxima gran lectura</h1>
-            <p>Explora nuestra colección de libros y reserva tus favoritos para recogerlos en nuestra librería</p>
-            <div class="search-bar">
-                <input type="text" placeholder="Buscar libros, autores o géneros...">
-                <button><i class="fas fa-search"></i></button>
-            </div>
+      <div class="container">
+        <h1>Descubre tu próxima gran lectura</h1>
+        <p>
+          Explora nuestra colección de libros y reserva tus favoritos para
+          recogerlos en nuestra librería
+        </p>
+        <div class="search-bar">
+          <input
+            id="searchInput"
+            type="text"
+            placeholder="Buscar libros, autores o géneros..."
+          />
         </div>
+      </div>
     </section>
 
     <section class="main-content">
-        <div class="container">
-            <h2 class="section-title">Nuestra Colección</h2>
-            
-            <div id="books-container">
-                <!-- Spinner de carga -->
-                <div class="loading-spinner">
-                    <div class="book-spinner">
-                        <div class="page"></div>
-                        <div class="page"></div>
-                        <div class="page"></div>
-                        <div class="page"></div>
-                        <div class="page"></div>
-                    </div>
-                    <div class="loading-text">Cargando nuestra biblioteca...</div>
-                    <div class="loading-quote">"Un libro debe ser el hacha que rompa el mar helado dentro de nosotros." - Franz Kafka</div>
-                </div>
+      <div class="container">
+        <h2 class="section-title">Nuestra Colección</h2>
+
+        <div id="books-container">
+          <!-- Spinner de carga -->
+          <div class="loading-spinner">
+            <div class="book-spinner">
+              <div class="page"></div>
+              <div class="page"></div>
+              <div class="page"></div>
+              <div class="page"></div>
+              <div class="page"></div>
             </div>
+            <div class="loading-text">Cargando nuestra biblioteca...</div>
+            <div class="loading-quote">
+              "Un libro sin oración es como un barco sin timón." – Charles
+              Spurgeon
+            </div>
+          </div>
         </div>
+      </div>
     </section>
 
-    <footer>
-        <div class="container footer-content">
-            <div class="footer-logo">Librería Azul</div>
-            <div class="footer-links">
-                <a href="#">Inicio</a>
-                <a href="#">Sobre nosotros</a>
-                <a href="#">Términos y condiciones</a>
-                <a href="#">Política de privacidad</a>
-            </div>
-            <div class="social-icons">
-                <a href="#"><i class="fab fa-facebook-f"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-goodreads"></i></a>
-            </div>
-            <div class="copyright">
-                &copy; 2023 Librería Azul. Todos los derechos reservados.
-            </div>
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2 class="modal-title">Formulario de Registro</h2>
         </div>
+
+        <div class="modal-body">
+          <form id="modalForm">
+            <div class="modal-form-group">
+              <label class="modal-label">Nombre completo</label>
+              <input
+                type="text"
+                class="modal-input"
+                id="userName"
+                placeholder="Ingresa tu nombre"
+                required
+              />
+            </div>
+
+            <div class="modal-form-group">
+              <label class="modal-label">Correo electrónico</label>
+              <input
+                type="email"
+                class="modal-input"
+                id="userEmail"
+                placeholder="ejemplo@correo.com"
+                required
+              />
+            </div>
+
+            <div class="modal-form-group">
+              <label class="modal-label">Teléfono</label>
+              <input
+                type="phone"
+                class="modal-input"
+                id="userPhone"
+                placeholder="(123)-456-7890 "
+                required
+              />
+            </div>
+
+            <div class="modal-form-group">
+              <label class="modal-label">Cantidad</label>
+              <input
+                value="1"
+                type="number"
+                class="modal-input"
+                id="qtty"
+                placeholder="0"
+                min="1"
+                max="100"
+                required
+              />
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button class="modal-btn modal-btn-secondary" onclick="closeModal()">
+            Cancelar
+          </button>
+          <button class="modal-btn modal-btn-primary" onclick="">Enviar</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="container footer-content">
+        <img class="footer-logo" src="src/img/igl.png" height="100px" />
+
+        <div class="footer-links"></div>
+        <div class="copyright">
+          &copy; 2025 Iglesia Bautista Reformada Miami. Todos los derechos
+          reservados.
+        </div>
+      </div>
     </footer>
-
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script>
-        // Configuración de Firebase (reemplaza con tus credenciales)
-// const firebaseConfig = {
-//   apiKey: "AIzaSyCk0RH8NdQFcSLJ8g4aaHqwF-aMbQrDqIA",
-//   authDomain: "bodda-451a0.firebaseapp.com",
-//   projectId: "bodda-451a0",
-//   storageBucket: "bodda-451a0.firebasestorage.app",
-//   messagingSenderId: "357631041042",
-//   appId: "1:357631041042:web:d799811ff56b69c2f1c2cb",
-//   measurementId: "G-W5MW75MKGJ"
-// };
-const firebaseConfig = {
-  apiKey: "AIzaSyAhtBiiYGI5T5v6Kr1HhkCFBZFVGNtQa1o",
-  authDomain: "library-e411e.firebaseapp.com",
-  projectId: "library-e411e",
-  storageBucket: "library-e411e.firebasestorage.app",
-  messagingSenderId: "547023237247",
-  appId: "1:547023237247:web:25d519d3f2d6a0454f4f4a",
-  measurementId: "G-BJ0BQT2VFP"
-};
+      // Función para filtrar libros por texto en todos los campos
+      function filterBooks(books, searchText) {
+        const text = searchText.trim().toLowerCase();
+        if (!text) return books; // Si no hay texto, devuelve todos
 
-
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-
-        // Datos de libros de ejemplo (se usará si Firebase no está configurado)
-        const sampleBooks = [
-            {
-                id: "1",
-                title: "Cien años de soledad",
-                author: "Gabriel García Márquez",
-                description: "Una saga familiar que narra la historia de la familia Buendía a lo largo de siete generaciones en el pueblo ficticio de Macondo.",
-                cover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-                genre: "Realismo mágico",
-                available: true
-            },
-            {
-                id: "2",
-                title: "1984",
-                author: "George Orwell",
-                description: "Una distopía que describe un estado totalitario donde el gobierno controla todos los aspectos de la vida, incluso los pensamientos.",
-                cover: "https://images.unsplash.com/photo-1589998059171-988d887df646?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-                genre: "Distopía",
-                available: true
-            },
-            {
-                id: "3",
-                title: "El Principito",
-                author: "Antoine de Saint-Exupéry",
-                description: "Un cuento poético que viene acompañado de ilustraciones hechas con acuarelas por el mismo Saint-Exupéry.",
-                cover: "https://images.unsplash.com/photo-1600189261867-30e5ffe7b8da?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-                genre: "Literatura infantil",
-                available: false
-            },
-            {
-                id: "4",
-                title: "Orgullo y prejuicio",
-                author: "Jane Austen",
-                description: "La historia se centra en la familia Bennet, especialmente en Elizabeth Bennet, una de las cinco hijas de un señor rural.",
-                cover: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-                genre: "Romance",
-                available: true
-            },
-            {
-                id: "5",
-                title: "Don Quijote de la Mancha",
-                author: "Miguel de Cervantes",
-                description: "La obra cuenta las aventuras de Alonso Quijano, un hidalgo pobre que enloquece leyendo libros de caballerías.",
-                cover: "https://images.unsplash.com/photo-1531346878377-a5be20888e57?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-                genre: "Novela",
-                available: true
-            },
-            {
-                id: "6",
-                title: "Crónica de una muerte anunciada",
-                author: "Gabriel García Márquez",
-                description: "La historia reconstruye las circunstancias del asesinato de Santiago Nasar a manos de los hermanos Vicario.",
-                cover: "https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80",
-                genre: "Novela",
-                available: true
-            }
-        ];
-
-        // Función para obtener libros de Firebase (o del JSON si Firebase no está configurado)
-        async function getBooks() {
-            try {
-                // Intenta obtener libros de Firebase
-                if (firebaseConfig.apiKey !== "TU_API_KEY") {
-                    const querySnapshot = await db.collection("books").get();
-                    const books = [];
-                    querySnapshot.forEach((doc) => {
-                        books.push({ id: doc.id, ...doc.data() });
-                    });
-                    return books;
-                } else {
-                    // Si Firebase no está configurado, usa los datos de ejemplo
-                    console.log("Firebase no configurado. Usando datos de ejemplo.");
-                    return sampleBooks;
-                }
-            } catch (error) {
-                console.error("Error al obtener libros:", error);
-                return sampleBooks; // Fallback a datos de ejemplo
-            }
-        }
-
-        // Función para reservar un libro
-        async function reserveBook(bookId) {
-            try {
-                // Verificar si el usuario está autenticado
-                const user = auth.currentUser;
-                if (!user) {
-                    alert("Por favor inicia sesión para reservar libros.");
-                    return;
-                }
-
-                // Actualizar el libro en Firebase
-                if (firebaseConfig.apiKey !== "TU_API_KEY") {
-                    await db.collection("books").doc(bookId).update({
-                        available: false,
-                        reservedBy: user.uid,
-                        reservedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-
-                // Actualizar la UI
-                const reserveBtn = document.querySelector(`.reserve-btn[data-id="${bookId}"]`);
-                if (reserveBtn) {
-                    reserveBtn.textContent = "Reservado";
-                    reserveBtn.disabled = true;
-                    reserveBtn.style.backgroundColor = "#4CAF50";
-                    
-                    // Mostrar badge de reservado
-                    const bookCard = reserveBtn.closest('.book-card');
-                    if (bookCard) {
-                        const reservedBadge = document.createElement('div');
-                        reservedBadge.className = 'reserved-badge';
-                        reservedBadge.textContent = 'Reservado';
-                        bookCard.querySelector('.book-cover').prepend(reservedBadge);
-                    }
-                }
-
-                alert("Libro reservado con éxito. ¡Gracias!");
-            } catch (error) {
-                console.error("Error al reservar libro:", error);
-                alert("Ocurrió un error al reservar el libro. Por favor intenta nuevamente.");
-            }
-        }
-
-        // Función para alternar favoritos
-        function toggleFavorite(bookId, btn) {
-            btn.classList.toggle('active');
-            
-            // Aquí iría la lógica para guardar en Firebase
-            // Por ahora solo lo manejamos localmente
-            const favorites = JSON.parse(localStorage.getItem('favorites') || []);
-            const index = favorites.indexOf(bookId);
-            
-            if (index === -1) {
-                favorites.push(bookId);
-            } else {
-                favorites.splice(index, 1);
-            }
-            
-            localStorage.setItem('favorites', JSON.stringify(favorites));
-        }
-
-        // Función para renderizar los libros
-        function renderBooks(books) {
-            const booksContainer = document.getElementById('books-container');
-            
-            if (books.length === 0) {
-                booksContainer.innerHTML = '<p class="no-books">No se encontraron libros disponibles.</p>';
-                return;
-            }
-            
-            booksContainer.innerHTML = '<div class="books-grid"></div>';
-            const booksGrid = booksContainer.querySelector('.books-grid');
-            
-            books.forEach(book => {
-                const favorites = JSON.parse(localStorage.getItem('favorites') || []);
-                const isFavorite = favorites.includes(book.id);
-                
-                const bookCard = document.createElement('div');
-                bookCard.className = 'book-card';
-                bookCard.innerHTML = `
-                    <div class="book-cover">
-                        ${!book.available ? '<div class="reserved-badge">Reservado</div>' : ''}
-                        <img src="${book.cover}" alt="${book.title}">
-                        <div class="badge">${book.genre}</div>
-                    </div>
-                    <div class="book-info">
-                        <h3 class="book-title">${book.title}</h3>
-                        <p class="book-author">${book.author}</p>
-                        <p class="book-description">${book.description}</p>
-                        <div class="book-actions">
-                            <button class="btn btn-reserve reserve-btn" data-id="${book.id}" ${!book.available ? 'disabled style="background-color: #4CAF50;">Reservado' : '>Reservar'}</button>
-                            <button class="btn btn-favorite ${isFavorite ? 'active' : ''}" data-id="${book.id}">
-                                <i class="fas fa-heart"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                booksGrid.appendChild(bookCard);
-            });
-            
-            // Agregar event listeners a los botones
-            document.querySelectorAll('.reserve-btn').forEach(btn => {
-                btn.addEventListener('click', () => reserveBook(btn.dataset.id));
-            });
-            
-            document.querySelectorAll('.btn-favorite').forEach(btn => {
-                btn.addEventListener('click', () => toggleFavorite(btn.dataset.id, btn));
-            });
-        }
-
-        // Cargar y mostrar los libros cuando la página esté lista
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Simular un retraso de carga para mostrar el spinner
-            setTimeout(async () => {
-                const books = await getBooks();
-                renderBooks(books);
-            }, 1500);
-            
-            // Inicializar favoritos desde localStorage
-            if (!localStorage.getItem('favorites')) {
-                localStorage.setItem('favorites', JSON.stringify([]));
-            }
+        return books.filter((book) => {
+          return (
+            (book.title && book.title.toLowerCase().includes(text)) ||
+            (book.author && book.author.toLowerCase().includes(text)) ||
+            (book.description &&
+              book.description.toLowerCase().includes(text)) ||
+            (book.promo && book.promo.name.toLowerCase().includes(text))
+          );
         });
+      }
+
+      // Conectar input con renderizado
+      document
+        .getElementById("searchInput")
+        .addEventListener("input", async (e) => {
+          const allBooks = await getBooks(); // Trae los libros de Firebase
+          const filtered = filterBooks(allBooks, e.target.value);
+          renderBooks(filtered);
+        });
+
+      (function () {
+        emailjs.init("-Q-hV4bAlYnHn7l7V"); // Reemplaza con tu Public Key de EmailJS
+      })();
+
+      /***************************************
+       * CONFIGURACIÓN FIREBASE
+       ***************************************/
+      const email = document.getElementById("userEmail");
+      const phone = document.getElementById("userPhone");
+      const name = document.getElementById("userName");
+      const qtty = document.getElementById("qtty");
+      let bookName = "";
+      let currentBookId = "";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAhtBiiYGI5T5v6Kr1HhkCFBZFVGNtQa1o",
+        authDomain: "library-e411e.firebaseapp.com",
+        projectId: "library-e411e",
+        storageBucket: "library-e411e.appspot.com", // ✅ corregido
+        messagingSenderId: "547023237247",
+        appId: "1:547023237247:web:25d519d3f2d6a0454f4f4a",
+        measurementId: "G-BJ0BQT2VFP",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      const auth = firebase.auth();
+
+      /***************************************
+       * UTILIDADES
+       ***************************************/
+      function validateForm(form) {
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return false;
+        }
+        const cantidad = Number(form.qtty.value);
+        if (cantidad < 1 || cantidad > 100) {
+          alert("La cantidad debe estar entre 1 y 100");
+          return false;
+        }
+        return true;
+      }
+
+      function updateUIAfterReserve(bookId) {
+        const reserveBtn = document.querySelector(
+          `.reserve-btn[data-id="${bookId}"]`
+        );
+        if (reserveBtn) {
+          reserveBtn.textContent = "Reservado";
+          reserveBtn.disabled = true;
+          reserveBtn.style.backgroundColor = "#4CAF50";
+
+          const bookCard = reserveBtn.closest(".book-card");
+          if (bookCard) {
+            const reservedBadge = document.createElement("div");
+            reservedBadge.className = "reserved-badge";
+            reservedBadge.textContent = "Reservado";
+            bookCard.querySelector(".book-cover").prepend(reservedBadge);
+          }
+        }
+      }
+
+      /***************************************
+       * LIBROS
+       ***************************************/
+      async function getBooks() {
+        try {
+          const querySnapshot = await db.collection("books").get();
+          const books = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          books.sort((a, b) => {
+            if (a.promo && !b.promo) return -1;
+            if (!a.promo && b.promo) return 1;
+            return 0;
+          });
+
+          return books;
+        } catch (error) {
+          console.error("Error al obtener libros:", error);
+          return [];
+        }
+      }
+
+      function reserveBook(bookId, bName) {
+        if (!bName) {
+          throw new Error("Libro no definido");
+        }
+        bookName = bName;
+        currentBookId = bookId;
+        openModal();
+      }
+
+      function renderBooks(books) {
+        const container = document.getElementById("books-container");
+        if (!books.length) {
+          container.innerHTML =
+            '<p class="no-books">No se encontraron libros disponibles.</p>';
+          return;
+        }
+
+        container.innerHTML = '<div class="books-grid"></div>';
+        const grid = container.querySelector(".books-grid");
+
+        books.forEach((book) => {
+          if (!book.available) return;
+
+          const card = document.createElement("div");
+          card.className = "book-card";
+          card.innerHTML = `
+        <div class="book-cover">
+          ${
+            !book.available ? '<div class="reserved-badge">Reservado</div>' : ""
+          }
+          <img src="${book.cover}" alt="${book.title}">
+          ${
+            book.promo ? "<div class='badge'>" + book.promo.name + "</div>" : ""
+          }
+        </div>
+        <div class="book-info">
+          <h3 class="book-title">${book.title}</h3>
+          <p class="book-author">${book.author}</p>
+        ${
+          book.promo
+            ? `<s>$${book.price}</s><p class="book-price"> $${(
+                parseFloat(book.price) *
+                (1 - book.promo.discount / 100)
+              ).toFixed(2)}</p>`
+            : `<p class="book-price">$ ${book.price}</p>`
+        }
+          
+          
+          <p class="book-description">${book.description}</p>
+          <div class="book-actions">
+            <button class="btn btn-reserve reserve-btn"
+               data-id="${book.id}"
+               data-name="${book.title}"
+               ${
+                 !book.available
+                   ? 'disabled style="background-color:#4CAF50">Reservado'
+                   : ">Reservar"
+               }
+            </button>
+          </div>
+        </div>
+      `;
+          grid.appendChild(card);
+        });
+
+        document
+          .querySelectorAll(".reserve-btn")
+          .forEach((btn) =>
+            btn.addEventListener("click", () =>
+              reserveBook(btn.dataset.id, btn.dataset.name)
+            )
+          );
+      }
+
+      /***************************************
+       * MODAL Y FORMULARIO
+       ***************************************/
+      let modalOpen = false;
+
+      function openModal() {
+        const modal = document.getElementById("modalOverlay");
+        modal.classList.add("active");
+        modalOpen = true;
+        document.body.style.overflow = "hidden";
+        setTimeout(() => name.focus(), 300);
+      }
+
+      function closeModal() {
+        const modal = document.getElementById("modalOverlay");
+        modal.classList.remove("active");
+        modalOpen = false;
+        document.body.style.overflow = "auto";
+        document.getElementById("modalForm").reset();
+      }
+
+      async function handleFormSubmit() {
+        const form = document.getElementById("modalForm");
+        if (!validateForm(form)) return;
+
+        try {
+          await sendReservationEmail();
+          updateUIAfterReserve(currentBookId);
+          alert(
+            "Libro reservado con éxito. Se ha enviado un correo de confirmación."
+          );
+          closeModal();
+        } catch (error) {
+          console.error("Error al reservar:", error);
+          alert("Ocurrió un error al reservar. Intenta nuevamente.");
+        }
+      }
+
+      /***************************************
+       * EMAILJS
+       ***************************************/
+      async function sendReservationEmail() {
+        try {
+          const params = {
+            email: email.value,
+            phone: phone.value,
+            name: name.value,
+            from_name: "Tu Biblioteca",
+            book: bookName,
+            quantity: qtty.value,
+          };
+
+          const EMAILJS_USER_ID = "-Q-hV4bAlYnHn7l7V";
+          const SERVICE_ID = "service_czex81h";
+          const TEMPLATE_ID = "template_wwhdcrf";
+          await emailjs.send(SERVICE_ID, TEMPLATE_ID, params, EMAILJS_USER_ID);
+          console.log("Correo enviado exitosamente");
+        } catch (err) {
+          console.error("Error enviando correo:", err);
+        }
+      }
+
+      /***************************************
+       * INICIALIZACIÓN
+       ***************************************/
+
+      closeModal();
+
+      setTimeout(async () => {
+        const books = await getBooks();
+        renderBooks(books);
+      }, 1000);
+
+      document.getElementById("modalOverlay").addEventListener("click", (e) => {
+        if (e.target === e.currentTarget) closeModal();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (modalOpen && e.key === "Escape") closeModal();
+      });
+
+      qtty.addEventListener("input", function () {
+        this.value = Math.min(100, Math.max(1, this.value));
+      });
+
+      // Botón enviar
+      document
+        .querySelector(".modal-btn-primary")
+        .addEventListener("click", handleFormSubmit);
     </script>
-</body>
+  </body>
 </html>
