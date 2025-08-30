@@ -3,11 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Panel de Administración - Librería Azul</title>
+    <title>Panel de Administración - Librería I.B.R Miami</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap"
       rel="stylesheet"
     />
+     <link rel="shortcut icon" href="src/img/favicon.png" type="image/png" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
@@ -726,57 +727,62 @@ document.getElementById("enablePromo").addEventListener("change", (e) => {
       }
 
       // Función para guardar/actualizar un libro
-      async function saveBook(e) {
-        e.preventDefault();
+     async function saveBook(e) {
+  e.preventDefault();
 
-        try {
-          submitText.style.display = "none";
-          submitSpinner.style.display = "inline-block";
-          submitBtn.disabled = true;
-        
-const enabled = document.getElementById("enablePromo").checked;
-const promoPercent = document.getElementById("discount").value;
-const promoName = document.getElementById("promoname").value;
+  try {
+    submitText.style.display = "none";
+    submitSpinner.style.display = "inline-block";
+    submitBtn.disabled = true;
 
-const promo = enabled 
-    ? { name: promoName, discount: promoPercent } 
-    : firebase.firestore.FieldValue.delete();
+    const enabled = document.getElementById("enablePromo").checked;
+    const promoPercent = document.getElementById("discount").value;
+    const promoName = document.getElementById("promoname").value;
 
-console.log(promo);
-          const bookData = {
-            title: document.getElementById("title").value,
-            author: document.getElementById("author").value,
-            description: document.getElementById("description").value,
-            cover: document.getElementById("cover").value,
-            available: document.getElementById("available").value === "true",
-            price: document.getElementById("price").value,
-            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-            promo
-          };
+    const bookData = {
+      title: document.getElementById("title").value,
+      author: document.getElementById("author").value,
+      description: document.getElementById("description").value,
+      cover: document.getElementById("cover").value,
+      available: document.getElementById("available").value === "true",
+      price: document.getElementById("price").value,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
 
-          if (editingBookId) {
-            // Actualizar libro existente
-            await db.collection("books").doc(editingBookId).update(bookData);
-            showAlert("Libro actualizado con éxito");
-          } else {
-            // Crear nuevo libro
-            bookData.createdAt =
-              firebase.firestore.FieldValue.serverTimestamp();
-            await db.collection("books").add(bookData);
-            showAlert("Libro agregado con éxito");
-          }
+    if (editingBookId) {
+      // Actualizar libro existente
+      const docRef = db.collection("books").doc(editingBookId);
+      const docSnap = await docRef.get();
 
-          closeModal();
-          loadBooks();
-        } catch (error) {
-          console.error("Error al guardar libro:", error);
-          showAlert("Error al guardar el libro", "danger");
-        } finally {
-          submitText.style.display = "inline-block";
-          submitSpinner.style.display = "none";
-          submitBtn.disabled = false;
-        }
+      if (enabled) {
+        bookData.promo = { name: promoName, discount: promoPercent };
+      } else if (docSnap.exists && docSnap.data().promo !== undefined) {
+        bookData.promo = firebase.firestore.FieldValue.delete();
       }
+      
+      await docRef.update(bookData);
+      showAlert("Libro actualizado con éxito");
+    } else {
+      // Crear nuevo libro
+      if (enabled) {
+        bookData.promo = { name: promoName, discount: promoPercent };
+      }
+      bookData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection("books").add(bookData);
+      showAlert("Libro agregado con éxito");
+    }
+
+    closeModal();
+    loadBooks();
+  } catch (error) {
+    console.error("Error al guardar libro:", error);
+    showAlert("Error al guardar el libro", "danger");
+  } finally {
+    submitText.style.display = "inline-block";
+    submitSpinner.style.display = "none";
+    submitBtn.disabled = false;
+  }
+}
 
       // Función para eliminar un libro
       async function deleteBook(bookId) {
