@@ -411,7 +411,7 @@
         <div id="alert-container"></div>
 
         <div class="card">
-          <h2 class="card-title">Listado de Libros</h2>
+          <h2 id="bookList" class="card-title">Listado de Libros</h2>
           <div class="table-responsive">
             <table class="table">
               <thead>
@@ -577,6 +577,7 @@ document.getElementById("enablePromo").addEventListener("change", (e) => {
       const auth = firebase.auth();
 
       // Referencias a elementos del DOM
+      const bookList= document.getElementById("bookList");
       const booksTableBody = document.getElementById("books-table-body");
       const addBookBtn = document.getElementById("add-book-btn");
       const bookForm = document.getElementById("book-form");
@@ -644,6 +645,8 @@ document.getElementById("enablePromo").addEventListener("change", (e) => {
             '<tr><td colspan="6" style="text-align: center;">Cargando libros...</td></tr>';
 
           const querySnapshot = await db.collection("books").get();
+          alert(querySnapshot.size);
+          bookList.innerText += ` (${querySnapshot.size})`;
 
           if (querySnapshot.empty) {
             booksTableBody.innerHTML =
@@ -652,7 +655,6 @@ document.getElementById("enablePromo").addEventListener("change", (e) => {
           }
 
           booksTableBody.innerHTML = "";
-
           querySnapshot.forEach((doc) => {
             const book = doc.data();
             const row = document.createElement("tr");
