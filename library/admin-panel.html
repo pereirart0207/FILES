@@ -271,6 +271,7 @@
         border-radius: 20px;
         font-size: 0.8rem;
         font-weight: 600;
+        cursor: pointer;
       }
 
       .badge-success {
@@ -645,8 +646,7 @@ document.getElementById("enablePromo").addEventListener("change", (e) => {
             '<tr><td colspan="6" style="text-align: center;">Cargando libros...</td></tr>';
 
           const querySnapshot = await db.collection("books").get();
-          alert(querySnapshot.size);
-          bookList.innerText += ` (${querySnapshot.size})`;
+          bookList.innerText = `Listado de Libros (${querySnapshot.size})`;
 
           if (querySnapshot.empty) {
             booksTableBody.innerHTML =
@@ -662,43 +662,39 @@ document.getElementById("enablePromo").addEventListener("change", (e) => {
             // Obtener link "directo" para mostrar la imagen
             
 
-            row.innerHTML = `
-                <td>
-                    <img src="${book.cover}" 
-                         alt="${book.title}" 
-                         style="width: 50px; height: 70px; object-fit: cover; border-radius:4px;"/>
-                </td>
-                <td>${book.title}</td>
-                <td>
-                ${
-                    book.promo
-                    ? `<s>$${book.price}</s> $${(parseFloat(book.price) * (1 - book.promo.discount / 100)).toFixed(2)} <span class="promo-badge">${book.promo.name}</span>`
-                    : `$${book.price}`
-                }
-                </td>
-                <td>${book.author}</td>
-                <td>
-                    <span class="badge ${
-                      book.available ? "badge-success" : "badge-danger"
-                    }">
-                        ${book.available ? "Disponible" : "No disponible"}
-                    </span>
-                </td>
-                <td>
-                    <div class="action-btns">
-                        <button class="btn btn-warning edit-btn" data-id="${
-                          doc.id
-                        }">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-danger delete-btn" data-id="${
-                          doc.id
-                        }">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            `;
+        row.innerHTML = `
+  <td>
+      <img src="${book.cover}" 
+           alt="${book.title}" 
+           style="width: 50px; height: 70px; object-fit: cover; border-radius:4px;"/>
+  </td>
+  <td>${book.title}</td>
+  <td>
+  ${
+      book.promo
+      ? `<s>$${book.price}</s> $${(parseFloat(book.price) * (1 - book.promo.discount / 100)).toFixed(2)} <span class="promo-badge">${book.promo.name}</span>`
+      : `$${book.price}`
+  }
+  </td>
+  <td>${book.author}</td>
+  <td>
+      <span class="badge ${book.available ? "badge-success" : "badge-danger"} toggle-availability" 
+            data-id="${doc.id}" 
+            data-available="${book.available}">
+          ${book.available ? "Disponible" : "No disponible"}
+      </span>
+  </td>
+  <td>
+      <div class="action-btns">
+          <button class="btn btn-warning edit-btn" data-id="${doc.id}">
+              <i class="fas fa-edit"></i>
+          </button>
+          <button class="btn btn-danger delete-btn" data-id="${doc.id}">
+              <i class="fas fa-trash"></i>
+          </button>
+      </div>
+  </td>
+`;
 
             booksTableBody.appendChild(row);
           });
@@ -713,6 +709,30 @@ document.getElementById("enablePromo").addEventListener("change", (e) => {
               openModal({ id: btn.dataset.id, ...doc.data() });
             });
           });
+
+
+
+          // Toggle disponibilidad
+          document.querySelectorAll(".toggle-availability").forEach((span) => {
+            span.addEventListener("click", async () => {
+              const id = span.dataset.id;
+              const currentAvailable = span.dataset.available === "true";
+
+              try {
+                await db.collection("books").doc(id).update({
+                  available: !currentAvailable
+                });
+
+                // Refrescar la tabla
+                loadBooks();
+              } catch (error) {
+                console.error("Error al actualizar disponibilidad:", error);
+                alert("Error al cambiar disponibilidad");
+              }
+            });
+          });
+
+
 
           document.querySelectorAll(".delete-btn").forEach((btn) => {
             btn.addEventListener("click", () => {
@@ -785,6 +805,12 @@ document.getElementById("enablePromo").addEventListener("change", (e) => {
     submitBtn.disabled = false;
   }
 }
+
+
+
+
+
+
 
       // Función para eliminar un libro
       async function deleteBook(bookId) {
