@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="../puncto_images/logo.png?raw=true">
+    <title>Conversor PUNCTO</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --border: #475569;
+            --success: #10b981;
+            --error: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary), #0a0f1c);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        
+        .logo-container {
+            width: 100%;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--bg-tertiary);
+            overflow: hidden;
+            position: relative;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            transition: transform 0.5s ease;
+        }
+        
+        .logo-container:hover img {
+            transform: scale(1.05);
+        }
+        
+        header {
+            background-color: var(--bg-tertiary);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        main {
+            padding: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        
+        .result-container {
+            background-color: var(--bg-primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+        }
+        
+        .result-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        #out {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--accent);
+            word-break: break-all;
+            min-height: 40px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 14px 20px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        button.secondary {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        button.secondary:hover {
+            background-color: var(--border);
+        }
+        
+        footer {
+            padding: 15px 30px;
+            background-color: var(--bg-tertiary);
+            border-top: 1px solid var(--border);
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background-color: var(--success);
+            color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.error {
+            background-color: var(--error);
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            main {
+                padding: 20px;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            #out {
+                font-size: 1.5rem;
+            }
+            
+            .logo-container {
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img src="../puncto_images/logo.png?raw=true" alt="Logo PUNCTO">
+        </div>
+        
+        
+        <main>
+            <div class="input-group">
+                <label for="dec">Número decimal</label>
+                <input id="dec" type="text" inputmode="numeric" placeholder="Ingrese un número decimal" autofocus>
+            </div>
+            
+            <div class="result-container">
+                <div class="result-label">Hexadecimal Invertido</div>
+                <div id="out">—</div>
+            </div>
+            
+            <div class="actions">
+                <button id="convert-btn" class="primary">Convertir</button>
+                <button id="copy-btn" class="secondary">Copiar</button>
+            </div>
+        </main>
+        
+        <footer>
+            <p>Si usas un lector convencional decimal a 13.56 MHz conéctalo a este equipo y acerca la tarjeta antes de introducirla en la plataforma de fichaje.  
+  La tarjeta se copiará automáticamente en el portapapeles.</p>
+        </footer>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+
+    <script>
+        const dec = document.getElementById('dec');
+        const out = document.getElementById('out');
+        const convertBtn = document.getElementById('convert-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const notification = document.getElementById('notification');
+        
+        // Función para mostrar notificación
+        function showNotification(message, isError = false) {
+            notification.textContent = message;
+            notification.className = 'notification';
+            
+            if (isError) {
+                notification.classList.add('error');
+            }
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Función para convertir a hexadecimal
+        function toHex(n) { 
+            return Number(n).toString(16).toUpperCase(); 
+        }
+        
+        // Función para rellenar con ceros si es necesario
+        function pad(s) { 
+            return s.length % 2 ? '0' + s : s; 
+        }
+        
+        // Función para invertir los bytes
+        function reverseBytes(s) {
+            s = pad(s);
+            return (s.match(/.{1,2}/g) || []).reverse().join('');
+        }
+        
+        // Función principal de conversión
+        function convert() {
+            const val = dec.value.trim();
+            
+            // Validar entrada
+            if (!/^-?\d+$/.test(val)) { 
+                out.textContent = '—';
+                showNotification('Por favor, ingrese un número decimal válido', true);
+                return; 
+            }
+            
+            // Realizar conversión
+            const hex = toHex(val);
+            const inv = reverseBytes(hex);
+            out.textContent = inv;
+            
+            // Copiar al portapapeles
+            try {
+                navigator.clipboard.writeText(inv);
+                showNotification('¡Convertido y copiado al portapapeles!');
+            } catch(e) { 
+                console.warn('No se pudo copiar', e);
+                showNotification('Convertido, pero no se pudo copiar', true);
+            }
+            
+            // Limpiar campo de entrada
+            dec.value = '';
+            dec.focus();
+        }
+        
+        // Función para copiar resultado
+        function copyResult() {
+            const result = out.textContent;
+            if (result !== '—') {
+                try {
+                    navigator.clipboard.writeText(result);
+                    showNotification('Resultado copiado al portapapeles');
+                } catch(e) {
+                    console.warn('No se pudo copiar', e);
+                    showNotification('No se pudo copiar el resultado', true);
+                }
+            } else {
+                showNotification('No hay resultado para copiar', true);
+            }
+        }
+        
+        // Event listeners
+        dec.addEventListener('keydown', e => {
+            if (e.key === 'Enter') convert();
+        });
+        
+        convertBtn.addEventListener('click', convert);
+        copyBtn.addEventListener('click', copyResult);
+    </script>
+</body>
+</html>
