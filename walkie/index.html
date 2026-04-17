@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0b0f14" />
+    <title data-i18n="app_title">Walkie · Voz por MQTT</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="./assets/app.css" />
+  </head>
+
+  <body>
+    <main class="app device">
+      <header class="top">
+        <div class="brand">
+          <div class="icon" aria-hidden="true">
+            <i class="fa-solid fa-walkie-talkie"></i>
+          </div>
+          <div>
+            <h1>WALKIE</h1>
+            <div class="sub" data-i18n="brand_sub">Voz rápida para divertirte con amigos</div>
+          </div>
+        </div>
+
+        <div class="topRight">
+          <div class="status" id="status" data-state="bad" aria-live="polite">
+            <span class="dot" aria-hidden="true"></span>
+            <span id="statusText" data-i18n="status_offline">offline</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="screen" id="screen" aria-label="Display">
+        <div class="screenRow">
+          <span class="screenK" data-i18n="screen_ch">CANAL</span>
+          <span class="screenV" id="screenChannel">1</span>
+          <span class="screenSep" aria-hidden="true">·</span>
+          <span class="screenK" data-i18n="screen_users">USUARIOS</span>
+          <span class="screenV" id="screenUsers">1</span>
+        </div>
+        <div class="screenRow screenRow2">
+          <span class="screenK" data-i18n="screen_speaking">HABLA</span>
+          <span class="screenV" id="screenSpeaker" data-i18n="speaker_idle">—</span>
+        </div>
+        <div class="screenHint" id="screenHint" aria-live="polite"></div>
+      </section>
+
+      <div class="content">
+        <section class="card" aria-label="Configuración">
+          <div class="grid">
+            <div class="field">
+              <label for="username"
+                ><span data-i18n="label_user">Usuario</span>
+                <span class="hint" data-i18n="hint_saved">se guarda</span></label
+              >
+              <input
+                id="username"
+                autocomplete="nickname"
+                data-i18n-attr="placeholder"
+                data-i18n="ph_user"
+                placeholder="Tu nombre (opcional)"
+              />
+            </div>
+            <div class="field">
+              <label for="channel">
+                <span data-i18n="label_channel">Canal</span>
+                <span class="hint" id="channelBadge">canal: 1</span>
+              </label>
+
+              <div class="dial" id="dial" aria-label="Selector de canal">
+                <input
+                  id="channel"
+                  type="range"
+                  min="1"
+                  max="100"
+                  step="1"
+                  value="1"
+                  aria-label="Canal"
+                />
+                <button
+                  id="dialKnob"
+                  class="dialKnob"
+                  type="button"
+                  role="slider"
+                  aria-label="Canal"
+                  aria-valuemin="1"
+                  aria-valuemax="100"
+                  aria-valuenow="1"
+                  aria-valuetext="Canal 1"
+                >
+                  <span class="dialTicks" aria-hidden="true"></span>
+                  <span class="dialPointer" aria-hidden="true"></span>
+                </button>
+                <div class="dialReadout">
+                  <span class="dialLabel" data-i18n="channel_readout">CH</span>
+                  <span class="dialValue" id="channelValue">1</span>
+                </div>
+                <input
+                  id="channelAlt"
+                  class="dialAlt"
+                  type="range"
+                  min="1"
+                  max="100"
+                  step="1"
+                  value="1"
+                  aria-label="Canal (slider)"
+                />
+              </div>
+            </div>
+          </div>
+
+          <details>
+            <summary data-i18n="advanced">Opciones avanzadas</summary>
+            <div class="field" style="margin-top: 10px">
+              <label for="lang"><span data-i18n="lang_label">Idioma</span></label>
+              <select id="lang" class="lang" data-i18n-attr="aria-label" data-i18n="lang_label" aria-label="Idioma">
+                <option value="es">ES</option>
+                <option value="en">EN</option>
+              </select>
+            </div>
+            <div class="field" style="margin-top: 10px">
+              <label for="broker"><span data-i18n="label_broker">Broker MQTT</span> <span class="hint">WSS</span></label>
+              <input id="broker" data-i18n-attr="placeholder" data-i18n="ph_broker" placeholder="wss://…" />
+            </div>
+          </details>
+        </section>
+
+        <section class="pttWrap" aria-label="Push to talk" data-i18n-attr="aria-label" data-i18n="ptt_aria">
+          <button
+            class="ptt"
+            id="ptt"
+            type="button"
+            data-rec="0"
+            aria-pressed="false"
+            disabled
+          >
+            <span class="recDot" aria-hidden="true"></span>
+            <span data-i18n="ptt_hold">Mantén para hablar</span>
+            <i class="fa-solid fa-microphone" aria-hidden="true"></i>
+          </button>
+          <div class="pttHelp">
+            <span
+              ><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i>
+              <span data-i18n="help_hold">Mantén pulsado</span></span
+            >
+            <span
+              ><i class="fa-solid fa-keyboard" aria-hidden="true"></i>
+              <span data-i18n="help_space">Tecla Espacio</span></span
+            >
+            <span
+              ><i class="fa-solid fa-clock" aria-hidden="true"></i>
+              <span data-i18n="help_max">máx. 6s</span></span
+            >
+          </div>
+        </section>
+      </div>
+
+      <footer class="footer">
+        <span data-i18n="footer_tip">Tip: comparte el canal con tus amigos</span>
+        <span data-i18n="footer_demo">Walkie MQTT · demo</span>
+      </footer>
+    </main>
+
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <script type="module" src="./assets/app.js"></script>
+  </body>
+</html>
