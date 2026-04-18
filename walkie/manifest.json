@@ -1,0 +1,17 @@
+{
+  "background_color": "#040065",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "WalkieApp",
+  "orientation": "any",
+  "scope": "/index.html",
+  "short_name": "WalkieApp",
+  "start_url": "/index.html",
+  "theme_color": "#0b0f14",
+  "id": "tonywalkie.app",
+  "description": "an app to enjoy talking with friends for free",
+  "categories": [
+    "social",
+    "utilities"
+  ]
+}
