@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
@@ -11,6 +11,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
     />
     <link rel="stylesheet" href="./assets/app.css" />
+    <link rel="favicon" href="icon.png" />
   </head>
 
   <body>
@@ -22,7 +23,9 @@
           </div>
           <div>
             <h1>WALKIE</h1>
-            <div class="sub" data-i18n="brand_sub">Voz rápida para divertirte con amigos</div>
+            <div class="sub" data-i18n="brand_sub">
+              Voz rápida para divertirte con amigos
+            </div>
           </div>
         </div>
 
@@ -44,7 +47,9 @@
         </div>
         <div class="screenRow screenRow2">
           <span class="screenK" data-i18n="screen_speaking">HABLA</span>
-          <span class="screenV" id="screenSpeaker" data-i18n="speaker_idle">—</span>
+          <span class="screenV" id="screenSpeaker" data-i18n="speaker_idle"
+            >—</span
+          >
         </div>
         <div class="screenHint" id="screenHint" aria-live="polite"></div>
       </section>
@@ -55,7 +60,9 @@
             <div class="field">
               <label for="username"
                 ><span data-i18n="label_user">Usuario</span>
-                <span class="hint" data-i18n="hint_saved">se guarda</span></label
+                <span class="hint" data-i18n="hint_saved"
+                  >se guarda</span
+                ></label
               >
               <input
                 id="username"
@@ -116,20 +123,41 @@
           <details>
             <summary data-i18n="advanced">Opciones avanzadas</summary>
             <div class="field" style="margin-top: 10px">
-              <label for="lang"><span data-i18n="lang_label">Idioma</span></label>
-              <select id="lang" class="lang" data-i18n-attr="aria-label" data-i18n="lang_label" aria-label="Idioma">
+              <label for="lang"
+                ><span data-i18n="lang_label">Idioma</span></label
+              >
+              <select
+                id="lang"
+                class="lang"
+                data-i18n-attr="aria-label"
+                data-i18n="lang_label"
+                aria-label="Idioma"
+              >
                 <option value="es">ES</option>
                 <option value="en">EN</option>
               </select>
             </div>
             <div class="field" style="margin-top: 10px">
-              <label for="broker"><span data-i18n="label_broker">Broker MQTT</span> <span class="hint">WSS</span></label>
-              <input id="broker" data-i18n-attr="placeholder" data-i18n="ph_broker" placeholder="wss://…" />
+              <label for="broker"
+                ><span data-i18n="label_broker">Broker MQTT</span>
+                <span class="hint">WSS</span></label
+              >
+              <input
+                id="broker"
+                data-i18n-attr="placeholder"
+                data-i18n="ph_broker"
+                placeholder="wss://…"
+              />
             </div>
           </details>
         </section>
 
-        <section class="pttWrap" aria-label="Push to talk" data-i18n-attr="aria-label" data-i18n="ptt_aria">
+        <section
+          class="pttWrap"
+          aria-label="Push to talk"
+          data-i18n-attr="aria-label"
+          data-i18n="ptt_aria"
+        >
           <button
             class="ptt"
             id="ptt"
@@ -160,7 +188,9 @@
       </div>
 
       <footer class="footer">
-        <span data-i18n="footer_tip">Tip: comparte el canal con tus amigos</span>
+        <span data-i18n="footer_tip"
+          >Tip: comparte el canal con tus amigos</span
+        >
         <span data-i18n="footer_demo">Walkie MQTT · demo</span>
       </footer>
     </main>
