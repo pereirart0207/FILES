@@ -80,6 +80,16 @@ const I18N = Object.freeze({
     err_mqtt_prefix: "MQTT:",
 
     sfx_click: "Click",
+
+    call_outgoing: "Llamando...",
+    call_incoming: "llamada entrante",
+    call_accept: "Aceptar",
+    call_reject: "Rechazar",
+    call_hangup: "Colgar",
+    call_connected: "Llamada conectada",
+    call_ended: "Llamada finalizada",
+    call_no_answer: "No contesta",
+    call_timeout: "Tiempo de espera agotado",
   },
   en: {
     app_title: "Walkie · Voice over MQTT",
@@ -142,6 +152,16 @@ const I18N = Object.freeze({
     err_mqtt_prefix: "MQTT:",
 
     sfx_click: "Click",
+
+    call_outgoing: "Calling...",
+    call_incoming: "incoming call",
+    call_accept: "Accept",
+    call_reject: "Reject",
+    call_hangup: "Hang up",
+    call_connected: "Call connected",
+    call_ended: "Call ended",
+    call_no_answer: "No answer",
+    call_timeout: "Call timeout",
   },
 });
 
@@ -559,6 +579,15 @@ class WalkieApp {
     this.oneTouchActive = false;
     this.callModeActive = false;
     this.activeCallPartner = null;
+
+    // Sistema de llamadas
+    this.callState = "idle"; // idle, outgoing, incoming, active
+    this.callPartnerId = null;
+    this.callPartnerName = null;
+    this.callStartTime = null;
+    this.callTimer = null;
+    this.callTimeoutTimer = null;
+    this.callRingInterval = null;
   }
 
   setHint(text, ms = 2200) {
@@ -955,6 +984,7 @@ class WalkieApp {
     if (!this.client || !this.connected) return;
     this.updateRoomUi();
 
+    // Suscribirse a presencia
     const pattern = `${this.presenceTopicBase}/+`;
     const previous = this._subscribedPresenceTopic;
     if (previous && previous !== pattern) {
@@ -969,8 +999,17 @@ class WalkieApp {
         return;
       }
       this._subscribedPresenceTopic = pattern;
-      // Actualiza conteo aunque no haya mensajes todavía.
       this.updatePresenceUi();
+    });
+
+    // ✅ SUSCRIBIRSE A TEMAS DE LLAMADAS PROPIOS
+    const callPattern = `${this.presenceTopicBase}/call/${this.senderId}`;
+    this.client.subscribe(callPattern, (err) => {
+      if (err) {
+        this.logger.error(`Error suscribiendose a llamadas: ${err}`);
+        return;
+      }
+      this.logger.system(`Sistema de llamadas activo ✓`);
     });
   }
 
@@ -1085,10 +1124,251 @@ class WalkieApp {
     }
 
     this.els.callModal.setAttribute("aria-hidden", "false");
+
+    // Añadir eventos a botones de llamada
+    document.querySelectorAll(".userCallBtn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const userId = btn.dataset.userId;
+        this.closeCallModal();
+        this.initiateCall(userId);
+      });
+    });
   }
 
   closeCallModal() {
     this.els.callModal.setAttribute("aria-hidden", "true");
+  }
+
+  // ========== SISTEMA DE LLAMADAS ==========
+
+  initiateCall(userId) {
+    if (this.callState !== "idle") return;
+
+    const user = this.presence.get(userId);
+    if (!user) return;
+
+    this.callState = "outgoing";
+    this.callPartnerId = userId;
+    this.callPartnerName = user.from;
+
+    this.setHint(this.i18n.t("call_outgoing") + ` ${user.from}`);
+    this.logger.system(`${this.i18n.t("call_outgoing")} ${user.from}`);
+
+    // Enviar solicitud de llamada
+    this.sendCallMessage(userId, "request");
+
+    // Timeout 30 segundos
+    this.callTimeoutTimer = setTimeout(() => {
+      this.endCall("timeout");
+    }, 30000);
+
+    // Sonido de llamada saliente
+    this.playRingTone(true);
+  }
+
+  handleIncomingCall(fromId, fromName) {
+    if (this.callState !== "idle") {
+      // Ya estamos en llamada, rechazar automaticamente
+      this.sendCallMessage(fromId, "busy");
+      return;
+    }
+
+    this.callState = "incoming";
+    this.callPartnerId = fromId;
+    this.callPartnerName = fromName;
+
+    // Mostrar modal de llamada entrante
+    this.showIncomingCallModal(fromName);
+
+    // Sonido de llamada entrante
+    this.playRingTone(false);
+
+    this.logger.system(`${this.i18n.t("call_incoming")}: ${fromName}`);
+
+    // Timeout 30 segundos
+    this.callTimeoutTimer = setTimeout(() => {
+      this.endCall("timeout");
+    }, 30000);
+  }
+
+  acceptCall() {
+    if (this.callState !== "incoming") return;
+
+    clearTimeout(this.callTimeoutTimer);
+    this.stopRingTone();
+
+    this.callState = "active";
+    this.callStartTime = Date.now();
+
+    this.sendCallMessage(this.callPartnerId, "accept");
+    this.logger.system(this.i18n.t("call_connected"));
+
+    // ✅ AMBOS lados activan MODO LLAMADA FULL DUPLEX
+    this.oneTouchActive = true;
+    this.callModeActive = true;
+    this.els.pttOnetouch.dataset.active = "1";
+    this.els.pttOnetouch.querySelector("i").className =
+      "fa-solid fa-phone-volume";
+
+    // Iniciar transmisión CONTINUA automaticamente
+    this.onPressStart(null);
+
+    // Iniciar contador de tiempo
+    this.startCallTimer();
+
+    this.setHint(`${this.i18n.t("call_connected")} ${this.callPartnerName}`);
+  }
+
+  rejectCall() {
+    if (this.callState !== "incoming") return;
+
+    clearTimeout(this.callTimeoutTimer);
+    this.stopRingTone();
+
+    this.sendCallMessage(this.callPartnerId, "reject");
+    this.logger.system(`${this.i18n.t("call_reject")} ${this.callPartnerName}`);
+
+    this.resetCallState();
+  }
+
+  endCall(reason = "user") {
+    clearTimeout(this.callTimeoutTimer);
+    this.stopRingTone();
+    this.stopCallTimer();
+
+    if (this.callState === "active") {
+      // Desactivar modo llamada
+      this.oneTouchActive = false;
+      this.callModeActive = false;
+      this.els.pttOnetouch.dataset.active = "0";
+      this.els.pttOnetouch.querySelector("i").className =
+        "fa-solid fa-lock-open";
+      this.onPressEnd();
+    }
+
+    if (this.callPartnerId && this.callState !== "idle") {
+      this.sendCallMessage(this.callPartnerId, "end");
+    }
+
+    let message = this.i18n.t("call_ended");
+    if (reason === "timeout") message = this.i18n.t("call_timeout");
+    if (reason === "no_answer") message = this.i18n.t("call_no_answer");
+
+    this.logger.system(message);
+    this.setHint(message);
+
+    this.resetCallState();
+  }
+
+  resetCallState() {
+    this.callState = "idle";
+    this.callPartnerId = null;
+    this.callPartnerName = null;
+    this.callStartTime = null;
+
+    this.hideIncomingCallModal();
+  }
+
+  sendCallMessage(targetId, type) {
+    if (!this.client || !this.connected) return;
+
+    const topic = `${this.presenceTopicBase}/call/${targetId}`;
+    const username = clampStr(this.els.username.value || "anon", 24);
+
+    const payload = JSON.stringify({
+      type,
+      fromId: this.senderId,
+      from: username,
+      ts: Date.now(),
+    });
+
+    this.client.publish(topic, payload);
+  }
+
+  playRingTone(isOutgoing) {
+    if (!this.audioGate.ctx) return;
+
+    let beepCount = 0;
+    this.callRingInterval = setInterval(
+      () => {
+        if (isOutgoing) {
+          // Tono llamada saliente: beep cada 2s
+          playBeep(this.audioGate.ctx, 440, 100);
+        } else {
+          // Tono llamada entrante: doble beep
+          playBeep(this.audioGate.ctx, 880, 150);
+          setTimeout(() => playBeep(this.audioGate.ctx, 880, 150), 200);
+        }
+        beepCount++;
+      },
+      isOutgoing ? 2000 : 1500
+    );
+  }
+
+  stopRingTone() {
+    if (this.callRingInterval) {
+      clearInterval(this.callRingInterval);
+      this.callRingInterval = null;
+    }
+  }
+
+  startCallTimer() {
+    this.callTimer = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - this.callStartTime) / 1000);
+      const minutes = Math.floor(elapsed / 60);
+      const seconds = elapsed % 60;
+      const timeStr = `${minutes.toString().padStart(2, "0")}:${seconds
+        .toString()
+        .padStart(2, "0")}`;
+
+      this.setHint(`${this.callPartnerName} · ${timeStr}`, 1500);
+    }, 1000);
+  }
+
+  stopCallTimer() {
+    if (this.callTimer) {
+      clearInterval(this.callTimer);
+      this.callTimer = null;
+    }
+  }
+
+  showIncomingCallModal(fromName) {
+    // Implementacion modal llamada entrante
+    const modal = document.createElement("div");
+    modal.id = "incomingCallModal";
+    modal.className = "callModalOverlay";
+    modal.innerHTML = `
+      <div class="callModal">
+        <div class="callAvatar">
+          <i class="fa-solid fa-user fa-3x"></i>
+        </div>
+        <div class="callName">${fromName}</div>
+        <div class="callStatus">${this.i18n.t("call_incoming")}</div>
+        <div class="callActions">
+          <button class="callBtn rejectBtn" id="rejectCallBtn">
+            <i class="fa-solid fa-phone-slash"></i>
+          </button>
+          <button class="callBtn acceptBtn" id="acceptCallBtn">
+            <i class="fa-solid fa-phone"></i>
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document
+      .getElementById("acceptCallBtn")
+      .addEventListener("click", () => this.acceptCall());
+    document
+      .getElementById("rejectCallBtn")
+      .addEventListener("click", () => this.rejectCall());
+  }
+
+  hideIncomingCallModal() {
+    const modal = document.getElementById("incomingCallModal");
+    if (modal) modal.remove();
   }
 
   updatePresenceUi() {
@@ -1113,6 +1393,66 @@ class WalkieApp {
 
   onMessage(topic, payload) {
     const topicStr = String(topic || "");
+
+    // Detectar mensajes de llamada
+    if (topicStr.includes(`/call/${this.senderId}`)) {
+      const data = safeJsonParse(payload.toString());
+      if (!data || !data.fromId || !data.type) return;
+
+      if (data.fromId === this.senderId) return;
+
+      switch (data.type) {
+        case "request":
+          this.handleIncomingCall(data.fromId, data.from);
+          break;
+        case "accept":
+          if (this.callState === "outgoing") {
+            clearTimeout(this.callTimeoutTimer);
+            this.stopRingTone();
+            this.callState = "active";
+            this.callStartTime = Date.now();
+
+            // ✅ AMBOS lados activan MODO LLAMADA FULL DUPLEX
+            this.oneTouchActive = true;
+            this.callModeActive = true;
+            this.els.pttOnetouch.dataset.active = "1";
+            this.els.pttOnetouch.querySelector("i").className =
+              "fa-solid fa-phone-volume";
+
+            // Iniciar transmisión CONTINUA automaticamente
+            this.onPressStart(null);
+
+            this.startCallTimer();
+            this.logger.system(this.i18n.t("call_connected"));
+            this.setHint(`${this.i18n.t("call_connected")} ${data.from}`);
+          }
+          break;
+        case "reject":
+          if (this.callState === "outgoing") {
+            clearTimeout(this.callTimeoutTimer);
+            this.stopRingTone();
+            this.logger.system(`${this.i18n.t("call_reject")} ${data.from}`);
+            this.setHint(`${this.i18n.t("call_reject")}`);
+            this.resetCallState();
+          }
+          break;
+        case "end":
+          if (this.callState !== "idle") {
+            this.endCall();
+          }
+          break;
+        case "busy":
+          if (this.callState === "outgoing") {
+            clearTimeout(this.callTimeoutTimer);
+            this.stopRingTone();
+            this.logger.system(`${data.from} ${this.i18n.t("call_busy")}`);
+            this.setHint(`${data.from} esta ocupado`);
+            this.resetCallState();
+          }
+          break;
+      }
+      return;
+    }
 
     if (
       this.presenceTopicBase &&

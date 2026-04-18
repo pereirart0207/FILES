@@ -213,13 +213,34 @@
       <div class="modalContent">
         <div class="modalHeader">
           <h3>📞 Llamada privada</h3>
-          <button class="modalClose" id="callModalClose">
-            <i class="fa-solid fa-xmark"></i>
-          </button>
+          <button class="modalClose" id="callModalClose"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="modalBody" id="callModalBody">
           <div class="usersList" id="usersList"></div>
         </div>
+      </div>
+    </div>
+    
+    <!-- Modal Llamada Entrante -->
+    <div class="modal" id="incomingCallModal" aria-hidden="true">
+      <div class="modalBackdrop"></div>
+      <div class="modalContent callModalActive">
+        <div style="padding: 30px 20px; text-align:center;">
+          <div class="callingAnimation">📞</div>
+          <h3 style="margin: 10px 0 6px;" id="incomingCallName">Usuario</h3>
+          <p style="opacity: .7; margin: 0 0 24px;">Llamada entrante</p>
+          
+          <div style="display:flex; gap: 16px; justify-content:center;">
+            <button class="callBtn callBtnReject" id="callRejectBtn">
+              <i class="fa-solid fa-phone-slash"></i>
+            </button>
+            <button class="callBtn callBtnAccept" id="callAcceptBtn">
+              <i class="fa-solid fa-phone"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
       </div>
     </div>
 
