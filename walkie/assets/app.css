@@ -740,3 +740,27 @@ summary{
 @media (prefers-reduced-motion: reduce){
   *{ animation: none !important; transition: none !important; }
 }
+
+/* Interfaz llamada activa */
+.activeCallScreen .callAvatar {
+  animation: none;
+  box-shadow: 0 0 0 12px rgba(61, 220, 151, .15), 0 0 0 6px rgba(61, 220, 151, .3);
+  border-color: var(--ok);
+}
+
+.callTimer {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas;
+  font-size: 48px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  opacity: .9;
+  margin-top: 8px;
+}
+
+.hangupBtn {
+  background: var(--danger);
+  color: #fff;
+  width: 80px !important;
+  height: 80px !important;
+  font-size: 28px !important;
+}
