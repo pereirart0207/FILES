@@ -420,6 +420,25 @@ summary{
   50%{ transform: scale(1.35); opacity: 1; }
 }
 
+.ptt-onetouch {
+  min-height: 60px;
+  display: none;
+  background: rgba(0,194,255,.08);
+  border-color: rgba(0,194,255,.20);
+}
+
+.ptt-onetouch[data-active="1"] {
+  transform: scale(.97);
+  border-color: var(--accent-2);
+  box-shadow: inset 0 0 20px rgba(0,194,255,.30), 0 0 0 4px rgba(0,194,255,.16);
+}
+
+@media (pointer: coarse) {
+  .ptt-onetouch {
+    display: flex;
+  }
+}
+
 .pttHelp{
   display:flex;
   justify-content:space-between;

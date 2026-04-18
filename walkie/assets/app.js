@@ -69,7 +69,8 @@ const I18N = Object.freeze({
     err_audio_long: "Audio demasiado largo. Prueba a hablar menos tiempo.",
     err_mic_denied: "Permiso de micrófono denegado.",
     err_mic_start: "No se pudo iniciar el micrófono.",
-    sys_audio_received_tap: "Audio recibido (toca la pantalla para habilitar sonido).",
+    sys_audio_received_tap:
+      "Audio recibido (toca la pantalla para habilitar sonido).",
     err_audio_unsupported: "Formato de audio no compatible en este navegador.",
     err_audio_play: "No se pudo reproducir el audio.",
     log_voice_received: "Mensaje de voz recibido",
@@ -205,11 +206,17 @@ function safeJsonParse(text) {
 }
 
 function nowTime() {
-  return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  return new Date().toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
 }
 
 function normalizeChannel(input) {
-  const digits = String(input ?? "").trim().replace(/[^\d]/g, "");
+  const digits = String(input ?? "")
+    .trim()
+    .replace(/[^\d]/g, "");
   const n = Number.parseInt(digits, 10);
   if (!Number.isFinite(n)) return DEFAULTS.channel;
   const clamped = Math.max(1, Math.min(100, n));
@@ -225,7 +232,9 @@ function getOrCreateSenderId() {
   const key = "walkie.senderId";
   const existing = localStorage.getItem(key);
   if (existing) return existing;
-  const id = (crypto?.randomUUID?.() ?? `id_${Math.random().toString(16).slice(2)}_${Date.now()}`);
+  const id =
+    crypto?.randomUUID?.() ??
+    `id_${Math.random().toString(16).slice(2)}_${Date.now()}`;
   localStorage.setItem(key, id);
   return id;
 }
@@ -428,7 +437,11 @@ class AudioRecorder {
 
     this.stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-    const preferredTypes = ["audio/mp4", "audio/webm;codecs=opus", "audio/webm"];
+    const preferredTypes = [
+      "audio/mp4",
+      "audio/webm;codecs=opus",
+      "audio/webm",
+    ];
     const options = {};
     for (const t of preferredTypes) {
       if (window.MediaRecorder?.isTypeSupported?.(t)) {
@@ -458,12 +471,17 @@ class AudioRecorder {
 
   async stop() {
     clearTimeout(this.stopTimer);
-    if (!this.mediaRecorder || this.mediaRecorder.state === "inactive") return null;
+    if (!this.mediaRecorder || this.mediaRecorder.state === "inactive")
+      return null;
 
     const blob = await new Promise((resolve) => {
       const onStop = () => {
         this.mediaRecorder.removeEventListener("stop", onStop);
-        resolve(new Blob(this.chunks, { type: this.mediaRecorder.mimeType || "audio/webm" }));
+        resolve(
+          new Blob(this.chunks, {
+            type: this.mediaRecorder.mimeType || "audio/webm",
+          })
+        );
       };
       this.mediaRecorder.addEventListener("stop", onStop);
       this.mediaRecorder.stop();
@@ -482,7 +500,9 @@ class AudioRecorder {
 class WalkieApp {
   constructor() {
     this.senderId = getOrCreateSenderId();
-    this.sessionId = (crypto?.randomUUID?.() ?? `sess_${Math.random().toString(16).slice(2)}_${Date.now()}`);
+    this.sessionId =
+      crypto?.randomUUID?.() ??
+      `sess_${Math.random().toString(16).slice(2)}_${Date.now()}`;
 
     this.els = {
       status: $("#status"),
@@ -493,6 +513,7 @@ class WalkieApp {
       broker: $("#broker"),
       log: $maybe("#log"),
       ptt: $("#ptt"),
+      pttOnetouch: $("#pttOnetouch"),
       channelBadge: $("#channelBadge"),
       lang: $("#lang"),
       usersCount: $maybe("#usersCount"),
@@ -530,6 +551,8 @@ class WalkieApp {
     this.recording = false;
     this.keyHeld = false;
     this._subscribedTopic = "";
+
+    this.oneTouchActive = false;
   }
 
   setHint(text, ms = 2200) {
@@ -543,12 +566,14 @@ class WalkieApp {
   }
 
   init() {
-    const storedBroker = localStorage.getItem("walkie.brokerUrl") ?? DEFAULTS.brokerUrl;
+    const storedBroker =
+      localStorage.getItem("walkie.brokerUrl") ?? DEFAULTS.brokerUrl;
     const storedChannel =
       localStorage.getItem("walkie.channel") ??
       localStorage.getItem("walkie.room") ??
       DEFAULTS.channel;
-    const storedUsername = localStorage.getItem("walkie.username") ?? DEFAULTS.username;
+    const storedUsername =
+      localStorage.getItem("walkie.username") ?? DEFAULTS.username;
 
     this.els.broker.value = storedBroker;
     this.els.channel.value = normalizeChannel(storedChannel);
@@ -595,11 +620,19 @@ class WalkieApp {
     this.els.lang.addEventListener("change", () => {
       this.i18n.setLang(this.els.lang.value);
       this.updateRoomUi();
-      this.updateStatus(this.connected ? "ok" : "bad", this.connected ? this.i18n.t("status_online") : this.i18n.t("status_offline"));
+      this.updateStatus(
+        this.connected ? "ok" : "bad",
+        this.connected
+          ? this.i18n.t("status_online")
+          : this.i18n.t("status_offline")
+      );
     });
 
     this.els.username.addEventListener("input", () => {
-      localStorage.setItem("walkie.username", clampStr(this.els.username.value, 24));
+      localStorage.setItem(
+        "walkie.username",
+        clampStr(this.els.username.value, 24)
+      );
     });
 
     this.els.channel.addEventListener("input", () => {
@@ -621,10 +654,13 @@ class WalkieApp {
           this.els.dialKnob.setPointerCapture(e.pointerId);
         } catch {}
         startY = e.clientY;
-        startValue = Number.parseInt(normalizeChannel(this.els.channel.value), 10) || 1;
+        startValue =
+          Number.parseInt(normalizeChannel(this.els.channel.value), 10) || 1;
         accum = 0;
 
-        const coarse = e.pointerType === "touch" || window.matchMedia?.("(pointer: coarse)")?.matches;
+        const coarse =
+          e.pointerType === "touch" ||
+          window.matchMedia?.("(pointer: coarse)")?.matches;
         stepPx = coarse ? 3 : 6;
       });
 
@@ -638,24 +674,41 @@ class WalkieApp {
         if (steps === 0) return;
         accum -= steps * stepPx;
         applyChannel(startValue + steps, { noisy: true });
-        startValue = Number.parseInt(normalizeChannel(this.els.channel.value), 10) || startValue;
+        startValue =
+          Number.parseInt(normalizeChannel(this.els.channel.value), 10) ||
+          startValue;
       });
 
-      this.els.dialKnob.addEventListener("wheel", async (e) => {
-        e.preventDefault();
-        await this.audioGate.unlock();
-        const cur = Number.parseInt(normalizeChannel(this.els.channel.value), 10) || 1;
-        const dir = e.deltaY > 0 ? -1 : 1;
-        applyChannel(cur + dir, { noisy: true });
-      }, { passive: false });
+      this.els.dialKnob.addEventListener(
+        "wheel",
+        async (e) => {
+          e.preventDefault();
+          await this.audioGate.unlock();
+          const cur =
+            Number.parseInt(normalizeChannel(this.els.channel.value), 10) || 1;
+          const dir = e.deltaY > 0 ? -1 : 1;
+          applyChannel(cur + dir, { noisy: true });
+        },
+        { passive: false }
+      );
 
       this.els.dialKnob.addEventListener("keydown", async (e) => {
-        const keys = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft", "Home", "End", "PageUp", "PageDown"];
+        const keys = [
+          "ArrowUp",
+          "ArrowRight",
+          "ArrowDown",
+          "ArrowLeft",
+          "Home",
+          "End",
+          "PageUp",
+          "PageDown",
+        ];
         if (!keys.includes(e.key)) return;
         e.preventDefault();
         await this.audioGate.unlock();
 
-        const cur = Number.parseInt(normalizeChannel(this.els.channel.value), 10) || 1;
+        const cur =
+          Number.parseInt(normalizeChannel(this.els.channel.value), 10) || 1;
         let next = cur;
         if (e.key === "ArrowUp" || e.key === "ArrowRight") next = cur + 1;
         if (e.key === "ArrowDown" || e.key === "ArrowLeft") next = cur - 1;
@@ -683,7 +736,31 @@ class WalkieApp {
     this.els.ptt.addEventListener("pointerdown", (e) => this.onPressStart(e));
     this.els.ptt.addEventListener("pointerup", () => this.onPressEnd());
     this.els.ptt.addEventListener("pointercancel", () => this.onPressEnd());
-    this.els.ptt.addEventListener("lostpointercapture", () => this.onPressEnd());
+    this.els.ptt.addEventListener("lostpointercapture", () =>
+      this.onPressEnd()
+    );
+
+    // One touch toggle button (mobile only)
+    this.els.pttOnetouch.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      if (this.oneTouchActive) {
+        this.oneTouchActive = false;
+        this.els.pttOnetouch.dataset.active = "0";
+        this.onPressEnd();
+      } else {
+        this.oneTouchActive = true;
+        this.els.pttOnetouch.dataset.active = "1";
+        this.onPressStart(e);
+      }
+    });
+
+    // If normal PTT is released while one touch is active, keep recording
+    const originalOnPressEnd = this.onPressEnd.bind(this);
+    this.onPressEnd = () => {
+      if (this.oneTouchActive) return;
+      originalOnPressEnd();
+    };
 
     window.addEventListener("keydown", (e) => {
       if (e.code !== "Space") return;
@@ -720,14 +797,18 @@ class WalkieApp {
     this.topic = `walkie/v1/channel/${channel}`;
     this.presenceTopicBase = `walkie/v1/channel/${channel}/presence`;
     this.presenceKey = `${this.presenceTopicBase}/${this.senderId}`;
-    this.els.channelBadge.textContent = `${this.i18n.t("channel_badge_prefix")}: ${channel}`;
+    this.els.channelBadge.textContent = `${this.i18n.t(
+      "channel_badge_prefix"
+    )}: ${channel}`;
     this.els.screenChannel.textContent = String(channel);
     this.updatePresenceUi();
   }
 
   updateDialUi() {
-    const channel = Number.parseInt(normalizeChannel(this.els.channel.value), 10) || 1;
-    if (this.els.channelValue) this.els.channelValue.textContent = String(channel);
+    const channel =
+      Number.parseInt(normalizeChannel(this.els.channel.value), 10) || 1;
+    if (this.els.channelValue)
+      this.els.channelValue.textContent = String(channel);
     if (this.els.channelAlt) this.els.channelAlt.value = String(channel);
 
     if (this.els.dialKnob) {
@@ -741,7 +822,8 @@ class WalkieApp {
     const max = 100;
     const t = (channel - min) / (max - min);
     const deg = (-120 + t * 240).toFixed(2);
-    if (this.els.dial) this.els.dial.style.setProperty("--dial-angle", `${deg}deg`);
+    if (this.els.dial)
+      this.els.dial.style.setProperty("--dial-angle", `${deg}deg`);
   }
 
   connect(isReconnect = false) {
@@ -769,7 +851,10 @@ class WalkieApp {
       connectTimeout: 10_000,
       keepalive: 30,
       clean: true,
-      clientId: `walkie_${this.senderId.slice(0, 8)}_${this.sessionId.slice(0, 6)}`,
+      clientId: `walkie_${this.senderId.slice(0, 8)}_${this.sessionId.slice(
+        0,
+        6
+      )}`,
     });
 
     this.client.on("connect", () => {
@@ -794,10 +879,16 @@ class WalkieApp {
     });
 
     this.client.on("error", (err) => {
-      this.logger.error(err?.message ? `${this.i18n.t("err_mqtt_prefix")} ${err.message}` : this.i18n.t("log_error"));
+      this.logger.error(
+        err?.message
+          ? `${this.i18n.t("err_mqtt_prefix")} ${err.message}`
+          : this.i18n.t("log_error")
+      );
     });
 
-    this.client.on("message", (topic, payload) => this.onMessage(topic, payload));
+    this.client.on("message", (topic, payload) =>
+      this.onMessage(topic, payload)
+    );
   }
 
   subscribe() {
@@ -818,7 +909,10 @@ class WalkieApp {
         return;
       }
       this._subscribedTopic = newTopic;
-      this.logger.system(`${this.i18n.t("sys_listening")} ${newTopic}`, this.els.channelBadge.textContent);
+      this.logger.system(
+        `${this.i18n.t("sys_listening")} ${newTopic}`,
+        this.els.channelBadge.textContent
+      );
     });
   }
 
@@ -857,7 +951,9 @@ class WalkieApp {
       this.prunePresence();
     }, 1500);
 
-    window.addEventListener("beforeunload", this._beforeUnloadPresence, { once: true });
+    window.addEventListener("beforeunload", this._beforeUnloadPresence, {
+      once: true,
+    });
   }
 
   stopPresenceLoop() {
@@ -888,7 +984,11 @@ class WalkieApp {
       this.client.publish(this.presenceKey, payload, { retain: true });
       this.presence.set(this.senderId, { ts: Date.now(), from: username });
       this.updatePresenceUi();
-      if (forceLog) this.logger.system(`Presencia: ${username}`, this.els.channelBadge.textContent);
+      if (forceLog)
+        this.logger.system(
+          `Presencia: ${username}`,
+          this.els.channelBadge.textContent
+        );
     } catch {}
   }
 
@@ -922,7 +1022,8 @@ class WalkieApp {
     this.els.screen.classList.add("speaking");
     clearTimeout(this._speakerTimer);
     this._speakerTimer = setTimeout(() => {
-      if (this.els.speakerName) this.els.speakerName.textContent = this.i18n.t("speaker_idle");
+      if (this.els.speakerName)
+        this.els.speakerName.textContent = this.i18n.t("speaker_idle");
       this.els.screenSpeaker.textContent = this.i18n.t("speaker_idle");
       this.els.screen.classList.remove("speaking");
     }, 3200);
@@ -931,7 +1032,10 @@ class WalkieApp {
   onMessage(topic, payload) {
     const topicStr = String(topic || "");
 
-    if (this.presenceTopicBase && topicStr.startsWith(`${this.presenceTopicBase}/`)) {
+    if (
+      this.presenceTopicBase &&
+      topicStr.startsWith(`${this.presenceTopicBase}/`)
+    ) {
       const text = payload?.toString?.() ?? "";
       if (!text) {
         const id = topicStr.split("/").pop();
@@ -965,7 +1069,11 @@ class WalkieApp {
     this.playAudioDataUrl(audio).catch(() => {});
     this.setSpeaker(from);
 
-    this.logger.add({ who: from, msg: this.i18n.t("log_voice_received"), badge: this.els.channelBadge.textContent });
+    this.logger.add({
+      who: from,
+      msg: this.i18n.t("log_voice_received"),
+      badge: this.els.channelBadge.textContent,
+    });
   }
 
   async playAudioDataUrl(dataUrl) {
@@ -975,10 +1083,14 @@ class WalkieApp {
     const mimeFull = getDataUrlMimeFull(dataUrl); // e.g. "audio/webm;codecs=opus"
     if (mimeFull) {
       const base = mimeFull.split(";")[0];
-      const can = audioEl.canPlayType(mimeFull) || (base ? audioEl.canPlayType(base) : "");
+      const can =
+        audioEl.canPlayType(mimeFull) ||
+        (base ? audioEl.canPlayType(base) : "");
       if (!can) {
         // No bloqueamos: algunos navegadores devuelven "" pero luego reproducen OK.
-        this.logger.system(`${this.i18n.t("err_audio_unsupported")} (${mimeFull})`);
+        this.logger.system(
+          `${this.i18n.t("err_audio_unsupported")} (${mimeFull})`
+        );
       }
     }
 
@@ -1005,6 +1117,13 @@ class WalkieApp {
   setPttEnabled(enabled) {
     this.els.ptt.disabled = !enabled;
     this.els.ptt.setAttribute("aria-disabled", String(!enabled));
+    this.els.pttOnetouch.disabled = !enabled;
+    this.els.pttOnetouch.setAttribute("aria-disabled", String(!enabled));
+
+    if (!enabled) {
+      this.oneTouchActive = false;
+      this.els.pttOnetouch.dataset.active = "0";
+    }
   }
 
   async onPressStart(e) {
@@ -1052,7 +1171,10 @@ class WalkieApp {
     if (!blob) return;
 
     const username = clampStr(this.els.username.value || "anon", 24);
-    localStorage.setItem("walkie.username", username === "anon" ? "" : username);
+    localStorage.setItem(
+      "walkie.username",
+      username === "anon" ? "" : username
+    );
 
     const dataUrl = await new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -1071,7 +1193,11 @@ class WalkieApp {
 
     try {
       this.client.publish(this.topic, JSON.stringify(message));
-      this.logger.add({ who: username || "anon", msg: this.i18n.t("log_sent"), badge: this.els.channelBadge.textContent });
+      this.logger.add({
+        who: username || "anon",
+        msg: this.i18n.t("log_sent"),
+        badge: this.els.channelBadge.textContent,
+      });
       if (this.audioGate.ctx) playClick(this.audioGate.ctx);
     } catch (err) {
       this.logger.error(err?.message || this.i18n.t("err_send"));
