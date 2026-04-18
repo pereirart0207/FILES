@@ -528,6 +528,10 @@ class WalkieApp {
       screenUsers: $("#screenUsers"),
       screenSpeaker: $("#screenSpeaker"),
       screenHint: $("#screenHint"),
+      callModal: $("#callModal"),
+      callModalClose: $("#callModalClose"),
+      callModalBody: $("#callModalBody"),
+      usersList: $("#usersList"),
     };
 
     this.i18n = makeTranslator();
@@ -553,6 +557,8 @@ class WalkieApp {
     this._subscribedTopic = "";
 
     this.oneTouchActive = false;
+    this.callModeActive = false;
+    this.activeCallPartner = null;
   }
 
   setHint(text, ms = 2200) {
@@ -627,6 +633,21 @@ class WalkieApp {
           : this.i18n.t("status_offline")
       );
     });
+
+    // Abrir modal de usuarios al pulsar el contador de usuarios
+    this.els.screenUsers.addEventListener("click", () => {
+      this.openCallModal();
+    });
+
+    this.els.callModalClose.addEventListener("click", () => {
+      this.closeCallModal();
+    });
+
+    this.els.callModal
+      .querySelector(".modalBackdrop")
+      .addEventListener("click", () => {
+        this.closeCallModal();
+      });
 
     this.els.username.addEventListener("input", () => {
       localStorage.setItem(
@@ -740,17 +761,31 @@ class WalkieApp {
       this.onPressEnd()
     );
 
-    // One touch toggle button (mobile only)
+    // Lock toggle button (mobile only)
     this.els.pttOnetouch.addEventListener("click", (e) => {
       e.preventDefault();
+      e.stopPropagation();
 
       if (this.oneTouchActive) {
-        this.oneTouchActive = false;
-        this.els.pttOnetouch.dataset.active = "0";
-        this.onPressEnd();
+        if (e.shiftKey || e.touches?.length > 1) {
+          // Long press / doble touch: Modo llamada
+          this.callModeActive = true;
+          this.els.pttOnetouch.querySelector("i").className =
+            "fa-solid fa-phone-volume";
+        } else {
+          // Click normal: Desactivar
+          this.oneTouchActive = false;
+          this.callModeActive = false;
+          this.els.pttOnetouch.dataset.active = "0";
+          this.els.pttOnetouch.querySelector("i").className =
+            "fa-solid fa-lock-open";
+          this.onPressEnd();
+        }
       } else {
         this.oneTouchActive = true;
+        this.callModeActive = false;
         this.els.pttOnetouch.dataset.active = "1";
+        this.els.pttOnetouch.querySelector("i").className = "fa-solid fa-lock";
         this.onPressStart(e);
       }
     });
@@ -1009,6 +1044,53 @@ class WalkieApp {
     this.updatePresenceUi();
   }
 
+  publishCallPresence(state) {
+    if (!this.client || !this.connected) return;
+
+    const callTopic = `${this.presenceTopicBase}/call/${this.senderId}`;
+
+    this.client.publish(
+      callTopic,
+      JSON.stringify({
+        state,
+        from: clampStr(this.els.username.value || "anon", 24),
+        ts: Date.now(),
+      }),
+      { retain: state === "active" }
+    );
+  }
+
+  openCallModal() {
+    this.els.usersList.innerHTML = "";
+
+    this.presence.forEach((info, id) => {
+      if (id === this.senderId) return; // No mostrarse a si mismo
+
+      const item = document.createElement("div");
+      item.className = "userItem";
+
+      item.innerHTML = `
+        <span>${info.from}</span>
+        <button class="userCallBtn" data-user-id="${id}">
+          <i class="fa-solid fa-phone"></i>
+        </button>
+      `;
+
+      this.els.usersList.appendChild(item);
+    });
+
+    if (this.els.usersList.children.length === 0) {
+      this.els.usersList.innerHTML =
+        '<div style="text-align:center; opacity:.6; padding:20px;">No hay usuarios conectados</div>';
+    }
+
+    this.els.callModal.setAttribute("aria-hidden", "false");
+  }
+
+  closeCallModal() {
+    this.els.callModal.setAttribute("aria-hidden", "true");
+  }
+
   updatePresenceUi() {
     const count = Math.max(1, this.presence.size || 1);
     if (this.els.usersCount) this.els.usersCount.textContent = String(count);
@@ -1122,6 +1204,9 @@ class WalkieApp {
 
     if (!enabled) {
       this.oneTouchActive = false;
+      this.callModeActive = false;
+      this.activeCallPartner = null;
+      this.publishCallPresence("end");
       this.els.pttOnetouch.dataset.active = "0";
     }
   }
@@ -1168,6 +1253,16 @@ class WalkieApp {
     this.els.ptt.setAttribute("aria-pressed", "false");
 
     const blob = await this.recorder.stop();
+
+    // Modo llamada: transmisión continua full duplex
+    if (this.oneTouchActive && this.callModeActive) {
+      // Anunciar que estamos en llamada
+      this.publishCallPresence("active");
+
+      // Seguir grabando automaticamente sin parar
+      setTimeout(() => this.onPressStart(null), 30);
+    }
+
     if (!blob) return;
 
     const username = clampStr(this.els.username.value || "anon", 24);
