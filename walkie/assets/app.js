@@ -1197,12 +1197,16 @@ class WalkieApp {
 
     clearTimeout(this.callTimeoutTimer);
     this.stopRingTone();
+    this.hideIncomingCallModal();
 
     this.callState = "active";
     this.callStartTime = Date.now();
 
     this.sendCallMessage(this.callPartnerId, "accept");
     this.logger.system(this.i18n.t("call_connected"));
+
+    // ✅ Mostrar INTERFAZ DE LLAMADA ACTIVA
+    this.showActiveCallScreen();
 
     // ✅ AMBOS lados activan MODO LLAMADA FULL DUPLEX
     this.oneTouchActive = true;
@@ -1216,8 +1220,6 @@ class WalkieApp {
 
     // Iniciar contador de tiempo
     this.startCallTimer();
-
-    this.setHint(`${this.i18n.t("call_connected")} ${this.callPartnerName}`);
   }
 
   rejectCall() {
@@ -1268,6 +1270,7 @@ class WalkieApp {
     this.callStartTime = null;
 
     this.hideIncomingCallModal();
+    this.hideActiveCallScreen();
   }
 
   sendCallMessage(targetId, type) {
@@ -1371,6 +1374,52 @@ class WalkieApp {
     if (modal) modal.remove();
   }
 
+  showActiveCallScreen() {
+    // ✅ INTERFAZ DE LLAMADA ACTIVA - IGUAL PARA AMBOS USUARIOS
+    const activeCall = document.createElement("div");
+    activeCall.id = "activeCallScreen";
+    activeCall.className = "callModalOverlay activeCallScreen";
+
+    activeCall.innerHTML = `
+      <div class="callModal">
+        <div class="callAvatar activeCallAvatar">
+          <i class="fa-solid fa-user fa-3x"></i>
+        </div>
+        <div class="callName">${this.callPartnerName}</div>
+        <div class="callTimer" id="callTimerDisplay">00:00</div>
+        
+        <div style="margin-top: 60px;">
+          <button class="callBtn hangupBtn" id="hangupCallBtn">
+            <i class="fa-solid fa-phone-slash"></i>
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(activeCall);
+
+    document.getElementById("hangupCallBtn").addEventListener("click", () => {
+      this.endCall();
+    });
+
+    // Actualizar timer en tiempo real en la interfaz
+    setInterval(() => {
+      if (this.callState !== "active") return;
+      const elapsed = Math.floor((Date.now() - this.callStartTime) / 1000);
+      const minutes = Math.floor(elapsed / 60);
+      const seconds = elapsed % 60;
+      const timeStr = `${minutes.toString().padStart(2, "0")}:${seconds
+        .toString()
+        .padStart(2, "0")}`;
+      document.getElementById("callTimerDisplay").textContent = timeStr;
+    }, 1000);
+  }
+
+  hideActiveCallScreen() {
+    const screen = document.getElementById("activeCallScreen");
+    if (screen) screen.remove();
+  }
+
   updatePresenceUi() {
     const count = Math.max(1, this.presence.size || 1);
     if (this.els.usersCount) this.els.usersCount.textContent = String(count);
@@ -1412,6 +1461,9 @@ class WalkieApp {
             this.callState = "active";
             this.callStartTime = Date.now();
 
+            // ✅ Mostrar INTERFAZ DE LLAMADA ACTIVA
+            this.showActiveCallScreen();
+
             // ✅ AMBOS lados activan MODO LLAMADA FULL DUPLEX
             this.oneTouchActive = true;
             this.callModeActive = true;
@@ -1424,7 +1476,6 @@ class WalkieApp {
 
             this.startCallTimer();
             this.logger.system(this.i18n.t("call_connected"));
-            this.setHint(`${this.i18n.t("call_connected")} ${data.from}`);
           }
           break;
         case "reject":
