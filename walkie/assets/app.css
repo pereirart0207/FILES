@@ -974,13 +974,12 @@ summary:hover{ color: var(--text); }
   input{ padding: 13px 14px; }
   summary{ padding: 8px 2px; font-size: 13px; }
 
-  /* Push-to-talk pinned within thumb reach while config scrolls */
+  /* Push-to-talk pinned within thumb reach while config scrolls;
+     keeps the base grid (talk button + lock square side by side) */
   .pttWrap{
     position: sticky;
     bottom: 0;
     z-index: 6;
-    display: flex;
-    flex-direction: column;
     gap: 10px;
     margin: 10px -12px 0;
     padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
@@ -991,17 +990,18 @@ summary:hover{ color: var(--text); }
   }
   .ptt{
     min-height: 72px;
-    padding: 14px 14px;
-    font-size: 15px;
-    letter-spacing: .06em;
+    padding: 14px 12px;
+    font-size: 14px;
+    letter-spacing: .03em;
   }
   .ptt-lock{
-    width: 60px;
-    height: 60px;
-    border-radius: 14px;
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
     font-size: 22px;
   }
   .pttHelp{
+    grid-column: 1 / -1;
     justify-content: center;
     gap: 16px;
     margin: 0;
