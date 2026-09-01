@@ -917,6 +917,106 @@ summary:hover{ color: var(--text); }
   }
 }
 
+/* ============ Mobile: full-screen app shell ============ */
+@media (max-width: 480px){
+  html{ scroll-padding-bottom: 150px; }
+
+  body{
+    display: block;
+    padding: 0;
+  }
+
+  .app{
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+    border-top: 0;
+    box-shadow: none;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* speaker-grille dots crowd a small header */
+  .device::before{ display: none; }
+
+  .top{
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: calc(14px + env(safe-area-inset-top)) 14px 12px;
+    background: linear-gradient(180deg, rgba(9,13,19,.94), rgba(9,13,19,.72) 72%, transparent);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  .screen{ margin: 0 12px 12px; }
+  .screenV{ font-size: 18px; }
+
+  .content{
+    flex: 1 1 auto;
+    padding: 0 12px 0;
+  }
+
+  /* one field per row so the dial gets real room */
+  .grid{ grid-template-columns: 1fr; }
+
+  .dialKnob{ width: 66px; height: 66px; }
+  .dialValue{ font-size: 20px; }
+
+  /* 16px form text keeps iOS from zooming on focus */
+  input,
+  .lang,
+  select{ font-size: 16px; }
+  input{ padding: 13px 14px; }
+  summary{ padding: 8px 2px; font-size: 13px; }
+
+  /* Push-to-talk pinned within thumb reach while config scrolls */
+  .pttWrap{
+    position: sticky;
+    bottom: 0;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px -12px 0;
+    padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, transparent, rgba(7,10,15,.86) 24%, rgba(7,10,15,.97));
+    border-top: 1px solid rgba(255,255,255,.08);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  .ptt{
+    min-height: 72px;
+    padding: 14px 14px;
+    font-size: 15px;
+    letter-spacing: .06em;
+  }
+  .ptt-lock{
+    width: 60px;
+    height: 60px;
+    border-radius: 14px;
+    font-size: 22px;
+  }
+  .pttHelp{
+    justify-content: center;
+    gap: 16px;
+    margin: 0;
+    font-size: 11px;
+    opacity: .9;
+  }
+
+  .footer{
+    justify-content: center;
+    text-align: center;
+    gap: 6px;
+    padding: 10px 14px 14px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce){
   *{ animation: none !important; transition: none !important; }
 }
